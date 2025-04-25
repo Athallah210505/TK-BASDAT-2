@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block meta %}
+{{ block.super }}
+<title>Perpanjang Periode Adopsi</title>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h1 class="text-2xl font-bold text-green-600 mb-6">Form Perpanjang Periode Adopsi Satwa</h1>
+        
+        <div class="bg-green-50 p-6 rounded-lg border border-green-100 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h2 class="text-xl font-semibold text-green-600 mb-4">Informasi Hewan</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-gray-500 text-sm">Nama Hewan:</p>
+                            <p class="font-medium">{{ adoption.animal.name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Jenis Hewan:</p>
+                            <p class="font-medium">{{ adoption.animal.species }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Kondisi:</p>
+                            <p class="font-medium">{{ adoption.animal.condition }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h2 class="text-xl font-semibold text-green-600 mb-4">Informasi Adopter</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-gray-500 text-sm">Nama Adopter:</p>
+                            <p class="font-medium">{{ adoption.adopter.user.get_full_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Tipe Adopter:</p>
+                            <p class="font-medium">{{ adoption.adopter.get_adopter_type_display }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Kontak:</p>
+                            <p class="font-medium">{{ adoption.adopter.contact }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
+            <h3 class="font-semibold text-blue-700 mb-2">Detail Adopsi Saat Ini</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <p class="text-gray-500 text-sm">Tanggal Mulai:</p>
+                    <p class="font-medium">{{ adoption.start_date }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Tanggal Akhir:</p>
+                    <p class="font-medium">{{ adoption.end_date }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Kontribusi Awal:</p>
+                    <p class="font-medium">Rp {{ adoption.contribution }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 class="font-semibold text-gray-700 mb-4">Form Perpanjang Periode Adopsi</h3>
+                <p class="mb-4 text-gray-600">Saat memperpanjang adopsi, adopter cukup mengisi nominal kontribusi finansial dan tanggal akhir periode adopsi.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 mb-2">Tanggal Akhir Adopsi Baru:</label>
+                        <input type="date" name="end_date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" value="{{ form.end_date.value|date:'Y-m-d' }}">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 mb-2">Nominal Kontribusi Finansial:</label>
+                        <div class="flex">
+                            <span class="inline-flex items-center px-3 text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">
+                                Rp
+                            </span>
+                            <input type="number" name="contribution" min="0" step="1000" class="w-full px-4 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-green-500" value="{{ form.contribution.value }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'adoption_detail' adoption.id %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">
+                    Batal
+                </a>
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
+                    Submit Form
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

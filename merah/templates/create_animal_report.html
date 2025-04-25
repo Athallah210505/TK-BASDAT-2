@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block meta %}
+{{ block.super }}
+<title>Tambah Laporan Kondisi Satwa</title>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h1 class="text-2xl font-bold text-green-600 mb-6">Tambah Laporan Kondisi Satwa</h1>
+        
+        <div class="bg-green-50 p-6 rounded-lg border border-green-100 mb-6">
+            <h2 class="text-xl font-semibold text-green-600 mb-4">Informasi Hewan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="text-gray-500 text-sm">Nama Hewan:</p>
+                    <p class="font-medium">{{ adoption.animal.name }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Jenis Hewan:</p>
+                    <p class="font-medium">{{ adoption.animal.species }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Adopter:</p>
+                    <p class="font-medium">{{ adoption.adopter.user.get_full_name }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Periode Adopsi:</p>
+                    <p class="font-medium">{{ adoption.start_date }} s/d {{ adoption.end_date }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 class="font-semibold text-gray-700 mb-4">Laporan Kondisi</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Kondisi Terbaru Satwa:</label>
+                        <textarea name="condition" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Deskripsikan kondisi terbaru satwa..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 mb-2">Foto Kondisi Satwa:</label>
+                        <input type="file" name="photo" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <p class="text-sm text-gray-500 mt-1">Upload foto kondisi terbaru satwa (opsional)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'animal_condition_report' adoption.id %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">
+                    Batal
+                </a>
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
+                    Simpan Laporan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

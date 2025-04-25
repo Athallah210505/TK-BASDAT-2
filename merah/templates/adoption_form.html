@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block meta %}
+{{ block.super }}
+<title>Form Adopsi Satwa</title>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h1 class="text-2xl font-bold text-green-600 mb-6">Form Adopsi Satwa</h1>
+        
+        {% if error %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <div class="bg-green-50 p-6 rounded-lg border border-green-100 mb-6">
+            <h2 class="text-xl font-semibold text-green-600 mb-4">Informasi Hewan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="text-gray-500 text-sm">Nama Hewan:</p>
+                    <p class="font-medium">{{ animal.name }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm">Jenis Hewan:</p>
+                    <p class="font-medium">{{ animal.species }}</p>
+                </div>
+                <div class="md:col-span-2">
+                    <p class="text-gray-500 text-sm">Kondisi:</p>
+                    <p class="font-medium">{{ animal.condition }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="mb-6">
+                <p class="text-lg font-semibold text-green-600 mb-3">Pendaftaran Adopter</p>
+                <p class="text-gray-600 mb-4">Perlu memastikan bahwa pihak yang akan mengadopsi satwa ini sudah memiliki akun dengan role pengunjung. Formulir ini akan muncul saat staf admin memilih tombol "Daftarkan Adopter". Namun sebelum mengisi form, staf akan ditanya apakah calon adopter mengadopsi satwa sebagai individu ataukah sebagai organisasi.</p>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">Username calon adopter:</label>
+                            <input type="text" name="username" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Masukkan username">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-2">Tipe Adopter:</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" id="individual" name="adopter_type" value="individual" class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                    <label for="individual" class="ml-2 text-gray-700">Individu</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="organization" name="adopter_type" value="organization" class="h-4 w-4 text-green-600 focus:ring-green-500">
+                                    <label for="organization" class="ml-2 text-gray-700">Organisasi</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="new-user-form" class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                    <h3 class="font-semibold text-gray-700 mb-4">Buat User Baru</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">First Name:</label>
+                            <input type="text" name="first_name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Last Name:</label>
+                            <input type="text" name="last_name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 mb-2">Email:</label>
+                            <input type="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-gray-700 mb-4">Informasi Adopter</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 mb-2">Alamat:</label>
+                            <textarea name="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 mb-2">Kontak:</label>
+                            <input type="text" name="contact" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <p class="text-lg font-semibold text-green-600 mb-3">Form Adopsi Satwa</p>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">Tanggal Mulai Adopsi:</label>
+                            <input type="date" name="start_date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Tanggal Akhir Adopsi:</label>
+                            <input type="date" name="end_date" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 mb-2">Nominal Kontribusi Finansial:</label>
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">
+                                    Rp
+                                </span>
+                                <input type="number" name="contribution" min="0" step="1000" class="w-full px-4 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'adoption_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">
+                    Batal
+                </a>
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
+                    Submit Form
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelector('input[name="username"]').addEventListener('blur', function() {
+        const newUserForm = document.getElementById('new-user-form');
+        if (this.value.trim() === '') {
+            newUserForm.style.display = 'block';
+        } else {
+            // it should be checked if the user exists in the database
+            newUserForm.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

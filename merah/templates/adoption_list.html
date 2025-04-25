@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block meta %}
+{{ block.super }}
+<title>Program Adopsi Satwa: Bantu Mereka dengan Cinta</title>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h1 class="text-3xl font-bold text-green-600 mb-2">Program Adopsi Satwa: Bantu Mereka dengan Cinta</h1>
+        <p class="mb-4 text-gray-600">[Bisa Tambahkan Ilustrasi Kalau Mau]</p>
+        
+        <h2 class="text-xl font-semibold text-green-600 mb-4">Pantau Status Adopsi Hewan</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for animal in animals %}
+            <div class="bg-green-50 border border-green-100 rounded-lg overflow-hidden hover-scale transition-all duration-300">
+                <div class="aspect-w-16 aspect-h-9 bg-green-100 p-4">
+                    {% if animal.photo %}
+                    <img src="{{ animal.photo.url }}" alt="{{ animal.name }}" class="w-full h-48 object-cover rounded-lg">
+                    {% else %}
+                    <div class="w-full h-48 bg-green-200 flex items-center justify-center rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="p-4">
+                    <h3 class="font-semibold text-lg">{{ animal.name|default:"[nama hewan] [kalau ada]" }}</h3>
+                    <p class="text-gray-600 mb-1">{{ animal.species|default:"[jenis hewan]" }}</p>
+                    <p class="text-gray-600 mb-2">{{ animal.condition|default:"[kondisi terbaru hewan]" }}</p>
+                    
+                    {% if animal.is_adopted %}
+                    <div class="mt-4 flex justify-end">
+                        <a href="{% url 'adoption_detail' animal.adoption_set.first.id %}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded btn-shine text-sm">
+                            [Diadopsi] [Lihat Detail]
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="mt-4 flex justify-end">
+                        <a href="{% url 'register_adopter' animal.id %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine text-sm">
+                            [Tidak Diadopsi] [Daftarkan Adopter]
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-10">
+                <p class="text-gray-500 text-lg">Belum ada data hewan yang tersedia.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block meta %}
+{{ block.super }}
+<title>Laporan Kondisi Satwa</title>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h1 class="text-2xl font-bold text-green-600 mb-6">Laporan Kondisi Satwa</h1>
+        
+        <div class="bg-green-50 p-6 rounded-lg border border-green-100 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-green-600">Informasi Hewan Adopsi</h2>
+                {% if user.is_staff %}
+                <a href="{% url 'create_animal_report' adoption.id %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine mt-2 md:mt-0">
+                    Tambah Laporan Baru
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-gray-500 text-sm">Nama Hewan:</p>
+                            <p class="font-medium">{{ adoption.animal.name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Jenis Hewan:</p>
+                            <p class="font-medium">{{ adoption.animal.species }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-gray-500 text-sm">Status:</p>
+                            <p class="font-medium">{{ adoption.get_status_display }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Periode Adopsi:</p>
+                            <p class="font-medium">{{ adoption.start_date }} s/d {{ adoption.end_date }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-6">
+            <h2 class="text-xl font-semibold text-green-600">Riwayat Kondisi Satwa</h2>
+            
+            {% for report in reports %}
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-green-300 transition-all duration-300">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-semibold">Laporan Tanggal: {{ report.report_date }}</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2">
+                        <p class="text-gray-500 text-sm mb-1">Kondisi Satwa:</p>
+                        <p>{{ report.condition }}</p>
+                    </div>
+                    <div>
+                        {% if report.photo %}
+                        <img src="{{ report.photo.url }}" alt="Foto kondisi satwa" class="w-full h-40 object-cover rounded-lg">
+                        {% else %}
+                        <div class="w-full h-40 bg-gray-200 flex items-center justify-center rounded-lg">
+                            <p class="text-gray-500">Tidak ada foto</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 text-center">
+                <p class="text-yellow-700">Belum ada laporan kondisi untuk satwa ini. Laporan akan ditambahkan secara berkala oleh staf taman safari.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="flex justify-end mt-6">
+            <a href="{% url 'adoption_detail' adoption.id %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
+                Kembali ke Detail Adopsi
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

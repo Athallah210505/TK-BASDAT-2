@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block meta %}
+{{ block.super }}
+<title>Sertifikat Adopsi Satwa</title>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-green-600 mb-2">Sertifikat Adopsi Satwa</h1>
+            <p class="text-gray-500">Sertifikat ini diberikan kepada</p>
+        </div>
+        
+        <div class="bg-green-50 border-8 border-double border-green-200 p-8 rounded-lg mb-6">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-serif font-bold mb-1">{{ adoption.adopter.user.get_full_name|default:"[nama_adopter]" }}</h2>
+                <p class="text-gray-600">{{ adoption.adopter.get_adopter_type_display|default:"[jenis adopter]" }}</p>
+            </div>
+            
+            <div class="text-center mb-8">
+                <p class="text-lg">di taman safari atas partisipasinya dalam program adopsi simbolis satwa</p>
+                <h3 class="text-xl font-semibold mt-2">{{ adoption.animal.name|default:"[nama_hewan]" }} ({{ adoption.animal.species|default:"[jenis_hewan]" }})</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="text-center">
+                    <p class="text-gray-500 text-sm">Tanggal mulai adopsi:</p>
+                    <p class="font-medium">{{ adoption.start_date|default:"[tanggal]" }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-500 text-sm">Tanggal akhir adopsi:</p>
+                    <p class="font-medium">{{ adoption.end_date|default:"[tanggal]" }}</p>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <p class="mb-2">Terima kasih atas kepedulian dan kontribusi Anda</p>
+                <p class="text-sm text-gray-500">Sertifikat ini menunjukkan bahwa Anda telah berpartisipasi dalam program adopsi simbolis satwa untuk membantu pelestarian satwa di taman safari kami.</p>
+            </div>
+        </div>
+        
+        <div class="flex justify-end">
+            <a href="{% url 'adoption_detail' adoption.id %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
+                Kembali
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
