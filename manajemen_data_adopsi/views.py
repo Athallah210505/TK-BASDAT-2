@@ -14,13 +14,13 @@ def is_staff(user):
 @user_passes_test(is_staff)
 def adoption_list(request):
     animals = Animal.objects.all()
-    return render(request, 'merah/adoption_list.html', {'animals': animals})
+    return render(request, 'manajemen_data_adopsi/adoption_list.html', {'animals': animals})
 
 @login_required
 @user_passes_test(is_staff)
 def adoption_detail(request, adoption_id):
     adoption = get_object_or_404(Adoption, id=adoption_id)
-    return render(request, 'merah/adoption_detail.html', {'adoption': adoption})
+    return render(request, 'manajemen_data_adopsi/adoption_detail.html', {'adoption': adoption})
 
 @login_required
 @user_passes_test(is_staff)
@@ -72,12 +72,12 @@ def register_adopter(request, animal_id):
                 else:
                     raise ValueError("Invalid adoption data")
         except ValueError as e:
-            return render(request, 'merah/adoption_form.html', {
+            return render(request, 'manajemen_data_adopsi/adoption_form.html', {
                 'animal': animal,
                 'error': str(e)
             })
     
-    return render(request, 'merah/adoption_form.html', {'animal': animal})
+    return render(request, 'manajemen_data_adopsi/adoption_form.html', {'animal': animal})
 
 @login_required
 @user_passes_test(is_staff)
@@ -92,7 +92,7 @@ def extend_adoption(request, adoption_id):
     else:
         form = AdoptionExtensionForm(instance=adoption)
     
-    return render(request, 'merah/adoption_extension_form.html', {
+    return render(request, 'manajemen_data_adopsi/adoption_extension_form.html', {
         'form': form,
         'adoption': adoption
     })
@@ -103,7 +103,7 @@ def adopter_info(request, adopter_id):
     adopter = get_object_or_404(Adopter, id=adopter_id)
     adoptions = Adoption.objects.filter(adopter=adopter).order_by('-start_date')
     
-    return render(request, 'merah/adopter_info.html', {
+    return render(request, 'manajemen_data_adopsi/adopter_info.html', {
         'adopter': adopter,
         'adoptions': adoptions
     })
@@ -123,7 +123,7 @@ def adoption_certificate(request, adoption_id):
     
     # Check if the requester is the adopter/staff
     if request.user.is_staff or (hasattr(request.user, 'adopter') and request.user.adopter == adoption.adopter):
-        return render(request, 'merah/adoption_certificate.html', {'adoption': adoption})
+        return render(request, 'manajemen_data_adopsi/adoption_certificate.html', {'adoption': adoption})
     else:
         return redirect('home')  # ganti
 
@@ -132,7 +132,7 @@ def animal_condition_report(request, adoption_id):
     adoption = get_object_or_404(Adoption, id=adoption_id)
     reports = AdoptionReport.objects.filter(adoption=adoption).order_by('-report_date')
     
-    return render(request, 'merah/animal_condition_report.html', {
+    return render(request, 'manajemen_data_adopsi/animal_condition_report.html', {
         'adoption': adoption,
         'reports': reports
     })
@@ -153,7 +153,7 @@ def create_animal_report(request, adoption_id):
     else:
         form = AdoptionReportForm()
     
-    return render(request, 'merah/create_animal_report.html', {
+    return render(request, 'manajemen_data_adopsi/create_animal_report.html', {
         'form': form,
         'adoption': adoption
     })

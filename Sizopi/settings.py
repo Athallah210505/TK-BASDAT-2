@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
-    'merah',
+    'manajemen_data_adopsi',
     
 ]
 
