@@ -104,7 +104,7 @@
         
         <div class="flex items-center">
             <button class="px-6 py-2 rounded-full border border-gray-300 mr-4 hover:bg-gray-100 transition">Log in</button>
-            <button class="px-6 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition btn-shine">Sign up</button>
+            <a href="{% url 'register' %}" class="px-6 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition btn-shine hover-scale">Sign up</a>
         </div>
     </nav>
 
@@ -253,6 +253,7 @@
             </button>
         </div>
     </div>
+
 
     <!-- Footer -->
     <footer class="bg-green-50 py-6 border-t border-green-100">
