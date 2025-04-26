@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <!-- Header Section -->
+    <div class="mb-10">
+        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float"> Rekam Medis Hewan</h1>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi lengkap mengenai riwayat medis hewan peliharaan</p>
+    </div>
+
+    <!-- Animal Profile Card -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-l-4 border-green-500">
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/4 mb-4 md:mb-0 flex justify-center">
+                <div class="w-40 h-40 rounded-full bg-green-100 flex items-center justify-center hover-scale">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9z7mrJYa7zsRfi6n26gjfhjzjvYMO3RfYMmFSJxJuaIo5y5-W7ih9VDxE1FZEineYw0EJYSmJ8Zi4P7o62NSOo0R7W2YyoL6UjKLhEoSEP_FuwdwnWFAIRHaZ-Uxq_LKGRf_xzYXK64tg/w640-h419/1644897149271573-0.png" alt="Harimau Sumatra Taro" class="rounded-full w-full h-full object-cover" />
+                </div>
+            </div>
+            <div class="md:w-3/4 md:pl-6">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Harimau Sumatra - Taro</h2>
+                <div class="mb-4">
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Spesies: Felis silvestris catus </span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Usia: 3 tahun</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Asal: Sumatra</span>
+                </div>
+                <p class="text-gray-600 mb-4">
+                    ID: <span class="font-semibold">PET-2025-0042</span> 
+                </p>
+                <div class="flex">
+                    <button class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mr-3 transition">
+                        Tambah Catatan Medis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medical Records Timeline -->
+    <h3 class="text-2xl font-bold text-gray-800 mb-6">Riwayat Medis</h3>
+    
+    <div class="space-y-6">
+        <!-- First Record -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover-scale">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <h3 class="text-xl font-bold text-green-600">Pemeriksaan Terakhir</h3>
+                <div class="flex items-center mt-2 md:mt-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-gray-500">23 April 2025</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Dokter Hewan</p>
+                    <p class="font-medium">dr_lisa</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Status Kesehatan</p>
+                    <span class="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">Sakit</span>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Diagnosis</p>
+                    <p class="font-medium">Infeksi telinga (Otitis externa)</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Pengobatan</p>
+                    <p class="font-medium">Antibiotik: Clavamox 2x sehari selama 7 hari</p>
+                    <p class="font-medium">Tetes telinga: Surolan 2x sehari selama 10 hari</p>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg mt-4">
+                <p class="text-sm text-gray-500 mb-2">Catatan Tindak Lanjut</p>
+                <p class="text-gray-700">Pembengkakan telinga sudah berkurang. Perlu kontrol kembali dalam 7 hari untuk evaluasi respon terhadap pengobatan. Pastikan telinga tetap kering dan obat diberikan secara teratur. Jika terjadi penolakan obat atau kondisi memburuk, segera hubungi klinik.</p>
+            </div>
+            
+            <div class="flex justify-end mt-4">
+                <button onclick="openModal()" class="text-blue-500 hover:text-blue-700 font-medium mr-4">Edit</button>
+                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium">Hapus</button>
+
+            </div>
+        </div>
+        
+        <!-- Second Record -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover-scale">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-600">Pemeriksaan Sebelumnya</h3>
+                <div class="flex items-center mt-2 md:mt-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-gray-500">15 Maret 2025</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Dokter Hewan</p>
+                    <p class="font-medium">dr_andi</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Status Kesehatan</p>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Sehat</span>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Diagnosis</p>
+                    <p class="font-medium">Pemeriksaan rutin dan vaksinasi tahunan</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Pengobatan</p>
+                    <p class="font-medium">Vaksin rabies dan FVRCP kombinasi</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-4">
+                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium">Hapus</button>
+            </div>
+        </div>
+        
+        <!-- Third Record -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover-scale">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-600">Pemeriksaan Awal</h3>
+                <div class="flex items-center mt-2 md:mt-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-gray-500">10 Oktober 2024</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Dokter Hewan</p>
+                    <p class="font-medium">dr_dian</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Status Kesehatan</p>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Sehat</span>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Diagnosis</p>
+                    <p class="font-medium">Pemeriksaan kesehatan awal</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Pengobatan</p>
+                    <p class="font-medium">Vaksin dasar dan obat cacing</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-4">
+                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium">Hapus</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Record Button -->
+    <div class="flex justify-center mt-8">
+        <button class="btn-shine bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Tambah Catatan Medis Baru
+        </button>
+    </div>
+    <!-- Modal for Editing Rekam Medis -->
+    <div id="editModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+        <div class="bg-white p-6 rounded-lg w-1/2">
+            <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Edit Rekam Medis</h2>
+            <form>
+                <div class="mb-4">
+                    <label for="tindak_lanjut" class="block text-sm font-medium text-gray-700">Catatan Tindak Lanjut</label>
+                    <textarea id="tindak_lanjut" name="tindak_lanjut" rows="4" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="diagnosa" class="block text-sm font-medium text-gray-700">Diagnosa</label>
+                    <input type="text" id="diagnosa" name="diagnosa" class="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="mb-4">
+                    <label for="pengobatan" class="block text-sm font-medium text-gray-700">Pengobatan</label>
+                    <input type="text" id="pengobatan" name="pengobatan" class="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-lg">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-96 max-w-md">
+            <h2 class="text-2xl font-bold text-center text-red-500 mb-4">HAPUS REKAM MEDIS</h2>
+            <p class="text-gray-700 text-center mb-6">Apakah anda yakin ingin menghapus rekam medis ini?</p>
+            <div class="flex justify-center space-x-4">
+                <button onclick="closeDeleteModal()" id="cancelDeleteBtn" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                    Tidak
+                </button>
+                <button onclick="confirmDelete()" id="confirmDeleteBtn" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                    Ya
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for Modal functionality -->
+    <script>
+        function openModal() {
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function openDeleteModal(recordId) {
+            currentRecordToDelete = recordId;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            currentRecordToDelete = null;
+        }
+    </script>
+
+</div>
+{% endblock %}
