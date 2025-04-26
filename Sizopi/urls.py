@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
     path('rekam_medis/', include('rekam_medis_hewan.urls')),
+    path('jadwal_pemeriksaan/', include('penjadwalan_pemeriksaan.urls')),
 ]
