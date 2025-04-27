@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taman Safari Management</title>
+    <!-- Correct Tailwind CSS CDN Link -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Animation Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        /* Custom animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+
+        /* Pop-out animation on hover for both card and button */
+        .card-wrapper:hover {
+            transform: scale(1.02); /* Slightly enlarge the card */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animation for fading in the elements */
+        .animate__fadeIn {
+            animation: fadeIn 2s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Reduce padding for time box */
+        .time-box {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-green-50 p-4">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-green-600">Atraksi dan Wahana</h1>
+        <p class="text-gray-600">Kelola semua atraksi dan wahana di Taman Safari</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Wrapper for Card and Button -->
+        <div class="card-wrapper hover-scale bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+            <!-- Management Card -->
+            <div class="flex items-center mb-4">
+                <div class="bg-green-100 rounded-md p-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-medium">Manajemen Atraksi dan Wahana</h2>
+                    <p class="text-xs text-gray-500">CRUD - Manajemen Atraksi dan Wahana</p>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-4">Kelola semua atraksi dan wahana di Taman Safari. Tambah, edit, dan hapus atraksi sesuai kebutuhan.</p>
+            
+            <div class="bg-gray-50 p-3 rounded-md mb-4">
+                <p class="text-xs text-gray-500 mb-1">Dikelola oleh:</p>
+                <p class="text-sm">Staf Administrasi</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Total Atraksi:</p>
+                    <p class="text-xl font-bold">10</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Total Wahana:</p>
+                    <p class="text-xl font-bold">5</p>
+                </div>
+            </div>
+
+            <!-- Button below the card -->
+            <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded flex items-center justify-center mt-4">
+                <span>Kelola Atraksi</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+
+        <!-- Reservation Card -->
+        <div class="card-wrapper hover-scale bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+            <div class="flex items-center mb-4">
+                <div class="bg-green-100 rounded-md p-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-lg font-medium">Reservasi Booking Tiket</h2>
+                    <p class="text-xs text-gray-500">CRUD Reservasi Booking Tiket</p>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-4">Kelola reservasi dan booking tiket atraksi untuk pengunjung Taman Safari. Konfirmasi atau tolak permintaan reservasi.</p>
+            
+            <div class="bg-gray-50 p-3 rounded-md mb-4">
+                <p class="text-xs text-gray-500 mb-1">Dikelola oleh:</p>
+                <p class="text-sm">Pengunjung, Staf Administrasi</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Menunggu:</p>
+                    <p class="text-xl font-bold">3</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Dikonfirmasi:</p>
+                    <p class="text-xl font-bold">12</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Ditolak:</p>
+                    <p class="text-xl font-bold">2</p>
+                </div>
+            </div>
+
+            <!-- Button below the card -->
+            <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded flex items-center justify-center mt-4">
+                <span>Kelola Reservasi</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+        <p class="text-sm text-gray-600 mb-4">Jadwal pertunjukan atraksi untuk hari ini</p>
+
+        <!-- Schedule Items -->
+        <div class="space-y-3">
+            <!-- Schedule Item 1 -->
+            <div class="flex animate__animated animate__fadeIn">
+                <div class="bg-green-100 text-green-800 px-3 py-0.5 rounded-md text-sm w-16 text-center time-box">
+                    08:00
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium">Pertunjukan Singa Laut</h4>
+                    <p class="text-sm text-gray-500">Arena singa laut</p>
+                </div>
+            </div>
+
+            <!-- Schedule Item 2 -->
+            <div class="flex animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                <div class="bg-green-100 text-green-800 px-3 py-0.5 rounded-md text-sm w-16 text-center time-box">
+                    10:00
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium">Show Burung Bebas</h4>
+                    <p class="text-sm text-gray-500">Arena Burung</p>
+                </div>
+            </div>
+
+            <!-- Schedule Item 3 -->
+            <div class="flex animate__animated animate__fadeIn" style="animation-delay: 0.4s">
+                <div class="bg-green-100 text-green-800 px-3 py-0.5 rounded-md text-sm w-16 text-center time-box">
+                    11:00
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium">Pertunjukan Gajah</h4>
+                    <p class="text-sm text-gray-500">Arena gajah</p>
+                </div>
+            </div>
+
+            <!-- Schedule Item 4 -->
+            <div class="flex animate__animated animate__fadeIn" style="animation-delay: 0.6s">
+                <div class="bg-green-100 text-green-800 px-3 py-0.5 rounded-md text-sm w-16 text-center time-box">
+                    13:00
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium">Atraksi Harimau</h4>
+                    <p class="text-sm text-gray-500">Arena harimau</p>
+                </div>
+            </div>
+
+            <!-- Schedule Item 5 -->
+            <div class="flex animate__animated animate__fadeIn" style="animation-delay: 0.8s">
+                <div class="bg-green-100 text-green-800 px-3 py-0.5 rounded-md text-sm w-16 text-center time-box">
+                    14:00
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium">Feeding Show</h4>
+                    <p class="text-sm text-gray-500">Arena tempat makan</p>
+                </div>
+            </div>
+
+            <!-- Schedule Item 6 -->
+            <div class="flex animate__animated animate__fadeIn" style="animation-delay: 1s">
+                <div class="bg-green-100 text-green-800 px-3 py-0.5 rounded-md text-sm w-16 text-center time-box">
+                    15:00
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium">Pertunjukan Lumba-lumba</h4>
+                    <p class="text-sm text-gray-500">Arena lumba-lumba</p>
+                </div>
+            </div>
+
+            <!-- Schedule Item 7 -->
+            <div class="flex animate__animated animate__fadeIn" style="animation-delay: 1.2s">
+                <div class="bg-green-100 text-green-800 px-3 py-0.5 rounded-md text-sm w-16 text-center time-box">
+                    16:00
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium">Show Reptil</h4>
+                    <p class="text-sm text-gray-500">Arena Reptil</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

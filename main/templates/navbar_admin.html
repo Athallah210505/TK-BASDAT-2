@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Sidebar -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-green-50 p-4 shadow-md">
+            <div class="flex items-center justify-between mb-6">
+                <img src="{% static 'main/claw.svg' %}" alt="Logo" class="h-8 w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+            
+            <nav class="space-y-4">
+                <div>
+                    <h3 class="text-gray-500 text-sm font-semibold">Main</h3>
+                    <ul class="mt-2 space-y-2">
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18"></path></svg>Dashboard</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>Animals</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8h18M3 16h18"></path></svg>Habitats</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16"></path></svg>Feeding</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-gray-500 text-sm font-semibold">Attractions</h3>
+                    <ul class="mt-2 space-y-2">
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 11h18M3 15h18"></path></svg>Overview</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6M9 9h6M9 13h6"></path></svg>Management</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 17h10"></path></svg>Booking</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path></svg>Adoptions</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 5l-7 7-7-7"></path></svg>Conservation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-gray-500 text-sm font-semibold">Users</h3>
+                    <ul class="mt-2 space-y-2">
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path></svg>Users</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 16h10"></path></svg>Settings</a></li>
+                        <li><a href="#" class="flex items-center text-gray-700 hover:text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"></path></svg>Logout</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content Section -->
+        <div class="flex-1 p-8">
+            <!-- Your Main Content Here -->
+            <h1 class="text-3xl font-semibold">Dashboard</h1>
+            <p class="text-gray-600">Welcome to the Taman Safari Management Dashboard!</p>
+        </div>
+    </div>
+</body>
+</html>
