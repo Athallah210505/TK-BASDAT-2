@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'register',
-    'animals',    
+    'animals', 
+    'habitat',   
 ]
 
 MIDDLEWARE = [

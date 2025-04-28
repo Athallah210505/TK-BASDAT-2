@@ -1,6 +1,3 @@
-from django.shortcuts import render
-from types import SimpleNamespace
-
 # Menampilkan daftar satwa
 from types import SimpleNamespace
 from django.shortcuts import render

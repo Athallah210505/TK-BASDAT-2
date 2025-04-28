@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('main.urls')),
     path('register/', register, name='register'),
     path('animals/', include(('animals.urls', 'animals'), namespace='animals')),
+    path('habitat/', include(('habitat.urls', 'habitat'), namespace='habitat')),
 ]
