@@ -1,104 +1,84 @@
-    {% load static %}
+{% load static %}
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        {% block meta %}
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        {% endblock %}
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-        <style>
-            /* Custom animations */
-            @keyframes float {
-                0% { transform: translateY(0px); }
-                50% { transform: translateY(-10px); }
-                100% { transform: translateY(0px); }
-            }
-            
-            .animate-float {
-                animation: float 3s ease-in-out infinite;
-            }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block meta %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% endblock %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        /* Custom animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
 
-            .hover-scale {
-                transition: transform 0.3s ease;
-            }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
 
-            .hover-scale:hover {
-                transform: scale(1.05);
-            }
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
 
-            .btn-shine {
-                position: relative;
-                overflow: hidden;
-            }
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
 
-            .btn-shine::after {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: linear-gradient(
-                    to right,
-                    rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 255, 255, 0.3) 50%,
-                    rgba(255, 255, 255, 0) 100%
-                );
-                transform: rotate(30deg);
-                transition: transform 0.5s;
-                opacity: 0;
-            }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            transition: transform 0.5s;
+            opacity: 0;
+        }
 
-            .btn-shine:hover::after {
-                transform: rotate(30deg) translateX(150%);
-                opacity: 1;
-            }
-        </style>
-    </head>
-    <body class="bg-green-50">
-        <!-- Navigation Bar -->
-        <nav class="flex justify-between items-center py-4 px-8 max-w-7xl mx-auto">
-            <div class="flex items-center">
-                <div class="text-green-500 text-3xl font-bold flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
-                        <circle cx="8" cy="9" r="1.5" />
-                        <circle cx="16" cy="9" r="1.5" />
-                        <path d="M8 14c0 2 2 4 4 4s4-2 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
-                    </svg>
-                    SIZOPI
-                </div>
+        .btn-shine:hover::after {
+            transform: rotate(30deg) translateX(150%);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-green-50">
+    {% include 'navbar.html' %}
+
+    <!-- Content Block -->
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    <footer class="bg-green-50 py-6 border-t border-green-100">
+        <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <img src="{% static 'image/claw.svg' %}" class="h-6 w-6 text-green-500 mr-2" alt="Lion Icon">
+                <span class="text-gray-500">© 2024 SIZOPI. All rights reserved.</span>
             </div>
             
-            <div class="hidden md:flex space-x-12">
-                <a href="#" class="font-medium border-b-2 border-green-500">Home</a>
-                <a href="#" class="font-medium text-gray-500 hover:text-green-500 transition">About</a>
-                <a href="#" class="font-medium text-gray-500 hover:text-green-500 transition">Features</a>
-                <a href="#" class="font-medium text-gray-500 hover:text-green-500 transition">Contact</a>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-500 hover:text-green-500 transition">Terms</a>
+                <a href="#" class="text-gray-500 hover:text-green-500 transition">Privacy</a>
+                <a href="#" class="text-gray-500 hover:text-green-500 transition">Contact</a>
             </div>
-        </nav>
-
-        <!-- Content Block -->
-        {% block content %}
-        {% endblock %}
-
-        <!-- Footer -->
-        <footer class="bg-green-50 py-6 border-t border-green-100">
-            <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center mb-4 md:mb-0">
-                    <img src="{% static 'image/claw.svg' %}" class="h-6 w-6 text-green-500 mr-2" alt="Lion Icon">
-                    <span class="text-gray-500">© 2024 SIZOPI. All rights reserved.</span>
-                </div>
-                
-                <div class="flex space-x-6">
-                    <a href="#" class="text-gray-500 hover:text-green-500 transition">Terms</a>
-                    <a href="#" class="text-gray-500 hover:text-green-500 transition">Privacy</a>
-                    <a href="#" class="text-gray-500 hover:text-green-500 transition">Contact</a>
-                </div>
-            </div>
-        </footer>
-    </body>
-    </html>
+        </div>
+    </footer>
+</body>
+</html>
