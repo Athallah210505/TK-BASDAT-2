@@ -1,51 +1,59 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block meta %}
-{{ block.super }}
 <title>Sertifikat Adopsi Satwa</title>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-green-600 mb-2">Sertifikat Adopsi Satwa</h1>
-            <p class="text-gray-500">Sertifikat ini diberikan kepada</p>
+<div class="bg-green-50 min-h-screen py-16">
+  <div class="max-w-7xl mx-auto px-8">
+    <div class="bg-white rounded-2xl shadow-xl p-8 animate__animated animate__fadeIn">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center mb-4">
+          <img src="{% static 'image/claw.svg' %}" class="h-8 w-8 mr-2" alt="Safari Icon">
+          <h1 class="text-4xl font-bold text-green-600">Sertifikat Adopsi Satwa</h1>
+        </div>
+        <p class="text-xl text-gray-500">Sertifikat ini diberikan atas partisipasi dalam program konservasi satwa</p>
+      </div>
+      
+      <div class="bg-green-100 border-8 border-double border-green-300 p-12 rounded-xl mb-12 text-center">
+        <div class="mb-10">
+          <h2 class="text-3xl font-serif font-bold text-green-700 mb-2">Budi Santoso</h2>
+          <p class="text-gray-600 text-lg">Individu</p>
         </div>
         
-        <div class="bg-green-50 border-8 border-double border-green-200 p-8 rounded-lg mb-6">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-serif font-bold mb-1">{{ adoption.adopter.user.get_full_name|default:"[nama_adopter]" }}</h2>
-                <p class="text-gray-600">{{ adoption.adopter.get_adopter_type_display|default:"[jenis adopter]" }}</p>
-            </div>
-            
-            <div class="text-center mb-8">
-                <p class="text-lg">di taman safari atas partisipasinya dalam program adopsi simbolis satwa</p>
-                <h3 class="text-xl font-semibold mt-2">{{ adoption.animal.name|default:"[nama_hewan]" }} ({{ adoption.animal.species|default:"[jenis_hewan]" }})</h3>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div class="text-center">
-                    <p class="text-gray-500 text-sm">Tanggal mulai adopsi:</p>
-                    <p class="font-medium">{{ adoption.start_date|default:"[tanggal]" }}</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-gray-500 text-sm">Tanggal akhir adopsi:</p>
-                    <p class="font-medium">{{ adoption.end_date|default:"[tanggal]" }}</p>
-                </div>
-            </div>
-            
-            <div class="text-center">
-                <p class="mb-2">Terima kasih atas kepedulian dan kontribusi Anda</p>
-                <p class="text-sm text-gray-500">Sertifikat ini menunjukkan bahwa Anda telah berpartisipasi dalam program adopsi simbolis satwa untuk membantu pelestarian satwa di taman safari kami.</p>
-            </div>
+        <div class="mb-10">
+          <p class="text-xl text-gray-700 mb-6">telah berpartisipasi dalam program adopsi simbolis satwa</p>
+          <h3 class="text-2xl font-semibold text-green-600">Simba (Singa Afrika)</h3>
         </div>
         
-        <div class="flex justify-end">
-            <a href="{% url 'adoption_detail' adoption.id %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
-                Kembali
-            </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          <div class="text-center">
+            <p class="text-gray-500 text-sm">Tanggal mulai adopsi:</p>
+            <p class="font-medium text-lg">15 Januari 2023</p>
+          </div>
+          <div class="text-center">
+            <p class="text-gray-500 text-sm">Tanggal akhir adopsi:</p>
+            <p class="font-medium text-lg">15 Januari 2024</p>
+          </div>
         </div>
+        
+        <div class="text-center">
+          <p class="mb-4 text-lg">Terima kasih atas kepedulian dan kontribusi Anda</p>
+          <p class="text-sm text-gray-500">Sertifikat ini menunjukkan partisipasi dalam program adopsi simbolis untuk membantu pelestarian satwa di Taman Safari kami.</p>
+        </div>
+      </div>
+      
+      <div class="flex justify-center">
+        <a href="/adoption/1" class="bg-green-500 hover:bg-green-600 text-white py-3 px-8 rounded-full btn-shine inline-flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Kembali
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

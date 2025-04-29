@@ -1,66 +1,78 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block meta %}
-{{ block.super }}
-<title>Tambah Laporan Kondisi Satwa</title>
+<title>Buat Laporan</title>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-        <h1 class="text-2xl font-bold text-green-600 mb-6">Tambah Laporan Kondisi Satwa</h1>
+<div class="bg-green-50 min-h-screen pt-24 pb-12">
+  <div class="max-w-7xl mx-auto px-8">
+    <div class="bg-white rounded-2xl shadow-xl p-8 animate__animated animate__fadeIn">
+      <h1 class="text-3xl font-bold text-green-600 mb-8">Tambah Laporan Kondisi</h1>
+      
+      <div class="bg-green-100 p-8 rounded-xl border border-green-200 mb-8 safari-card">
+        <h2 class="text-xl font-semibold text-green-700 mb-4">Informasi Hewan</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <p class="text-gray-500 text-sm">Nama Hewan:</p>
+            <p class="font-medium">Simba</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Jenis Hewan:</p>
+            <p class="font-medium">Singa Afrika</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Adopter:</p>
+            <p class="font-medium">Budi Santoso</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Periode Adopsi:</p>
+            <p class="font-medium">15 Jan 2023 s/d 15 Jan 2024</p>
+          </div>
+        </div>
+      </div>
+      
+      <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
         
-        <div class="bg-green-50 p-6 rounded-lg border border-green-100 mb-6">
-            <h2 class="text-xl font-semibold text-green-600 mb-4">Informasi Hewan</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <p class="text-gray-500 text-sm">Nama Hewan:</p>
-                    <p class="font-medium">{{ adoption.animal.name }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Jenis Hewan:</p>
-                    <p class="font-medium">{{ adoption.animal.species }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Adopter:</p>
-                    <p class="font-medium">{{ adoption.adopter.user.get_full_name }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Periode Adopsi:</p>
-                    <p class="font-medium">{{ adoption.start_date }} s/d {{ adoption.end_date }}</p>
-                </div>
+        <div class="bg-gray-50 p-8 rounded-xl border border-gray-200 safari-card">
+          <h3 class="text-xl font-semibold text-gray-700 mb-6">Detail Laporan</h3>
+          
+          <div class="space-y-6">
+            <div>
+              <label class="block text-gray-700 mb-2">Kondisi Satwa:</label>
+              <textarea name="condition" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Deskripsikan kondisi terbaru satwa...">Simba dalam kondisi sangat baik, aktif bermain dan nafsu makan normal. Berat badan stabil di 182kg.</textarea>
             </div>
+            
+            <div>
+              <label class="block text-gray-700 mb-2">Foto Kondisi:</label>
+              <div class="flex items-center justify-center w-full">
+                <label for="photo" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                  <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="mb-2 text-sm text-gray-500">Klik untuk upload foto</p>
+                    <p class="text-xs text-gray-500">PNG, JPG (Max. 5MB)</p>
+                  </div>
+                  <input id="photo" name="photo" type="file" class="hidden" />
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
-            {% csrf_token %}
-            
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 class="font-semibold text-gray-700 mb-4">Laporan Kondisi</h3>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-700 mb-2">Kondisi Terbaru Satwa:</label>
-                        <textarea name="condition" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Deskripsikan kondisi terbaru satwa..."></textarea>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-gray-700 mb-2">Foto Kondisi Satwa:</label>
-                        <input type="file" name="photo" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <p class="text-sm text-gray-500 mt-1">Upload foto kondisi terbaru satwa (opsional)</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex justify-end space-x-4">
-                <a href="{% url 'animal_condition_report' adoption.id %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">
-                    Batal
-                </a>
-                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
-                    Simpan Laporan
-                </button>
-            </div>
-        </form>
+        <div class="flex justify-end space-x-4">
+          <a href="/adoption/reports/1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-full transition">
+            Batal
+          </a>
+          <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine">
+            Simpan Laporan
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 {% endblock %}

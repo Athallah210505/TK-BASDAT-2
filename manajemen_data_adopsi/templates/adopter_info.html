@@ -1,103 +1,89 @@
 {% extends "base.html" %}
 
 {% block meta %}
-{{ block.super }}
 <title>Informasi Adopter</title>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-        <h1 class="text-2xl font-bold text-green-600 mb-6">Informasi Adopter</h1>
-        
-        <div class="bg-green-50 p-6 rounded-lg border border-green-100 mb-6">
-            <h2 class="text-xl font-semibold text-green-600 mb-4">Detail Adopter</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <p class="text-gray-500 text-sm">Nama:</p>
-                    <p class="font-medium">{{ adopter.user.get_full_name }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Username:</p>
-                    <p class="font-medium">{{ adopter.user.username }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Tipe Adopter:</p>
-                    <p class="font-medium">{{ adopter.get_adopter_type_display }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Email:</p>
-                    <p class="font-medium">{{ adopter.user.email }}</p>
-                </div>
-                <div class="md:col-span-2">
-                    <p class="text-gray-500 text-sm">Alamat:</p>
-                    <p class="font-medium">{{ adopter.address }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm">Kontak:</p>
-                    <p class="font-medium">{{ adopter.contact }}</p>
+<div class="container mx-auto p-6">
+    {% include "navbar.html" %}
+    
+    <div class="max-w-7xl mx-auto px-4 py-10 animate__animated animate__fadeIn">
+        <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+            <h1 class="text-3xl font-bold text-green-500 mb-6">Informasi Adopter</h1>
+            
+            <div class="bg-green-50 p-8 rounded-xl border border-green-100 mb-8 hover-scale transition-all duration-300">
+                <h2 class="text-2xl font-semibold text-green-600 mb-6">Detail Adopter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="text-gray-500 text-sm">Nama:</p>
+                        <p class="font-medium text-lg">Budi Santoso</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Username:</p>
+                        <p class="font-medium text-lg">budi123</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Tipe Adopter:</p>
+                        <p class="font-medium text-lg">Individu</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Email:</p>
+                        <p class="font-medium text-lg">budi@example.com</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-gray-500 text-sm">Alamat:</p>
+                        <p class="font-medium text-lg">Jl. Merdeka No. 123, Jakarta</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Kontak:</p>
+                        <p class="font-medium text-lg">08123456789</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="space-y-6">
-            <h2 class="text-xl font-semibold text-green-600 mb-4">Daftar Hewan yang Diadopsi</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for adoption in adoptions %}
-                <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover-scale transition-all duration-300">
-                    <div class="aspect-w-16 aspect-h-9 bg-gray-100 p-4">
-                        {% if adoption.animal.photo %}
-                        <img src="{{ adoption.animal.photo.url }}" alt="{{ adoption.animal.name }}" class="w-full h-40 object-cover rounded-lg">
-                        {% else %}
-                        <div class="w-full h-40 bg-green-100 flex items-center justify-center rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
+            <div class="space-y-8">
+                <h2 class="text-2xl font-semibold text-green-600 mb-6">Daftar Hewan yang Diadopsi</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="safari-card rounded-xl p-6 flex flex-col items-center bg-gradient-to-b from-green-50 to-green-100 border border-green-200">
+                        <div class="bg-green-100 p-6 rounded-full mb-6 animate-float">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Simba%28TheLionKing%29.png/250px-Simba%28TheLionKing%29.png" class="h-32 w-32 rounded-full object-cover" alt="Simba Icon">
                         </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="p-4">
-                        <h3 class="font-semibold text-lg">{{ adoption.animal.name }}</h3>
-                        <p class="text-gray-600 mb-1">{{ adoption.animal.species }}</p>
-                        
-                        <div class="mt-2 space-y-1">
-                            <div class="flex justify-between text-sm">
+                        <h3 class="text-2xl font-bold mb-2">Simba</h3>
+                        <p class="text-gray-500">Singa Afrika</p>
+                        <div class="card-description mt-4">
+                            <div class="flex justify-between text-sm mb-1">
                                 <span class="text-gray-500">Mulai:</span>
-                                <span>{{ adoption.start_date }}</span>
+                                <span>15 Januari 2023</span>
                             </div>
-                            <div class="flex justify-between text-sm">
+                            <div class="flex justify-between text-sm mb-1">
                                 <span class="text-gray-500">Akhir:</span>
-                                <span>{{ adoption.end_date }}</span>
+                                <span>15 Januari 2024</span>
                             </div>
                             <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Status:</span>
-                                <span class="{% if adoption.status == 'active' %}text-green-600{% elif adoption.status == 'expired' %}text-red-600{% else %}text-yellow-600{% endif %}">
-                                    {{ adoption.get_status_display }}
-                                </span>
+                                <span class="text-gray-500">Kondisi:</span>
+                                <span class="text-green-600 font-medium">Sehat</span>
                             </div>
                         </div>
                         
-                        <div class="mt-4 flex justify-end">
-                            <a href="{% url 'adoption_detail' adoption.id %}" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm btn-shine">
+                        <div class="mt-6 w-full">
+                            <a href="/adoption/1" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full btn-shine transition">
                                 Lihat Detail
                             </a>
                         </div>
                     </div>
                 </div>
-                {% empty %}
-                <div class="col-span-full bg-yellow-50 p-4 rounded-lg border border-yellow-200 text-center">
-                    <p class="text-yellow-700">Adopter ini belum mengadopsi satwa apapun.</p>
-                </div>
-                {% endfor %}
             </div>
-        </div>
-        
-        <div class="flex justify-end mt-6">
-            <a href="{% url 'adoption_list' %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded btn-shine">
-                Kembali ke Daftar Adopsi
-            </a>
+            
+            <div class="flex justify-end mt-8">
+                <a href="/adoptions/" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine transition flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Kembali ke Daftar Adopsi
+                </a>
+            </div>
         </div>
     </div>
 </div>
