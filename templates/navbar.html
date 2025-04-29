@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIZOPI - Taman Safari Management System</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <style>
+    .nav-link {
+      position: relative;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: #10B981;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .btn-transition {
+      transition: all 0.3s ease;
+    }
+
+    .logo-svg {
+      fill: #10B981;
+    }
+  </style>
+</head>
+<body class="bg-green-50">
+  <!-- Navigation Bar -->
+  <nav class="bg-green-50 border-b border-green-100 py-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center">
+        <!-- Logo and Brand -->
+        <div class="flex items-center">
+          <a href="#" class="flex items-center">
+            <img src="{% static 'image/claw.svg' %}" class="h-10 w-10" alt="Claw Icon">
+            <span class="ml-2 text-2xl font-bold text-green-500">SIZOPI</span>
+          </a>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#" class="nav-link active text-gray-900 hover:text-green-600 px-2 py-1 transition-colors duration-300">Home</a>
+          <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 transition-colors duration-300">About</a>
+          <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 transition-colors duration-300">Features</a>
+          <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 transition-colors duration-300">Contact</a>
+        </div>
+
+        <!-- Authentication Buttons -->
+        <div class="hidden md:flex items-center space-x-4">
+          <a href="#" class="text-gray-700 hover:text-green-600 font-medium rounded-full px-5 py-2 transition-colors duration-300">Log in</a>
+          <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-full px-5 py-2 btn-transition">Sign up</a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden flex items-center">
+          <button class="mobile-menu-button outline-none">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+              <path d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="md:hidden hidden mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-green-100">Home</a>
+        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-green-50">About</a>
+        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-green-50">Features</a>
+        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-green-50">Contact</a>
+        <div class="pt-4 flex flex-col space-y-2">
+          <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-green-50">Log in</a>
+          <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-green-500 hover:bg-green-600">Sign up</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% block content %}
+  <!-- Page content will go here -->
+  {% endblock %}
+
+  <script>
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuButton = document.querySelector('.mobile-menu-button');
+      const mobileMenu = document.querySelector('.mobile-menu');
+
+      if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

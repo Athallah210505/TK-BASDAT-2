@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 import os
 
@@ -43,6 +44,12 @@ INSTALLED_APPS = [
     'adopter_dan_riwayat', 
     'pengaturan_profil',
     'login_and_logout',
+    'register',
+    'animals', 
+    'habitat',   
+    'rekam_medis_hewan',
+    'penjadwalan_pemeriksaan',
+    'pemberian_pakan',  
 ]
 
 MIDDLEWARE = [
@@ -64,6 +71,8 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
         ],
+
+        'DIRS': [ BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
