@@ -2,7 +2,12 @@
 {% load static %}
 
 {% block content %}
-<div class="container mx-auto p-6">
+{% include 'navbar.html' %} 
+
+<!-- Spacer to offset fixed navbar height -->
+<div class="h-20"></div> <!-- Spacer adjusted to match navbar height -->
+
+<div class="container mx-auto p-6 pt-20"> <!-- Added top padding equal to navbar height -->
       <!-- Header Section -->
     <div class="mb-10">
         <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float"> Daftar Satwa</h1>
@@ -43,8 +48,6 @@
           <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Habitat: {{ animal.habitat }}</span>
 
         </div>
-
-
 
         <!-- Aksi Edit/Hapus -->
         <div class="mt-auto flex justify-between">
