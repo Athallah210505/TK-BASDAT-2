@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from register.forms import SignUpForm
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -33,13 +34,13 @@ def register_view(request):
         return redirect('dashboard')
         
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             messages.success(request, 'Registration successful!')
             return redirect('dashboard')
     else:
-        form = CustomUserCreationForm()
+        form = SignUpForm()
     
     return render(request, 'register.html', {'form': form})
