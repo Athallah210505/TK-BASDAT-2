@@ -4,17 +4,19 @@ from django.shortcuts import render
 def show_main(request):
     return render(request, 'main.html')
 
-def show_management(request):
-    return render(request, 'management.html')
+def show_staff_dashboard(request):
+    return render(request, 'staff_dashboard.html')
 
-def show_atraksi_management(request):
-    return render(request, 'atraksi_management.html')
+def dokter_hewan_dashboard(request):
+    return render(request, 'dokter_hewan_dashboard.html')
 
-def show_wahana_management(request):
-    return render(request, 'wahana_management.html')
+def pengunjung_dashboard(request):
+    return render(request, 'pengunjung_dashboard.html')
 
-def  show_user_booking(request):
-    return render(request, 'user_booking.html')
+def penjaga_hewan_dashboard(request):
+    return render(request, 'penjaga_hewan_dashboard.html')
 
-def show_admin_booking(request):
-    return render(request, 'admin_booking.html')
+def pelatih_pertunjukan_dashboard(request):
+    return render(request, 'pelatih_pertunjukan_dashboard.html')
+
+

@@ -1,13 +1,12 @@
 from django.urls import path
-from main.views import show_main, show_management, show_atraksi_management, show_wahana_management, show_user_booking, show_admin_booking
-
+from . import views
 app_name = 'main'
 
 urlpatterns = [
-    path('', show_main, name='show_main'),
-    path('management/', show_management, name='show_management'),
-    path('atraksi/', show_atraksi_management, name='show_atraksi_management'),
-    path('wahana/', show_wahana_management, name='show_wahana_management'),
-    path('user_booking/', show_user_booking, name='show_user_booking'),
-    path('admin_booking/', show_admin_booking, name='show_admin_booking'),
+    path('', views.show_main, name='show_main'),
+    path('staff_dashboard/', views.show_staff_dashboard, name='show_staff_dashboard'),
+    path('dokter_hewan_dashboard/', views.dokter_hewan_dashboard, name='dokter_hewan_dashboard'),
+    path('pengunjung_dashboard/', views.pengunjung_dashboard, name='pengunjung_dashboard'),
+    path('penjaga_hewan_dashboard/', views.penjaga_hewan_dashboard, name='penjaga_hewan_dashboard'),
+    path('pelatih_pertunjukan_dashboard/', views.pelatih_pertunjukan_dashboard, name='pelatih_pertunjukan_dashboard'),
 ]

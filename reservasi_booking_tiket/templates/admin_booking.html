@@ -1,15 +1,11 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIZOPI - Manajemen Reservasi Taman Safari</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-</head>
+{%extends 'base.html'%}
+
+{% block content %}
+{%include 'navbar_staff.html'%}
 <body class="bg-green-50">
     <div class="min-h-screen">
         <!-- Main Header -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-20">
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-green-500">Manajemen Reservasi</h1>
@@ -206,7 +202,7 @@
         const reservationData = [
             {
                 id: 1,
-                username: 'Arif',
+                username: 'eunlee',
                 attraction: 'Pertunjukan lumba-lumba',
                 location: 'Area Akuatik',
                 date: '2025-05-12',
@@ -216,7 +212,7 @@
             },
             {
                 id: 2,
-                username: 'Winnie',
+                username: 'minlee',
                 attraction: 'Feeding time harimau',
                 location: 'Kandang Harimau',
                 date: '2025-05-11',
@@ -226,7 +222,7 @@
             },
             {
                 id: 3,
-                username: 'Budi',
+                username: 'jooncho',
                 attraction: 'Pertunjukan Gajah',
                 location: 'Area Gajah',
                 date: '2025-05-15',
@@ -236,7 +232,7 @@
             },
             {
                 id: 4,
-                username: 'Siti',
+                username: 'jicho',
                 attraction: 'Show Burung Bebas',
                 location: 'Aviary',
                 date: '2025-05-14',
@@ -246,7 +242,7 @@
             },
             {
                 id: 5,
-                username: 'Deni',
+                username: 'eunkang',
                 attraction: 'Atraksi Harimau',
                 location: 'Arena Harimau',
                 date: '2025-05-13',
@@ -424,3 +420,5 @@
     </script>
 </body>
 </html>
+
+{% endblock %}

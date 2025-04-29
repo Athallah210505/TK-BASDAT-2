@@ -1,5 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
+{%extends "base.html"%}
+
+{% block content %}
+
+{%include 'navbar_staff.html'%}
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +21,7 @@
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-4 mt-20">
             <div>
                 <h1 class="text-3xl font-bold text-green-500">Manajemen Atraksi dan Wahana</h1>
                 <p class="text-gray-600">Kelola semua atraksi dan wahana di Taman Safari</p>
@@ -29,9 +33,13 @@
 
         <!-- Navigation Tabs -->
         <div class="mb-6">
-            <div class="flex">
-                <button class="px-6 py-2 rounded-l-lg bg-green-50 text-green-800 hover:bg-green-100">Atraksi</button>
-                <button class="px-6 py-2 rounded-r-lg bg-green-500 text-white">Wahana</button>
+            <div class="tab-container bg-green-50 rounded-lg w-64 h-12 flex overflow-hidden">
+                <a href="{% url 'show_atraksi_management' %}" class="tab flex-1 flex items-center justify-center cursor-pointer text-green-800 font-medium py-3">
+                    Atraksi
+                </a>
+                <a href="{% url 'show_wahana_management' %}" class="tab flex-1 flex items-center justify-center cursor-pointer bg-green-500 text-white font-medium py-3">
+                    Wahana
+                </a>
             </div>
         </div>
 
@@ -482,3 +490,5 @@
     </script>
 </body>
 </html>
+
+{% endblock %}  
