@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'navbar.html' %} 
+
+<!-- Spacer to offset fixed navbar height -->
+<div class="h-20"></div> <!-- Spacer adjusted to match navbar height -->
+
+<div class="container mx-auto p-6 pt-20"> <!-- Added top padding equal to navbar height -->
+      <!-- Header Section -->
+    <div class="mb-10">
+        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float"> Daftar Satwa</h1>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi lengkap mengenai hewan-hewan di SIZOPI</p>
+    </div>
+
+  <!-- Grid Card Satwa -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for animal in animals %}
+    <div id="animal-card-{{ animal.id }}" class="bg-white rounded-2xl shadow-lg border-l-4 border-green-500 overflow-hidden flex flex-col"
+         data-id="{{ animal.id }}"
+         data-species="{{ animal.species }}"
+         data-name="{{ animal.name }}"
+         data-origin="{{ animal.origin }}"
+         data-birth-date="{{ animal.birth_date|date:'Y-m-d' }}"
+         data-health-status="{{ animal.health_status }}"
+         data-photo-url="{{ animal.photo_url }}">
+      <!-- Foto Satwa -->
+      <div class="h-48 bg-green-50 flex items-center justify-center overflow-hidden">
+        {% if animal.photo_url %}
+        <img src="{{ animal.photo_url }}" alt="{{ animal.species }} {{ animal.name }}" class="object-cover h-full w-full hover-scale" />
+        {% else %}
+        <div class="text-gray-400">No Image</div>
+        {% endif %}
+      </div>
+
+      <!-- Isi Konten Card -->
+      <div class="p-4 flex-1 flex flex-col">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">
+          {{ animal.species }}{% if animal.name %} - {{ animal.name }}{% endif %}
+        </h2>
+        <div class="badges flex flex-wrap gap-2 mb-4">
+          <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Asal: {{ animal.origin }}</span>
+          {% if animal.birth_date %}
+          <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Lahir: {{ animal.birth_date }}</span>
+          {% endif %}
+          <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Status: {{ animal.health_status }}</span>
+          <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Habitat: {{ animal.habitat }}</span>
+
+        </div>
+
+        <!-- Aksi Edit/Hapus -->
+        <div class="mt-auto flex justify-between">
+          <button class="edit-btn text-blue-500 hover:underline" data-id="{{ animal.id }}">Edit</button>
+          <button class="delete-btn text-red-500 hover:underline" data-id="{{ animal.id }}">Hapus</button>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center text-gray-500 mt-12">Belum ada data satwa.</div>
+    {% endfor %}
+  </div>
+
+  <!-- Button Tambah Satwa di Bawah -->
+  <div class="flex justify-center mt-8">
+    <button id="addAnimalBtn" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center">
+      + Tambah Satwa
+    </button>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+  <div class="bg-white p-6 rounded-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Edit Satwa</h2>
+    <form id="editForm">
+      {% csrf_token %}
+      <input type="hidden" name="id" id="edit-id">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Nama Individu</label>
+        <input type="text" name="name" id="edit-name" class="input-field" />
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Spesies</label>
+        <input type="text" name="species" id="edit-species" class="input-field" required />
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Asal Hewan</label>
+        <input type="text" name="origin" id="edit-origin" class="input-field" required />
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+        <input type="date" name="birth_date" id="edit-birth-date" class="input-field" />
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Status Kesehatan</label>
+        <input type="text" name="health_status" id="edit-health-status" class="input-field" required />
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">URL Foto</label>
+        <input type="url" name="photo_url" id="edit-photo-url" class="input-field" />
+      </div>
+      <div class="flex justify-end space-x-3 mt-6">
+        <button type="button" onclick="closeEditModal()" class="btn-cancel">Batal</button>
+        <button type="submit" class="btn-confirm">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+  <div class="bg-white p-6 rounded-lg w-96 max-w-md">
+    <h2 class="text-2xl font-bold text-center text-red-500 mb-4">Hapus Satwa</h2>
+    <p class="text-gray-700 text-center mb-6">Apakah Anda yakin ingin menghapus <strong id="deleteAnimalName"></strong>?</p>
+    <div class="flex justify-center space-x-4">
+      <button onclick="closeDeleteModal()" class="btn-cancel">Tidak</button>
+      <button id="confirmDeleteBtn" class="btn-delete">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// CSRF helper
+let csrftoken;
+document.cookie.split(';').forEach(c => {
+  if (c.trim().startsWith('csrftoken=')) csrftoken = c.trim().split('=')[1];
+});
+function getCookie() { return csrftoken; }
+
+// Modal control functions
+function openEditModal(id) {
+  const card = document.getElementById(`animal-card-${id}`);
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-name').value = card.dataset.name;
+  document.getElementById('edit-species').value = card.dataset.species;
+  document.getElementById('edit-origin').value = card.dataset.origin;
+  document.getElementById('edit-birth-date').value = card.dataset.birthDate;
+  document.getElementById('edit-health-status').value = card.dataset.healthStatus;
+  document.getElementById('edit-photo-url').value = card.dataset.photoUrl;
+  document.getElementById('editModal').classList.remove('hidden');
+}
+function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+let deleteId = null;
+function openDeleteModal(id) {
+  deleteId = id;
+  const card = document.getElementById(`animal-card-${id}`);
+  document.getElementById('deleteAnimalName').textContent = card.dataset.name || card.dataset.species;
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); }
+
+// Attach Edit/Delete button handlers
+document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => openEditModal(btn.dataset.id)));
+document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => openDeleteModal(btn.dataset.id)));
+
+// Handle Edit Submit
+const editForm = document.getElementById('editForm');
+editForm.addEventListener('submit', async e => {
+  e.preventDefault(); const id = document.getElementById('edit-id').value;
+  const formData = new FormData(editForm);
+  const res = await fetch(`/animals/${id}/update/`, { method: 'POST', headers: {'X-CSRFToken': getCookie()}, body: formData });
+  if (!res.ok) return alert('Gagal memperbarui.');
+  const updated = await res.json(); const card = document.getElementById(`animal-card-${id}`);
+  card.dataset.species = updated.species; card.dataset.name = updated.name;
+  card.dataset.origin = updated.origin; card.dataset.birthDate = updated.birth_date;
+  card.dataset.healthStatus = updated.health_status; card.dataset.photoUrl = updated.photo_url;
+  card.querySelector('h2').textContent = `${updated.species}${updated.name? ' - '+updated.name: ''}`;
+  const badges = card.querySelector('.badges'); badges.innerHTML =
+    `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Asal: ${updated.origin}</span>`+
+    (updated.birth_date? `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Lahir: ${new Date(updated.birth_date).toLocaleDateString()}</span>`:'')+
+    `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Status: ${updated.health_status}</span>`;
+  if (updated.photo_url) card.querySelector('img').src = updated.photo_url;
+  closeEditModal();
+});
+
+// Handle Delete Confirm
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+confirmDeleteBtn.addEventListener('click', async () => {
+  if (!deleteId) return;
+  const res = await fetch(`/animals/${deleteId}/delete/`, { method: 'POST', headers: {'X-CSRFToken': getCookie()} });
+  if (!res.ok) return alert('Gagal menghapus.');
+  document.getElementById(`animal-card-${deleteId}`).remove(); closeDeleteModal();
+});
+
+// Tambah Satwa
+const addAnimalBtn = document.getElementById('addAnimalBtn');
+addAnimalBtn.addEventListener('click', () => window.location.href = '{% url "animals:animal_create" %}');
+</script>
+
+<style>
+.input-field { width: 100%; padding: .5rem; border: 1px solid #D1D5DB; border-radius: .375rem; }
+.btn-cancel { background: #E5E7EB; color: #374151; padding: .5rem 1rem; border-radius: .5rem; }
+.btn-confirm { background: #10B981; color: white; padding: .5rem 1rem; border-radius: .5rem; }
+.btn-delete { background: #EF4444; color: white; padding: .5rem 1rem; border-radius: .5rem; }
+</style>
+{% endblock %}
