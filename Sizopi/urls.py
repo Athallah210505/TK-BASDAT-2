@@ -25,7 +25,7 @@ urlpatterns = [
     path('', include('adopter_dan_riwayat.urls')),
     path('', include('pengaturan_profil.urls')),
     path('', include('login_and_logout.urls')),
-    path('register/', register, name='register'),
+    path('register/', include('register.urls')),
     path('animals/', include(('animals.urls', 'animals'), namespace='animals')),
     path('habitat/', include(('habitat.urls', 'habitat'), namespace='habitat')),
     path('rekam_medis/', include('rekam_medis_hewan.urls')),
