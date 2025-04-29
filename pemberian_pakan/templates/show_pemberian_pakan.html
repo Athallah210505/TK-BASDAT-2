@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    {% include 'navbar.html' %}
+    <!-- Header Section -->
+    <div class="mb-10">
+        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Pemberian Pakan</h1>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi lengkap mengenai hewan</p>
+    </div>
+
+    <!-- Animal Profile Card -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-l-4 border-green-500">
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/4 mb-4 md:mb-0 flex justify-center">
+                <div class="w-40 h-40 rounded-full bg-green-100 flex items-center justify-center hover-scale">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9z7mrJYa7zsRfi6n26gjfhjzjvYMO3RfYMmFSJxJuaIo5y5-W7ih9VDxE1FZEineYw0EJYSmJ8Zi4P7o62NSOo0R7W2YyoL6UjKLhEoSEP_FuwdwnWFAIRHaZ-Uxq_LKGRf_xzYXK64tg/w640-h419/1644897149271573-0.png" 
+                         alt="Harimau Sumatra Taro" 
+                         class="rounded-full w-full h-full object-cover" />
+                </div>
+            </div>
+            <div class="md:w-3/4 md:pl-6">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Harimau Sumatra - Taro</h2>
+                <div class="mb-4">
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Spesies: Felis silvestris catus</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Usia: 3 tahun</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Asal: Sumatra</span>
+                </div>
+                <p class="text-gray-600 mb-4">
+                    ID: <span class="font-semibold">PET-2025-0042</span> 
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="openAddScheduleModal()" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+                        Tambah Jadwal Pemberian Pakan
+                    </button>
+                    <button class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+                        Riwayat Pemberian Pakan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Feeding Schedule Modal -->
+    <div id="addScheduleModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Tambah Jadwal Pemberian Pakan</h2>
+            <form>
+                <div class="mb-4">
+                    <label for="new_food_type" class="block text-sm font-medium text-gray-700">Jenis Pakan</label>
+                    <input type="text" id="new_food_type" name="new_food_type" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Masukkan jenis pakan" />
+                </div>
+                <div class="mb-4">
+                    <label for="new_food_amount" class="block text-sm font-medium text-gray-700">Jumlah Pakan (gram)</label>
+                    <input type="number" id="new_food_amount" name="new_food_amount" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Masukkan jumlah dalam gram" />
+                </div>
+                <div class="mb-4">
+                    <label for="new_feeding_schedule" class="block text-sm font-medium text-gray-700">Jadwal Pemberian</label>
+                    <input type="datetime-local" id="new_feeding_schedule" name="new_feeding_schedule" class="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeAddScheduleModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feeding Records Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- First Record - Waiting -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100 h-full flex flex-col">
+            <div class="flex-grow">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Jenis Pakan</p>
+                        <p class="font-medium text-lg">Pisang</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Status</p>
+                        <span class="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">Menunggu Pemberian</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Jumlah (gram)</p>
+                        <p class="font-medium text-lg">150</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Jadwal</p>
+                        <p class="font-medium text-lg">25 April 2025</p>
+                        <p class="font-medium text-lg">14:00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <button class="btn-shine w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+                    Beri Pakan Sekarang
+                </button>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                <button onclick="openEditModal()" class="text-blue-500 hover:text-blue-700 font-medium flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                    Edit
+                </button>
+                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    Hapus
+                </button>
+            </div>
+        </div>
+
+        <!-- Second Record - Completed -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100 h-full flex flex-col">
+            <div class="flex-grow">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Jenis Pakan</p>
+                        <p class="font-medium text-lg">Daging Ayam</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Status</p>
+                        <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Selesai Diberikan</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Jumlah (gram)</p>
+                        <p class="font-medium text-lg">800</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Jadwal</p>
+                        <p class="font-medium text-lg">08:30</p>
+                        <p class="font-medium text-lg">25 April 2025</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="editModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Edit Pemberian Pakan</h2>
+            <form>
+                <div class="mb-4">
+                    <label for="food_type" class="block text-sm font-medium text-gray-700">Jenis Pakan</label>
+                    <input type="text" id="food_type" name="food_type" class="w-full p-2 border border-gray-300 rounded-md" value="Pisang" />
+                </div>
+                <div class="mb-4">
+                    <label for="food_amount" class="block text-sm font-medium text-gray-700">Jumlah (gram)</label>
+                    <input type="number" id="food_amount" name="food_amount" class="w-full p-2 border border-gray-300 rounded-md" value="150" />
+                </div>
+                <div class="mb-4">
+                    <label for="feeding_time" class="block text-sm font-medium text-gray-700">Waktu Pemberian</label>
+                    <input type="time" id="feeding_time" name="feeding_time" class="w-full p-2 border border-gray-300 rounded-md" value="14:00" />
+                </div>
+                <div class="mb-4">
+                    <label for="feeding_date" class="block text-sm font-medium text-gray-700">Tanggal Pemberian</label>
+                    <input type="date" id="feeding_date" name="feeding_date" class="w-full p-2 border border-gray-300 rounded-md" value="2025-04-25" />
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-96 max-w-md">
+            <h2 class="text-2xl font-bold text-center text-red-500 mb-4">Hapus Data Pakan</h2>
+            <p class="text-gray-700 text-center mb-6">Apakah anda yakin ingin menghapus data pemberian pakan ini?</p>
+            <div class="flex justify-center space-x-4">
+                <button onclick="closeDeleteModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                    Tidak
+                </button>
+                <button onclick="confirmDelete()" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                    Ya
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for Modal functionality -->
+    <script>
+        function openAddScheduleModal() {
+            document.getElementById('addScheduleModal').classList.remove('hidden');
+        }
+
+        function closeAddScheduleModal() {
+            document.getElementById('addScheduleModal').classList.add('hidden');
+        }
+
+        function openEditModal() {
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        function confirmDelete() {
+            alert('Data pakan telah dihapus');
+            closeDeleteModal();
+        }
+    </script>
+</div>
+{% endblock %}
