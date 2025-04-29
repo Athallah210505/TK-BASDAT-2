@@ -21,6 +21,8 @@ from register.views import register
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
+    path('manajemen_atraksi_wahana/', include('manajemen_atraksi_wahana.urls')),
+    path('reservasi_booking_tiket/', include('reservasi_booking_tiket.urls')),
     path('', include('manajemen_data_adopsi.urls')),
     path('', include('adopter_dan_riwayat.urls')),
     path('', include('pengaturan_profil.urls')),
@@ -31,4 +33,5 @@ urlpatterns = [
     path('rekam_medis/', include('rekam_medis_hewan.urls')),
     path('jadwal_pemeriksaan/', include('penjadwalan_pemeriksaan.urls')),
     path('pemberian_pakan/', include('pemberian_pakan.urls')),
+
 ]

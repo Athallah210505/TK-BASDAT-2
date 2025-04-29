@@ -1,0 +1,332 @@
+{%extends 'base.html'%}
+{% block content %}
+{% include 'navbar_staff.html' %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safari Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f0f9f0;
+        }
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+        .chart-bar {
+            width: 30px;
+            position: absolute;
+            bottom: 0;
+            background-color: #10b981;
+            border-radius: 4px 4px 0 0;
+        }
+        .progress-bar {
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="container mx-auto p-4 max-w-7xl mt-20">
+        <!-- Header Section -->
+        <header class="flex justify-between items-center mb-4 ">
+            <div>
+                <h1 class="text-2xl font-bold text-green-500">Safari Dashboard</h1>
+                <p class="text-sm text-gray-600">Welcome to the SIZOPI management system for Taman Safari.</p>
+            </div>
+            <div class="flex items-center">
+                <span class="text-sm mr-2">Peran:</span>
+                <div class="relative inline-block text-left">
+                    <select class="bg-white border border-gray-300 rounded-md py-1 pl-3 pr-8 text-sm">
+                        <option selected>Staf Administrasi</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- ID Card Section -->
+        <div class="bg-green-100 rounded-lg p-2 mb-6">
+            <span class="inline-block bg-white text-xs px-3 py-1 rounded-full text-green-700 font-medium">
+                ID Staf: e56f7a89-01b2-43c4-d5e6-f7a8b9c0d1e2
+            </span>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="bg-white rounded-lg p-6 shadow-sm mb-6">
+            <div class="mb-4">
+                <h2 class="text-lg font-medium">Eun Kang</h2>
+                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Staf Administrasi</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Username</p>
+                        <p>eunkang86</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Nomor Telepon</p>
+                        <p>08127219462</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Email</p>
+                        <p>eunkang86@example.com</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-id-badge"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Peran</p>
+                        <p>Staf Administrasi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-6">
+            <div class="flex border-b border-gray-200">
+                <button class="px-4 py-2 bg-green-500 text-white rounded-t-lg">Overview</button>
+                <button class="px-4 py-2 text-gray-600">Analytics</button>
+                <button class="px-4 py-2 text-gray-600">Reports</button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- Penjualan Tiket Card -->
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Penjualan Tiket</span>
+                    <i class="fas fa-ticket-alt text-green-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-1">157</h3>
+                <p class="text-xs text-gray-500">Tiket terjual hari ini</p>
+            </div>
+
+            <!-- Pengunjung Card -->
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Pengunjung</span>
+                    <i class="fas fa-users text-green-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-1">157</h3>
+                <p class="text-xs text-gray-500">Pengunjung hari ini</p>
+            </div>
+
+            <!-- Pendapatan Card -->
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Pendapatan</span>
+                    <i class="fas fa-dollar-sign text-green-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-1">Rp 15.700.000</h3>
+                <p class="text-xs text-gray-500">Pendapatan hari ini</p>
+            </div>
+
+            <!-- Rata-rata Pendapatan Card -->
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Rata-rata Pendapatan</span>
+                    <i class="fas fa-chart-line text-green-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-1">Rp 14.642.857</h3>
+                <p class="text-xs text-gray-500">Rata-rata pendapatan per hari</p>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Weekly Revenue Report -->
+            <div class="bg-white p-5 rounded-lg shadow-sm">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-chart-bar text-green-500 mr-2"></i>
+                    <h3 class="text-lg font-medium">Laporan Pendapatan Mingguan</h3>
+                </div>
+                <p class="text-xs text-gray-500 mb-4">Ringkasan pendapatan 7 hari terakhir</p>
+                
+                <div class="chart-container bg-green-50 rounded-lg p-4 mb-4">
+                    <div class="chart-bar" style="height: 120px; left: 8%;" data-day="Sen"></div>
+                    <div class="chart-bar" style="height: 150px; left: 22%;" data-day="Sel"></div>
+                    <div class="chart-bar" style="height: 100px; left: 36%;" data-day="Rab"></div>
+                    <div class="chart-bar" style="height: 140px; left: 50%;" data-day="Kam"></div>
+                    <div class="chart-bar" style="height: 160px; left: 64%;" data-day="Jum"></div>
+                    <div class="chart-bar" style="height: 180px; left: 78%;" data-day="Sab"></div>
+                    <div class="chart-bar" style="height: 130px; left: 92%;" data-day="Min"></div>
+                </div>
+                
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>Sen</span>
+                    <span>Sel</span>
+                    <span>Rab</span>
+                    <span>Kam</span>
+                    <span>Jum</span>
+                    <span>Sab</span>
+                    <span>Min</span>
+                </div>
+                
+                <div class="flex justify-between mt-4 text-sm">
+                    <span>Total: Rp 102.500.000</span>
+                    <span>Pengunjung: 1025</span>
+                </div>
+            </div>
+
+            <!-- Ticket Sales Summary -->
+            <div class="bg-white p-5 rounded-lg shadow-sm">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-ticket-alt text-green-500 mr-2"></i>
+                    <h3 class="text-lg font-medium">Ringkasan Penjualan Tiket</h3>
+                </div>
+                <p class="text-xs text-gray-500 mb-4">Penjualan tiket berdasarkan jenis</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="text-left text-sm text-gray-600">
+                                <th class="pb-3">Jenis Tiket</th>
+                                <th class="pb-3 text-center">Jumlah</th>
+                                <th class="pb-3 text-right">Pendapatan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-gray-100">
+                                <td class="py-3">Tiket Reguler</td>
+                                <td class="py-3 text-center">98</td>
+                                <td class="py-3 text-right">Rp 9.800.000</td>
+                            </tr>
+                            <tr class="border-t border-gray-100">
+                                <td class="py-3">Tiket Premium</td>
+                                <td class="py-3 text-center">35</td>
+                                <td class="py-3 text-right">Rp 5.250.000</td>
+                            </tr>
+                            <tr class="border-t border-gray-100">
+                                <td class="py-3">Tiket Keluarga</td>
+                                <td class="py-3 text-center">24</td>
+                                <td class="py-3 text-right">Rp 7.200.000</td>
+                            </tr>
+                            <tr class="border-t border-gray-100 font-medium">
+                                <td class="py-3">Total</td>
+                                <td class="py-3 text-center">157</td>
+                                <td class="py-3 text-right">Rp 22.250.000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Attractions -->
+        <div class="bg-white p-5 rounded-lg shadow-sm mb-6">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-star text-green-500 mr-2"></i>
+                <h3 class="text-lg font-medium">Atraksi Terpopuler</h3>
+            </div>
+            <p class="text-xs text-gray-500 mb-6">Atraksi dengan penjualan tiket tertinggi</p>
+            
+            <!-- Progress bars -->
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm">Pertunjukan Singa Laut</span>
+                        <span class="text-sm">45 tiket (28.7%)</span>
+                    </div>
+                    <div class="progress-bar" style="width: 28.7%"></div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm">Show Burung Bebas</span>
+                        <span class="text-sm">38 tiket (24.2%)</span>
+                    </div>
+                    <div class="progress-bar" style="width: 24.2%"></div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm">Pertunjukan Gajah</span>
+                        <span class="text-sm">32 tiket (20.4%)</span>
+                    </div>
+                    <div class="progress-bar" style="width: 20.4%"></div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm">Feeding Show</span>
+                        <span class="text-sm">25 tiket (15.9%)</span>
+                    </div>
+                    <div class="progress-bar" style="width: 15.9%"></div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm">Atraksi Harimau</span>
+                        <span class="text-sm">17 tiket (10.8%)</span>
+                    </div>
+                    <div class="progress-bar" style="width: 10.8%"></div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <button class="text-sm text-green-600 hover:text-green-700">
+                    Lihat Semua Atraksi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add functionality for tabs
+            const tabs = document.querySelectorAll('.flex.border-b button');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => {
+                        t.classList.remove('bg-green-500', 'text-white');
+                        t.classList.add('text-gray-600');
+                    });
+                    
+                    // Add active class to clicked tab
+                    this.classList.remove('text-gray-600');
+                    this.classList.add('bg-green-500', 'text-white');
+                });
+            });
+            
+            // Animate chart on load
+            const chartBars = document.querySelectorAll('.chart-bar');
+            chartBars.forEach(bar => {
+                const originalHeight = bar.style.height;
+                bar.style.height = '0';
+                setTimeout(() => {
+                    bar.style.transition = 'height 1s ease-out';
+                    bar.style.height = originalHeight;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

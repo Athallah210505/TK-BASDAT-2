@@ -1,0 +1,263 @@
+{%extends 'base.html'%}
+
+{% block content %}
+{% include 'navbar_penjaga_hewan.html' %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safari Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f0f9f0;
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .status-selesai {
+            background-color: #ecfdf5;
+            color: #10b981;
+        }
+        .status-menunggu {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="container mx-auto p-4 max-w-7xl mt-20">
+        <!-- Header Section -->
+        <header class="flex justify-between items-center mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-green-500">Safari Dashboard</h1>
+                <p class="text-sm text-gray-600">Welcome to the SIZOPI management system for Taman Safari.</p>
+            </div>
+            <div class="flex items-center">
+                <span class="text-sm mr-2">Peran:</span>
+                <div class="relative inline-block text-left">
+                    <select class="bg-white border border-gray-300 rounded-md py-1 pl-3 pr-8 text-sm">
+                        <option selected>Penjaga Hewan</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- ID Card Section -->
+        <div class="bg-green-100 rounded-lg p-2 mb-2">
+            <span class="inline-block bg-white text-xs px-3 py-1 rounded-full text-green-700 font-medium">
+                ID Staf: c82a4f76-1df2-4b9a-a7f5-8f25e128fc7e
+            </span>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="bg-white rounded-lg p-6 shadow-sm mb-6">
+            <div class="mb-4">
+                <h2 class="text-lg font-medium">Joon Kim</h2>
+                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Penjaga Hewan</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Username</p>
+                        <p>joonkim66</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Nomor Telepon</p>
+                        <p>08123456789</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Email</p>
+                        <p>joonkim66@example.com</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-id-badge"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Peran</p>
+                        <p>Penjaga Hewan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-6">
+            <div class="flex border-b border-gray-200">
+                <button class="px-4 py-2 bg-green-500 text-white rounded-t-lg">Overview</button>
+                <button class="px-4 py-2 text-gray-600">Analytics</button>
+                <button class="px-4 py-2 text-gray-600">Reports</button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- Staff ID Card -->
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">ID Staf</span>
+                    <i class="fas fa-id-card text-green-500"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-1 break-all">c82a4f76-1df2-4b9a-a7f5-8f25e128fc7e</h3>
+                <p class="text-xs text-gray-500">ID Staf Penjaga Hewan</p>
+            </div>
+
+            <!-- Animals Fed Card -->
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Hewan Diberi Pakan</span>
+                    <i class="fas fa-utensils text-green-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-1">42</h3>
+                <p class="text-xs text-gray-500">Jumlah hewan yang sudah diberi pakan</p>
+            </div>
+        </div>
+
+        <!-- Today's Feeding Schedule -->
+        <div class="bg-white p-5 rounded-lg shadow-sm mb-6">
+            <div class="flex items-center mb-4">
+                <i class="far fa-clock text-green-500 mr-2"></i>
+                <h3 class="text-lg font-medium">Jadwal Pemberian Pakan Hari Ini</h3>
+            </div>
+            <p class="text-xs text-gray-500 mb-6">Jadwal pemberian pakan untuk hari ini</p>
+            
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
+                        <i class="far fa-clock"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <p class="font-medium">08:00 - Kandang Reptil</p>
+                            <span class="status-badge status-selesai">Selesai</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
+                        <i class="far fa-clock"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <p class="font-medium">10:00 - Kandang Mamalia Besar</p>
+                            <span class="status-badge status-selesai">Selesai</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
+                        <i class="far fa-clock"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <p class="font-medium">14:00 - Kandang Burung</p>
+                            <span class="status-badge status-menunggu">Menunggu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
+                        <i class="far fa-clock"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <p class="font-medium">16:00 - Kandang Primata</p>
+                            <span class="status-badge status-menunggu">Menunggu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <button class="text-sm text-green-600 hover:text-green-700">
+                    Lihat Jadwal Lengkap
+                </button>
+            </div>
+        </div>
+
+        <!-- Responsible Animals -->
+        <div class="bg-white p-5 rounded-lg shadow-sm mb-6">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-paw text-green-500 mr-2"></i>
+                <h3 class="text-lg font-medium">Hewan Tanggung Jawab</h3>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">Daftar hewan yang menjadi tanggung jawab</p>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="text-left text-sm text-gray-600">
+                            <th class="pb-3 pl-1">Nama Hewan</th>
+                            <th class="pb-3 text-center">Jumlah</th>
+                            <th class="pb-3 text-right">Lokasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t border-gray-100">
+                            <td class="py-3 pl-1">Harimau Sumatera</td>
+                            <td class="py-3 text-center">3</td>
+                            <td class="py-3 text-right">Kandang Harimau</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="py-3 pl-1">Gajah Asia</td>
+                            <td class="py-3 text-center">2</td>
+                            <td class="py-3 text-right">Kandang Gajah</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="py-3 pl-1">Orangutan</td>
+                            <td class="py-3 text-center">5</td>
+                            <td class="py-3 text-right">Kandang Primata</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add functionality for tabs
+            const tabs = document.querySelectorAll('.flex.border-b button');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => {
+                        t.classList.remove('bg-green-500', 'text-white');
+                        t.classList.add('text-gray-600');
+                    });
+                    
+                    // Add active class to clicked tab
+                    this.classList.remove('text-gray-600');
+                    this.classList.add('bg-green-500', 'text-white');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

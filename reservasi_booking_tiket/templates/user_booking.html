@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'navbar_pengunjung.html' %}
+
+<div class="container mx-auto px-4 py-8 max-w-5xl mt-20">
+    <!-- Header -->
+    <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket Atraksi</h1>
+    <p class="text-gray-600 mb-6">Lihat dan kelola reservasi tiket Anda di Taman Safari</p>
+
+    <!-- Daftar Reservasi Section -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="bg-gray-800 p-4 flex items-center">
+            <span class="text-green-400 mr-2"><i class="fas fa-list"></i></span>
+            <h2 class="text-xl font-bold text-white">Daftar Reservasi Saya</h2>
+        </div>
+        <div class="p-4 bg-gray-100">
+            <p class="text-gray-600">Lihat dan kelola reservasi tiket Anda</p>
+        </div>
+
+        <div class="p-6">
+            <!-- Example of reservation card - first item -->
+            <div class="mb-6 pb-6 border-b border-gray-200">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xl font-semibold">Pertunjukan lumba-lumba</h3>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Terjadwal</span>
+                </div>
+                <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-gray-500 mb-1">Lokasi:</div>
+                        <div>Area Akuatik</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jam:</div>
+                        <div>10:00</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Tanggal:</div>
+                        <div>12 Mei 2025</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jumlah tiket:</div>
+                        <div>10</div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4 space-x-3">
+                    <a href="{% url 'show_user_edit_booking' %}?id=1" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                        Edit
+                    </a>
+                    <button type="button" onclick="showDeleteModal(1, 'Pertunjukan lumba-lumba')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                        Batalkan Reservasi
+                    </button>
+                </div>
+            </div>
+
+            <!-- Example of reservation card - second item -->
+            <div class="mb-6 pb-6 border-b border-gray-200 border-b-0">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xl font-semibold">Pertunjukan Gajah</h3>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Terjadwal</span>
+                </div>
+                <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-gray-500 mb-1">Lokasi:</div>
+                        <div>Arena gajah</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jam:</div>
+                        <div>13:00</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Tanggal:</div>
+                        <div>15 Mei 2025</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jumlah tiket:</div>
+                        <div>5</div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4 space-x-3">
+                    <a href="{% url 'show_user_edit_booking' %}?id=2" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                        Edit
+                    </a>
+                    <button type="button" onclick="showDeleteModal(2, 'Pertunjukan Gajah')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                        Batalkan Reservasi
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Reservation Button -->
+        <div class="p-6 bg-gray-50 border-t border-gray-200">
+            <a href="{% url 'show_user_add_booking' %}" class="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Tambah Reservasi Baru
+            </a>
+        </div>
+    </div>
+    
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 mx-4">
+            <h3 class="text-2xl font-bold mb-2 text-center">BATALKAN <span class="text-green-600">RESERVASI</span></h3>
+            <p class="text-gray-600 mb-8 text-center text-lg">Apakah anda yakin ingin membatalkan <span id="reservationName" class="bg-green-100 px-2 py-1 rounded">reservasi</span> ini?</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancelButton" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
+                    [TIDAK]
+                </button>
+                <form id="deleteForm" method="post" action="{% url 'show_user_booking' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="deleteId" name="cancel_id" value="">
+                    <button type="submit" class="px-6 py-2 text-red-600 font-bold rounded-lg hover:bg-red-50 transition">
+                        [YA]
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDeleteModal(id, name) {
+        // Set the reservation ID to delete
+        document.getElementById('deleteId').value = id;
+        
+        // Set the reservation name in the modal
+        document.getElementById('reservationName').textContent = name;
+        
+        // Show the modal
+        document.getElementById('cancelModal').classList.remove('hidden');
+    }
+    
+    // Add event listener to the cancel button
+    document.getElementById('cancelButton').addEventListener('click', function() {
+        document.getElementById('cancelModal').classList.add('hidden');
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('cancelModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

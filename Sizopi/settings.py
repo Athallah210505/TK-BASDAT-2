@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
+    'manajemen_atraksi_wahana',
+    'reservasi_booking_tiket',
     'manajemen_data_adopsi',
     'adopter_dan_riwayat', 
     'pengaturan_profil',
@@ -65,6 +67,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Sizopi.urls'
 
+import os
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
