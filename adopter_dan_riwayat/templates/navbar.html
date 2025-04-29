@@ -1,0 +1,185 @@
+{% load static %}
+
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 py-4 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center">
+  
+      <div class="flex items-center">
+        <a href="#" class="flex items-center group">
+          <div class="claw-container overflow-hidden">
+            <img src="{% static 'image/claw.svg' %}" class="h-10 w-10 claw-icon" alt="Claw Icon">
+          </div>
+          <span class="ml-2 text-2xl font-bold text-green-500">SIZOPI</span>
+        </a>
+      </div>
+
+  
+      <div class="hidden md:flex items-center space-x-10">
+        <a href="#" class="nav-link active text-gray-900 hover:text-green-600 px-2 py-1 transition-colors duration-300">Home</a>
+        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 transition-colors duration-300">About</a>
+        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 transition-colors duration-300">Features</a>
+        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 transition-colors duration-300">Contact</a>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-4">
+        <a href="#" class="text-gray-700 hover:text-green-600 font-medium rounded-full px-5 py-2 transition-colors duration-300 border border-transparent hover:border-green-200">Log in</a>
+        <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-full px-6 py-2.5 transition-all duration-300 hover:shadow-md">Sign up</a>
+      </div>
+
+      <div class="md:hidden flex items-center">
+        <button id="mobile-menu-button" class="outline-none focus:outline-none">
+          <svg id="menu-icon" class="w-6 h-6 text-gray-500" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 text-gray-500 hidden" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="md:hidden max-h-0 overflow-hidden transition-all duration-300">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white">
+      <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-900 bg-gray-50 hover:bg-green-50 hover:text-green-600 transition-all duration-300">Home</a>
+      <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300">About</a>
+      <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300">Features</a>
+      <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300">Contact</a>
+      <div class="pt-4 flex flex-col space-y-3 border-t border-gray-100 mt-3 px-2">
+        <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 border border-gray-200 transition-all duration-300 text-center">Log in</a>
+        <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-white bg-green-500 hover:bg-green-600 transition-all duration-300 text-center">Sign up</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<style>
+  /* Navigation link styles */
+  .nav-link {
+    position: relative;
+    font-weight: 500;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #10B981;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    border-radius: 2px;
+  }
+
+  .nav-link:hover::after, .nav-link.active::after {
+    transform: scaleX(1);
+  }
+  
+  /* Claw animation styles */
+  .claw-container {
+    position: relative;
+  }
+  
+  .claw-icon {
+    transition: transform 0.5s ease;
+  }
+  
+  /* Continuous subtle pulsing/rotating animation */
+  @keyframes pulse-rotate {
+    0% {
+      transform: scale(1) rotate(0deg);
+    }
+    25% {
+      transform: scale(1.05) rotate(5deg);
+    }
+    50% {
+      transform: scale(1.1) rotate(0deg);
+    }
+    75% {
+      transform: scale(1.05) rotate(-5deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+    }
+  }
+  
+  /* Scratch animation on hover */
+  @keyframes scratch {
+    0% {
+      transform: rotate(0deg);
+    }
+    20% {
+      transform: rotate(-15deg);
+    }
+    40% {
+      transform: translateY(-2px) rotate(10deg);
+    }
+    60% {
+      transform: translateY(2px) rotate(-5deg);
+    }
+    80% {
+      transform: translateY(-1px) rotate(5deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  /* Apply continuous animation */
+  .claw-icon {
+    animation: pulse-rotate 6s infinite ease-in-out;
+  }
+  
+  /* Apply scratch animation on hover */
+  .claw-container:hover .claw-icon {
+    animation: scratch 0.7s ease-in-out;
+  }
+  
+  /* Add this to enable scrolling effect */
+  #navbar.scrolled {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+</style>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', () => {
+        if (mobileMenu.classList.contains('max-h-0')) {
+          mobileMenu.classList.remove('max-h-0');
+          mobileMenu.classList.add('max-h-screen');
+          menuIcon.classList.add('hidden');
+          closeIcon.classList.remove('hidden');
+        } else {
+          mobileMenu.classList.add('max-h-0');
+          mobileMenu.classList.remove('max-h-screen');
+          menuIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+        }
+      });
+    }
+    
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  });
+</script>

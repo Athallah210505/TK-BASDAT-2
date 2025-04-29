@@ -21,6 +21,10 @@ from register.views import register
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
+    path('', include('manajemen_data_adopsi.urls')),
+    path('', include('adopter_dan_riwayat.urls')),
+    path('', include('pengaturan_profil.urls')),
+    path('', include('login_and_logout.urls')),
     path('register/', register, name='register'),
     path('animals/', include(('animals.urls', 'animals'), namespace='animals')),
     path('habitat/', include(('habitat.urls', 'habitat'), namespace='habitat')),
