@@ -1,0 +1,255 @@
+{% load static %}
+
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 py-4 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <a href="#" class="flex items-center group">
+          <div class="claw-container overflow-hidden">
+            <img src="{% static 'image/claw.svg' %}" class="h-10 w-10 claw-icon" alt="Claw Icon">
+          </div>
+          <span class="ml-2 text-2xl font-bold text-green-500">SIZOPI</span>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex items-center space-x-8">
+        <!-- Common links for all roles -->
+        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Dashboard
+        </a>
+        
+        <!-- Role-specific links will be dynamically inserted here -->
+        <div id="role-specific-menu" class="flex items-center space-x-8">
+          <!-- For demo purposes, showing admin role links -->
+          <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+            Kelola Pengunjung
+          </a>
+          
+          <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+            Kelola Adopsi
+          </a>
+          
+          <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+            Kelola Adopter
+          </a>
+        </div>
+        
+        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Profile
+        </a>
+        
+        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Logout
+        </a>
+      </div>
+
+      <!-- User info -->
+      <div class="hidden md:flex items-center">
+        <span class="text-sm text-gray-700 mr-2">User Name</span>
+        <div class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">
+          <span id="current-role">Staf Administrasi</span>
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button id="mobile-menu-button" class="p-1 text-gray-500 hover:text-gray-700 focus:outline-none">
+          <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile menu, hidden by default -->
+  <div id="mobile-menu" class="md:hidden hidden">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-50 hover:text-green-600 hover:bg-green-50">
+        Dashboard
+      </a>
+      
+      <!-- Role-specific mobile links -->
+      <div id="mobile-role-menu">
+        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+          Kelola Pengunjung
+        </a>
+        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+          Kelola Adopsi
+        </a>
+        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+          Kelola Adopter
+        </a>
+      </div>
+      
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        Profile
+      </a>
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        Logout
+      </a>
+      
+      <div class="mt-4 pt-4 border-t border-gray-100">
+        <div class="flex items-center px-3">
+          <span class="text-sm font-medium text-gray-700">User Name</span>
+          <span class="ml-2 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
+            Staf Administrasi
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Role selector for demo purposes -->
+<div class="fixed bottom-4 right-4 bg-white rounded-md shadow-md p-2 z-40 text-xs">
+  <select id="role-selector" class="block w-36 text-xs border border-gray-200 rounded-md">
+    <option value="admin">Staf Administrasi</option>
+    <option value="doctor">Dokter Hewan</option>
+    <option value="caretaker">Penjaga Hewan</option>
+    <option value="trainer">Pelatih Pertunjukan</option>
+    <option value="visitor">Pengunjung</option>
+    <option value="adopter">Pengunjung (Adopter)</option>
+  </select>
+</div>
+
+<style>
+  /* Navigation link styles - simpler version */
+  .nav-link {
+    position: relative;
+    font-weight: 500;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -6px;
+    left: 0;
+    background-color: #10B981;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+  
+  /* Navbar scroll effect */
+  #navbar.scrolled {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.98);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile menu functionality
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', function() {
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+  
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 10) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  });
+  
+  // Role-specific menu handling
+  const roleSelector = document.getElementById('role-selector');
+  const roleSpecificMenu = document.getElementById('role-specific-menu');
+  const mobileRoleMenu = document.getElementById('mobile-role-menu');
+  const currentRole = document.getElementById('current-role');
+  
+  // Define role-specific menu items
+  const roleMenuItems = {
+    'admin': [
+      { name: 'Kelola Pengunjung' },
+      { name: 'Kelola Adopsi' },
+      { name: 'Kelola Adopter' }
+    ],
+    'doctor': [
+      { name: 'Rekam Medis Hewan' }
+    ],
+    'caretaker': [
+      { name: 'Catatan Perawatan Hewan' }
+    ],
+    'trainer': [
+      { name: 'Jadwal Pertunjukan' }
+    ],
+    'visitor': [
+      { name: 'Informasi Kebun Binatang' }
+    ],
+    'adopter': [
+      { name: 'Informasi Kebun Binatang' },
+      { name: 'Hewan Adopsi' }
+    ]
+  };
+  
+  // Update role-specific menu
+  function updateRoleMenu(role) {
+    // Clear existing links
+    roleSpecificMenu.innerHTML = '';
+    mobileRoleMenu.innerHTML = '';
+    
+    // Set current role text
+    let roleText = '';
+    switch(role) {
+      case 'admin': roleText = 'Staf Administrasi'; break;
+      case 'doctor': roleText = 'Dokter Hewan'; break;
+      case 'caretaker': roleText = 'Penjaga Hewan'; break;
+      case 'trainer': roleText = 'Pelatih Pertunjukan'; break;
+      case 'visitor': roleText = 'Pengunjung'; break;
+      case 'adopter': roleText = 'Pengunjung (Adopter)'; break;
+    }
+    
+    // Update all role indicators
+    const roleIndicators = document.querySelectorAll('[id="current-role"]');
+    roleIndicators.forEach(el => {
+      el.textContent = roleText;
+    });
+    
+    // Add role-specific links
+    if (roleMenuItems[role]) {
+      roleMenuItems[role].forEach(item => {
+        // Add desktop menu item
+        const desktopLink = document.createElement('a');
+        desktopLink.href = '#';
+        desktopLink.className = 'nav-link text-gray-600 hover:text-green-600 transition-colors duration-200';
+        desktopLink.textContent = item.name;
+        roleSpecificMenu.appendChild(desktopLink);
+        
+        // Add mobile menu item
+        const mobileLink = document.createElement('a');
+        mobileLink.href = '#';
+        mobileLink.className = 'block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50';
+        mobileLink.textContent = item.name;
+        mobileRoleMenu.appendChild(mobileLink);
+      });
+    }
+  }
+  
+  // Initial update
+  if (roleSelector) {
+    updateRoleMenu(roleSelector.value);
+    
+    // Update on role change
+    roleSelector.addEventListener('change', function() {
+      updateRoleMenu(this.value);
+    });
+  }
+});
+</script>

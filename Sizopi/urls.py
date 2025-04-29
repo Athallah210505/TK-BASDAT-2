@@ -16,8 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from register.views import register
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
+    path('manajemen_atraksi_wahana/', include('manajemen_atraksi_wahana.urls')),
+    path('reservasi_booking_tiket/', include('reservasi_booking_tiket.urls')),
+    path('', include('manajemen_data_adopsi.urls')),
+    path('', include('adopter_dan_riwayat.urls')),
+    path('', include('pengaturan_profil.urls')),
+    path('', include('login_and_logout.urls')),
+    path('register/', register, name='register'),
+    path('animals/', include(('animals.urls', 'animals'), namespace='animals')),
+    path('habitat/', include(('habitat.urls', 'habitat'), namespace='habitat')),
+    path('rekam_medis/', include('rekam_medis_hewan.urls')),
+    path('jadwal_pemeriksaan/', include('penjadwalan_pemeriksaan.urls')),
+    path('pemberian_pakan/', include('pemberian_pakan.urls')),
+
 ]

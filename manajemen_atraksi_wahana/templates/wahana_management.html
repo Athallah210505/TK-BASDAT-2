@@ -1,0 +1,494 @@
+{%extends "base.html"%}
+
+{% block content %}
+
+{%include 'navbar_staff.html'%}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Atraksi dan Wahana Taman Safari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 mt-20">
+            <div>
+                <h1 class="text-3xl font-bold text-green-500">Manajemen Atraksi dan Wahana</h1>
+                <p class="text-gray-600">Kelola semua atraksi dan wahana di Taman Safari</p>
+            </div>
+            <div class="text-gray-700">
+                <span class="px-4 py-2 rounded-lg bg-green-100">Staf Administrasi</span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-6">
+            <div class="tab-container bg-green-50 rounded-lg w-64 h-12 flex overflow-hidden">
+                <a href="{% url 'show_atraksi_management' %}" class="tab flex-1 flex items-center justify-center cursor-pointer text-green-800 font-medium py-3">
+                    Atraksi
+                </a>
+                <a href="{% url 'show_wahana_management' %}" class="tab flex-1 flex items-center justify-center cursor-pointer bg-green-500 text-white font-medium py-3">
+                    Wahana
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <h2 class="text-2xl font-bold mr-4">Halaman utama manajemen data wahana</h2>
+                    <span class="text-green-600 text-sm">role staf administrasi</span>
+                </div>
+                <button id="btnTambahWahana" class="px-4 py-2 rounded-lg bg-green-500 text-white flex items-center">
+                    <span class="mr-2">+</span> Tambah Wahana
+                </button>
+            </div>
+
+            <!-- Wahana Table -->
+            <div class="bg-white rounded-lg p-6 shadow-sm">
+                <div class="flex items-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    <h3 class="text-xl font-bold uppercase">DATA WAHANA</h3>
+                </div>
+
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-2">Nama Wahana</th>
+                            <th class="text-left py-3 px-2">Kapasitas</th>
+                            <th class="text-left py-3 px-2">Jadwal</th>
+                            <th class="text-left py-3 px-2">Peraturan</th>
+                            <th class="text-right py-3 px-2">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wahanaTableBody">
+                        <!-- Table content will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Wahana -->
+    <div id="modalTambahWahana" class="fixed inset-0 z-50 hidden modal flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-xl font-bold">FORM TAMBAH WAHANA</h2>
+                    <p class="text-gray-600">Masukkan detail wahana baru di bawah ini.</p>
+                </div>
+                <button id="closeTambahWahana" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="formTambahWahana">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Nama Wahana:</label>
+                    <input type="text" id="namaWahanaBaru" class="w-full border rounded-md p-2" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Kapasitas Maksimum:</label>
+                    <div class="flex items-center">
+                        <input type="number" id="kapasitasBaru" class="w-full border rounded-md p-2" value="50" required>
+                        <span class="ml-2">orang</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Jadwal:</label>
+                    <div class="relative">
+                        <select id="jadwalBaru" class="w-full border rounded-md p-2 appearance-none">
+                            <option value="">Pilih jadwal</option>
+                            <option value="09:00">09:00</option>
+                            <option value="09:30">09:30</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="13:30">13:30</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Peraturan:</label>
+                    <div id="peraturanContainer">
+                        <div class="mb-2 flex items-center">
+                            <span class="mr-2">1.</span>
+                            <input type="text" class="peraturan-input w-full border rounded-md p-2" placeholder="Masukkan peraturan">
+                        </div>
+                        <div class="mb-2 flex items-center">
+                            <span class="mr-2">2.</span>
+                            <input type="text" class="peraturan-input w-full border rounded-md p-2" placeholder="Masukkan peraturan">
+                        </div>
+                    </div>
+                    <button type="button" id="btnTambahPeraturan" class="mt-2 px-4 py-2 border rounded-md text-green-500 bg-white hover:bg-green-50">
+                        + Tambah Peraturan
+                    </button>
+                </div>
+
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="btnBatalTambah" class="px-6 py-2 border rounded-md">BATAL</button>
+                    <button type="submit" class="px-6 py-2 bg-green-400 text-white rounded-md hover:bg-green-500">SIMPAN</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Edit Wahana -->
+    <div id="modalEditWahana" class="fixed inset-0 z-50 hidden modal flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-xl font-bold">FORM EDIT WAHANA</h2>
+                    <p class="text-gray-600">Edit detail wahana di bawah ini.</p>
+                </div>
+                <button id="closeEditWahana" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="formEditWahana">
+                <input type="hidden" id="editWahanaId">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Nama Wahana:</label>
+                    <input type="text" id="namaWahanaEdit" class="w-full border rounded-md p-2" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Kapasitas Maksimum:</label>
+                    <div class="flex items-center">
+                        <input type="number" id="kapasitasEdit" class="w-full border rounded-md p-2" required>
+                        <span class="ml-2">orang</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Jadwal:</label>
+                    <div class="relative">
+                        <select id="jadwalEdit" class="w-full border rounded-md p-2 appearance-none">
+                            <option value="09:00">09:00</option>
+                            <option value="09:30">09:30</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="13:30">13:30</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Peraturan:</label>
+                    <div id="peraturanEditContainer">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    <button type="button" id="btnTambahPeraturanEdit" class="mt-2 px-4 py-2 border rounded-md text-green-500 bg-white hover:bg-green-50">
+                        + Tambah Peraturan
+                    </button>
+                </div>
+
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="btnBatalEdit" class="px-6 py-2 border rounded-md">BATAL</button>
+                    <button type="submit" class="px-6 py-2 bg-green-400 text-white rounded-md hover:bg-green-500">SIMPAN PERUBAHAN</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Hapus Wahana -->
+    <div id="modalHapusWahana" class="fixed inset-0 z-50 hidden modal flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">HAPUS WAHANA</h2>
+            <p class="mb-6">Apakah anda yakin ingin menghapus wahana ini?</p>
+            
+            <div class="flex justify-end space-x-2">
+                <button id="btnBatalHapus" class="px-6 py-2 border rounded-md bg-gray-200">[TIDAK]</button>
+                <button id="btnKonfirmasiHapus" class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">[YA]</button>
+            </div>
+            <input type="hidden" id="hapusWahanaId">
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let wahanaData = [
+            {
+                id: 1,
+                nama: 'Roller Coaster',
+                kapasitas: 24,
+                jadwal: '10:00',
+                peraturan: ['Tidak diperbolehkan untuk anak di bawah 120 cm']
+            },
+            {
+                id: 2,
+                nama: 'Komedi Putar',
+                kapasitas: 30,
+                jadwal: '09:30',
+                peraturan: ['Pengunjung dilarang berdiri saat perjalanan berlangsung']
+            },
+            {
+                id: 3,
+                nama: 'Rumah Hantu',
+                kapasitas: 15,
+                jadwal: '11:00',
+                peraturan: ['Dilarang masuk bagi yang memiliki riwayat penyakit jantung']
+            },
+            {
+                id: 4,
+                nama: 'Tornado',
+                kapasitas: 20,
+                jadwal: '13:30',
+                peraturan: ['Pastikan tidak ada barang pribadi yang dibawa saat naik']
+            },
+            {
+                id: 5,
+                nama: 'Kora-kora',
+                kapasitas: 36,
+                jadwal: '14:00',
+                peraturan: ['Setiap pengunjung harus mengenakan sabuk pengaman']
+            }
+        ];
+
+        // DOM Elements
+        const wahanaTableBody = document.getElementById('wahanaTableBody');
+        const modalTambahWahana = document.getElementById('modalTambahWahana');
+        const btnTambahWahana = document.getElementById('btnTambahWahana');
+        const closeTambahWahana = document.getElementById('closeTambahWahana');
+        const btnBatalTambah = document.getElementById('btnBatalTambah');
+        const formTambahWahana = document.getElementById('formTambahWahana');
+        const btnTambahPeraturan = document.getElementById('btnTambahPeraturan');
+        const peraturanContainer = document.getElementById('peraturanContainer');
+        
+        const modalEditWahana = document.getElementById('modalEditWahana');
+        const closeEditWahana = document.getElementById('closeEditWahana');
+        const btnBatalEdit = document.getElementById('btnBatalEdit');
+        const formEditWahana = document.getElementById('formEditWahana');
+        const btnTambahPeraturanEdit = document.getElementById('btnTambahPeraturanEdit');
+        const peraturanEditContainer = document.getElementById('peraturanEditContainer');
+        
+        const modalHapusWahana = document.getElementById('modalHapusWahana');
+        const btnBatalHapus = document.getElementById('btnBatalHapus');
+        const btnKonfirmasiHapus = document.getElementById('btnKonfirmasiHapus');
+        
+        // Functions
+        function renderWahanaTable() {
+            wahanaTableBody.innerHTML = '';
+            
+            wahanaData.forEach(wahana => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200';
+                
+                row.innerHTML = `
+                    <td class="py-4 px-2">${wahana.nama}</td>
+                    <td class="py-4 px-2">${wahana.kapasitas} orang</td>
+                    <td class="py-4 px-2">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            ${wahana.jadwal}
+                        </div>
+                    </td>
+                    <td class="py-4 px-2">
+                        ${wahana.peraturan.map((p, i) => `<div>${i+1}. ${p}</div>`).join('')}
+                    </td>
+                    <td class="py-4 px-2 text-right">
+                        <button class="text-blue-500 mr-2 edit-btn" data-id="${wahana.id}">[Edit]</button>
+                        <button class="text-red-500 hapus-btn" data-id="${wahana.id}">[Hapus]</button>
+                    </td>
+                `;
+                
+                wahanaTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to the newly created buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.hapus-btn').forEach(btn => {
+                btn.addEventListener('click', () => openHapusModal(btn.dataset.id));
+            });
+        }
+        
+        function addPeraturanField(container, value = '') {
+            const peraturanCount = container.querySelectorAll('.peraturan-input').length + 1;
+            const peraturanDiv = document.createElement('div');
+            peraturanDiv.className = 'mb-2 flex items-center';
+            peraturanDiv.innerHTML = `
+                <span class="mr-2">${peraturanCount}.</span>
+                <input type="text" class="peraturan-input w-full border rounded-md p-2" placeholder="Masukkan peraturan" value="${value}">
+            `;
+            container.appendChild(peraturanDiv);
+        }
+        
+        function openEditModal(wahanaId) {
+            const wahana = wahanaData.find(w => w.id == wahanaId);
+            if (!wahana) return;
+            
+            document.getElementById('editWahanaId').value = wahana.id;
+            document.getElementById('namaWahanaEdit').value = wahana.nama;
+            document.getElementById('kapasitasEdit').value = wahana.kapasitas;
+            document.getElementById('jadwalEdit').value = wahana.jadwal;
+            
+            // Clear and repopulate peraturan fields
+            peraturanEditContainer.innerHTML = '';
+            wahana.peraturan.forEach(p => {
+                addPeraturanField(peraturanEditContainer, p);
+            });
+            
+            modalEditWahana.classList.remove('hidden');
+        }
+        
+        function openHapusModal(wahanaId) {
+            document.getElementById('hapusWahanaId').value = wahanaId;
+            modalHapusWahana.classList.remove('hidden');
+        }
+        
+        // Event Listeners
+        window.addEventListener('DOMContentLoaded', () => {
+            renderWahanaTable();
+        });
+        
+        btnTambahWahana.addEventListener('click', () => {
+            modalTambahWahana.classList.remove('hidden');
+        });
+        
+        closeTambahWahana.addEventListener('click', () => {
+            modalTambahWahana.classList.add('hidden');
+        });
+        
+        btnBatalTambah.addEventListener('click', () => {
+            modalTambahWahana.classList.add('hidden');
+        });
+        
+        btnTambahPeraturan.addEventListener('click', () => {
+            addPeraturanField(peraturanContainer);
+        });
+        
+        formTambahWahana.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const namaWahana = document.getElementById('namaWahanaBaru').value;
+            const kapasitas = document.getElementById('kapasitasBaru').value;
+            const jadwal = document.getElementById('jadwalBaru').value;
+            
+            const peraturanInputs = peraturanContainer.querySelectorAll('.peraturan-input');
+            const peraturan = Array.from(peraturanInputs)
+                .map(input => input.value)
+                .filter(val => val.trim() !== '');
+            
+            const newId = Math.max(...wahanaData.map(w => w.id), 0) + 1;
+            
+            wahanaData.push({
+                id: newId,
+                nama: namaWahana,
+                kapasitas: parseInt(kapasitas),
+                jadwal: jadwal,
+                peraturan: peraturan
+            });
+            
+            renderWahanaTable();
+            modalTambahWahana.classList.add('hidden');
+            
+            // Reset form
+            formTambahWahana.reset();
+            peraturanContainer.innerHTML = '';
+            addPeraturanField(peraturanContainer);
+            addPeraturanField(peraturanContainer);
+        });
+        
+        closeEditWahana.addEventListener('click', () => {
+            modalEditWahana.classList.add('hidden');
+        });
+        
+        btnBatalEdit.addEventListener('click', () => {
+            modalEditWahana.classList.add('hidden');
+        });
+        
+        btnTambahPeraturanEdit.addEventListener('click', () => {
+            addPeraturanField(peraturanEditContainer);
+        });
+        
+        formEditWahana.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const wahanaId = document.getElementById('editWahanaId').value;
+            const nama = document.getElementById('namaWahanaEdit').value;
+            const kapasitas = document.getElementById('kapasitasEdit').value;
+            const jadwal = document.getElementById('jadwalEdit').value;
+            
+            const peraturanInputs = peraturanEditContainer.querySelectorAll('.peraturan-input');
+            const peraturan = Array.from(peraturanInputs)
+                .map(input => input.value)
+                .filter(val => val.trim() !== '');
+            
+            const index = wahanaData.findIndex(w => w.id == wahanaId);
+            if (index !== -1) {
+                wahanaData[index] = {
+                    ...wahanaData[index],
+                    nama,
+                    kapasitas: parseInt(kapasitas),
+                    jadwal,
+                    peraturan
+                };
+            }
+            
+            renderWahanaTable();
+            modalEditWahana.classList.add('hidden');
+        });
+        
+        btnBatalHapus.addEventListener('click', () => {
+            modalHapusWahana.classList.add('hidden');
+        });
+        
+        btnKonfirmasiHapus.addEventListener('click', () => {
+            const wahanaId = document.getElementById('hapusWahanaId').value;
+            wahanaData = wahanaData.filter(w => w.id != wahanaId);
+            
+            renderWahanaTable();
+            modalHapusWahana.classList.add('hidden');
+        });
+        
+        // Initialize with two peraturan fields in the add form
+        addPeraturanField(peraturanContainer);
+        addPeraturanField(peraturanContainer);
+    </script>
+</body>
+</html>
+
+{% endblock %}  
