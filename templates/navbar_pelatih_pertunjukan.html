@@ -20,21 +20,10 @@
           Dashboard
         </a>
         
-        <!-- Role-specific links will be dynamically inserted here -->
-        <div id="role-specific-menu" class="flex items-center space-x-8">
-          <!-- For demo purposes, showing admin role links -->
-          <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-            Kelola Pengunjung
-          </a>
-          
-          <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-            Kelola Adopsi
-          </a>
-          
-          <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-            Kelola Adopter
-          </a>
-        </div>
+        <!-- Pelatih Pertunjukan (Trainer) specific links -->
+        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Jadwal Pertunjukan
+        </a>
         
         <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Profile
@@ -43,14 +32,6 @@
         <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Logout
         </a>
-      </div>
-
-      <!-- User info -->
-      <div class="hidden md:flex items-center">
-        <span class="text-sm text-gray-700 mr-2">User Name</span>
-        <div class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">
-          <span id="current-role">Staf Administrasi</span>
-        </div>
       </div>
 
       <!-- Mobile menu button -->
@@ -64,56 +45,30 @@
     </div>
   </div>
   
-  <!-- Mobile menu, hidden by default -->
+  <!-- Mobile menu -->
   <div id="mobile-menu" class="md:hidden hidden">
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
       <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-50 hover:text-green-600 hover:bg-green-50">
         Dashboard
       </a>
       
-      <!-- Role-specific mobile links -->
-      <div id="mobile-role-menu">
-        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
-          Kelola Pengunjung
-        </a>
-        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
-          Kelola Adopsi
-        </a>
-        <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
-          Kelola Adopter
-        </a>
-      </div>
+      <!-- Pelatih Pertunjukan (Trainer) mobile links -->
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        Jadwal Pertunjukan
+      </a>
       
       <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
         Profile
       </a>
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
-        Logout
-      </a>
       
-      <div class="mt-4 pt-4 border-t border-gray-100">
-        <div class="flex items-center px-3">
-          <span class="text-sm font-medium text-gray-700">User Name</span>
-          <span class="ml-2 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
-            Staf Administrasi
-          </span>
-        </div>
+      <div class="mt-2">
+        <button class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 transition-all duration-300 text-base">
+          Logout
+        </button>
       </div>
     </div>
   </div>
 </nav>
-
-<!-- Role selector for demo purposes -->
-<div class="fixed bottom-4 right-4 bg-white rounded-md shadow-md p-2 z-40 text-xs">
-  <select id="role-selector" class="block w-36 text-xs border border-gray-200 rounded-md">
-    <option value="admin">Staf Administrasi</option>
-    <option value="doctor">Dokter Hewan</option>
-    <option value="caretaker">Penjaga Hewan</option>
-    <option value="trainer">Pelatih Pertunjukan</option>
-    <option value="visitor">Pengunjung</option>
-    <option value="adopter">Pengunjung (Adopter)</option>
-  </select>
-</div>
 
 <style>
   /* Navigation link styles - simpler version */
@@ -167,89 +122,5 @@ document.addEventListener('DOMContentLoaded', function() {
       navbar.classList.remove('scrolled');
     }
   });
-  
-  // Role-specific menu handling
-  const roleSelector = document.getElementById('role-selector');
-  const roleSpecificMenu = document.getElementById('role-specific-menu');
-  const mobileRoleMenu = document.getElementById('mobile-role-menu');
-  const currentRole = document.getElementById('current-role');
-  
-  // Define role-specific menu items
-  const roleMenuItems = {
-    'admin': [
-      { name: 'Kelola Pengunjung' },
-      { name: 'Kelola Adopsi' },
-      { name: 'Kelola Adopter' }
-    ],
-    'doctor': [
-      { name: 'Rekam Medis Hewan' }
-    ],
-    'caretaker': [
-      { name: 'Catatan Perawatan Hewan' }
-    ],
-    'trainer': [
-      { name: 'Jadwal Pertunjukan' }
-    ],
-    'visitor': [
-      { name: 'Informasi Kebun Binatang' }
-    ],
-    'adopter': [
-      { name: 'Informasi Kebun Binatang' },
-      { name: 'Hewan Adopsi' }
-    ]
-  };
-  
-  // Update role-specific menu
-  function updateRoleMenu(role) {
-    // Clear existing links
-    roleSpecificMenu.innerHTML = '';
-    mobileRoleMenu.innerHTML = '';
-    
-    // Set current role text
-    let roleText = '';
-    switch(role) {
-      case 'admin': roleText = 'Staf Administrasi'; break;
-      case 'doctor': roleText = 'Dokter Hewan'; break;
-      case 'caretaker': roleText = 'Penjaga Hewan'; break;
-      case 'trainer': roleText = 'Pelatih Pertunjukan'; break;
-      case 'visitor': roleText = 'Pengunjung'; break;
-      case 'adopter': roleText = 'Pengunjung (Adopter)'; break;
-    }
-    
-    // Update all role indicators
-    const roleIndicators = document.querySelectorAll('[id="current-role"]');
-    roleIndicators.forEach(el => {
-      el.textContent = roleText;
-    });
-    
-    // Add role-specific links
-    if (roleMenuItems[role]) {
-      roleMenuItems[role].forEach(item => {
-        // Add desktop menu item
-        const desktopLink = document.createElement('a');
-        desktopLink.href = '#';
-        desktopLink.className = 'nav-link text-gray-600 hover:text-green-600 transition-colors duration-200';
-        desktopLink.textContent = item.name;
-        roleSpecificMenu.appendChild(desktopLink);
-        
-        // Add mobile menu item
-        const mobileLink = document.createElement('a');
-        mobileLink.href = '#';
-        mobileLink.className = 'block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50';
-        mobileLink.textContent = item.name;
-        mobileRoleMenu.appendChild(mobileLink);
-      });
-    }
-  }
-  
-  // Initial update
-  if (roleSelector) {
-    updateRoleMenu(roleSelector.value);
-    
-    // Update on role change
-    roleSelector.addEventListener('change', function() {
-      updateRoleMenu(this.value);
-    });
-  }
 });
 </script>
