@@ -6,7 +6,7 @@
 <div class="container mx-auto px-4 py-8 max-w-5xl mt-20">
     <!-- Header -->
     <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket Atraksi</h1>
-    <p class="text-gray-600 mb-6">Pesan tiket untuk atraksi favorit Anda di Taman Safari dan nikmati pengalaman yang tak terlupakan</p>
+    <p class="text-gray-600 mb-6">Edit reservasi tiket Anda di Taman Safari</p>
 
     <!-- Navigation Link -->
     <div class="mb-6">
@@ -22,14 +22,15 @@
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
         <div class="bg-green-100 p-4 flex items-center">
             <span class="text-green-600 mr-2"><i class="fas fa-ticket-alt"></i></span>
-            <h2 class="text-xl font-bold text-gray-800">TAMBAH RESERVASI</h2>
+            <h2 class="text-xl font-bold text-gray-800">EDIT RESERVASI</h2>
         </div>
         <div class="p-4 bg-green-50">
-            <p class="text-gray-600">Isi formulir untuk membuat reservasi tiket baru</p>
+            <p class="text-gray-600">Ubah detail reservasi tiket Anda</p>
         </div>
         
         <form method="post" action="{% url 'show_user_booking' %}" class="p-6">
             {% csrf_token %}
+            <input type="hidden" name="edit_id" id="editId">
             
             <div class="mb-4">
                 <label for="namaAtraksi" class="block text-gray-700 font-medium mb-2">Nama Atraksi:</label>
@@ -67,17 +68,17 @@
 
             <div class="mb-4">
                 <label for="jam" class="block text-gray-700 font-medium mb-2">Jam:</label>
-                <input type="time" id="jam" name="jam" value="10:00" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <input type="time" id="jam" name="jam" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
             <div class="mb-4">
                 <label for="tanggal" class="block text-gray-700 font-medium mb-2">Tanggal:</label>
-                <input type="date" id="tanggal" name="tanggal" value="2025-05-15" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <input type="date" id="tanggal" name="tanggal" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
             <div class="mb-6">
                 <label for="jumlahTiket" class="block text-gray-700 font-medium mb-2">Jumlah tiket yang ingin dibeli:</label>
-                <input type="number" id="jumlahTiket" name="jumlah_tiket" min="1" value="2" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <input type="number" id="jumlahTiket" name="jumlah_tiket" min="1" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                 <p id="maxTiket" class="text-sm text-gray-500 mt-1">Maksimal 120 tiket per reservasi</p>
             </div>
 
@@ -86,7 +87,7 @@
                     Batal
                 </a>
                 <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-                    Simpan
+                    Simpan Perubahan
                 </button>
             </div>
         </form>
@@ -119,10 +120,34 @@
             }
         }
         
-        // Add event listener for atraksi selection change
+        // Add event listener for attraction selection change
         namaAtraksiSelect.addEventListener('change', updateAttractionDetails);
         
-        // Call the function once on page load to initialize
+        // Get the ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id');
+        document.getElementById('editId').value = editId;
+        
+        // Pre-fill form based on edit ID
+        if (editId === '1') {
+            // Pertunjukan lumba-lumba
+            namaAtraksiSelect.value = 'pertunjukan_lumba_lumba';
+            document.getElementById('lokasi').value = 'Area Akuatik';
+            document.getElementById('jam').value = '10:00';
+            document.getElementById('tanggal').value = '2025-05-12';
+            document.getElementById('jumlahTiket').value = '10';
+            document.getElementById('maxTiket').textContent = 'Maksimal 30 tiket per reservasi';
+        } else if (editId === '2') {
+            // Pertunjukan Gajah
+            namaAtraksiSelect.value = 'pertunjukan_gajah';
+            document.getElementById('lokasi').value = 'Arena gajah';
+            document.getElementById('jam').value = '13:00';
+            document.getElementById('tanggal').value = '2025-05-15';
+            document.getElementById('jumlahTiket').value = '5';
+            document.getElementById('maxTiket').textContent = 'Maksimal 50 tiket per reservasi';
+        }
+        
+        // Trigger the update in case the select doesn't initialize properly
         updateAttractionDetails();
     });
 </script>

@@ -1,509 +1,149 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
 
 {% block content %}
-{%include 'navbar_pengunjung.html'%}
+{% include 'navbar_pengunjung.html' %}
 
+<div class="container mx-auto px-4 py-8 max-w-5xl mt-20">
+    <!-- Header -->
+    <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket Atraksi</h1>
+    <p class="text-gray-600 mb-6">Lihat dan kelola reservasi tiket Anda di Taman Safari</p>
 
-<body class="bg-green-50">
-    <div class="container mx-auto px-4 py-8 max-w-5xl mt-20">
-        <!-- Header -->
-        <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket Atraksi</h1>
-        <p class="text-gray-600 mb-6">Pesan tiket untuk atraksi favorit Anda di Taman Safari dan nikmati pengalaman yang tak terlupakan</p>
-
-        <!-- Tab Navigation -->
-        <div class="flex mb-8">
-            <a href="#" id="formReservasiTab" class="flex-1 bg-green-500 text-white text-center py-3 rounded-l-lg hover:bg-green-600 transition">Form Reservasi</a>
-            <a href="#" id="daftarReservasiTab" class="flex-1 bg-green-100 text-green-800 text-center py-3 rounded-r-lg hover:bg-green-200 transition">Daftar Reservasi Saya</a>
+    <!-- Daftar Reservasi Section -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="bg-gray-800 p-4 flex items-center">
+            <span class="text-green-400 mr-2"><i class="fas fa-list"></i></span>
+            <h2 class="text-xl font-bold text-white">Daftar Reservasi Saya</h2>
+        </div>
+        <div class="p-4 bg-gray-100">
+            <p class="text-gray-600">Lihat dan kelola reservasi tiket Anda</p>
         </div>
 
-        <!-- Form Reservasi Section -->
-        <div id="formReservasiSection" class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-            <div class="bg-green-100 p-4 flex items-center">
-                <span class="text-green-600 mr-2"><i class="fas fa-ticket-alt"></i></span>
-                <h2 class="text-xl font-bold text-gray-800">EDIT RESERVASI</h2>
-            </div>
-            <div class="p-4 bg-green-50">
-                <p class="text-gray-600">Ubah detail reservasi tiket Anda</p>
-            </div>
-            
-            <form id="reservasiForm" class="p-6">
-                <div class="mb-4">
-                    <label for="namaAtraksi" class="block text-gray-700 font-medium mb-2">Nama Atraksi:</label>
-                    <div class="relative">
-                        <select id="namaAtraksi" class="w-full p-3 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <option value="">Pilih Atraksi</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
+        <div class="p-6">
+            <!-- Example of reservation card - first item -->
+            <div class="mb-6 pb-6 border-b border-gray-200">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xl font-semibold">Pertunjukan lumba-lumba</h3>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Terjadwal</span>
+                </div>
+                <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-gray-500 mb-1">Lokasi:</div>
+                        <div>Area Akuatik</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jam:</div>
+                        <div>10:00</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Tanggal:</div>
+                        <div>12 Mei 2025</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jumlah tiket:</div>
+                        <div>10</div>
                     </div>
                 </div>
-
-                <div class="mb-4">
-                    <label for="lokasi" class="block text-gray-700 font-medium mb-2">Lokasi:</label>
-                    <input type="text" id="lokasi" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" readonly>
-                </div>
-
-                <div class="mb-4">
-                    <label for="jam" class="block text-gray-700 font-medium mb-2">Jam:</label>
-                    <input type="time" id="jam" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                </div>
-
-                <div class="mb-4">
-                    <label for="tanggal" class="block text-gray-700 font-medium mb-2">Tanggal:</label>
-                    <div class="relative">
-                        <input type="text" id="tanggalDisplay" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" readonly>
-                        <input type="hidden" id="tanggal">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <!-- Calendar Modal -->
-                    <div id="calendarModal" class="hidden absolute bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                        <div class="p-3 border-b flex items-center justify-between">
-                            <button id="prevMonth" class="text-gray-600 hover:text-gray-800">
-                                <span class="sr-only">Previous month</span>
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                                </svg>
-                            </button>
-                            <div id="currentMonth" class="font-medium"></div>
-                            <button id="nextMonth" class="text-gray-600 hover:text-gray-800">
-                                <span class="sr-only">Next month</span>
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="p-2">
-                            <div class="grid grid-cols-7 gap-1 text-center text-sm">
-                                <div class="py-1">Mi</div>
-                                <div class="py-1">Se</div>
-                                <div class="py-1">Se</div>
-                                <div class="py-1">Ra</div>
-                                <div class="py-1">Ka</div>
-                                <div class="py-1">Ju</div>
-                                <div class="py-1">Sa</div>
-                            </div>
-                            <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <label for="jumlahTiket" class="block text-gray-700 font-medium mb-2">Jumlah tiket yang ingin dibeli:</label>
-                    <input type="number" id="jumlahTiket" min="1" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <p id="maxTiket" class="text-sm text-gray-500 mt-1">Maksimal 120 tiket per reservasi</p>
-                </div>
-
-                <div class="flex justify-end space-x-3">
-                    <button type="button" id="batalButton" class="px-6 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition">
-                        [BATAL]
-                    </button>
-                    <button type="submit" id="simpanButton" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-                        [SIMPAN]
+                <div class="flex justify-end mt-4 space-x-3">
+                    <a href="{% url 'show_user_edit_booking' %}?id=1" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                        Edit
+                    </a>
+                    <button type="button" onclick="showDeleteModal(1, 'Pertunjukan lumba-lumba')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                        Batalkan Reservasi
                     </button>
                 </div>
-            </form>
-        </div>
-
-        <!-- Daftar Reservasi Section -->
-        <div id="daftarReservasiSection" class="bg-white rounded-lg shadow-md overflow-hidden mb-8 hidden">
-            <div class="bg-gray-800 p-4 flex items-center">
-                <span class="text-green-400 mr-2"><i class="fas fa-list"></i></span>
-                <h2 class="text-xl font-bold text-white">Daftar Reservasi Saya</h2>
-            </div>
-            <div class="p-4 bg-gray-100">
-                <p class="text-gray-600">Lihat dan kelola reservasi tiket Anda</p>
             </div>
 
-            <div id="reservasiList" class="p-6">
-                <!-- Reservasi items will be populated by JavaScript -->
+            <!-- Example of reservation card - second item -->
+            <div class="mb-6 pb-6 border-b border-gray-200 border-b-0">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xl font-semibold">Pertunjukan Gajah</h3>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Terjadwal</span>
+                </div>
+                <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-gray-500 mb-1">Lokasi:</div>
+                        <div>Arena gajah</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jam:</div>
+                        <div>13:00</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Tanggal:</div>
+                        <div>15 Mei 2025</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 mb-1">Jumlah tiket:</div>
+                        <div>5</div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4 space-x-3">
+                    <a href="{% url 'show_user_edit_booking' %}?id=2" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                        Edit
+                    </a>
+                    <button type="button" onclick="showDeleteModal(2, 'Pertunjukan Gajah')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                        Batalkan Reservasi
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
-        <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-                <h3 class="text-xl font-bold mb-4">BATALKAN RESERVASI</h3>
-                <p class="text-gray-600 mb-6">Apakah anda yakin ingin membatalkan reservasi ini?</p>
-                <div class="flex justify-end space-x-3">
-                    <button id="cancelDelete" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                        [TIDAK]
-                    </button>
-                    <button id="confirmDelete" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+        <!-- Add New Reservation Button -->
+        <div class="p-6 bg-gray-50 border-t border-gray-200">
+            <a href="{% url 'show_user_add_booking' %}" class="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Tambah Reservasi Baru
+            </a>
+        </div>
+    </div>
+    
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 mx-4">
+            <h3 class="text-2xl font-bold mb-2 text-center">BATALKAN <span class="text-green-600">RESERVASI</span></h3>
+            <p class="text-gray-600 mb-8 text-center text-lg">Apakah anda yakin ingin membatalkan <span id="reservationName" class="bg-green-100 px-2 py-1 rounded">reservasi</span> ini?</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancelButton" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
+                    [TIDAK]
+                </button>
+                <form id="deleteForm" method="post" action="{% url 'show_user_booking' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="deleteId" name="cancel_id" value="">
+                    <button type="submit" class="px-6 py-2 text-red-600 font-bold rounded-lg hover:bg-red-50 transition">
                         [YA]
                     </button>
-                </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Sample data
-        const atraksiData = [
-            { nama: "Pertunjukan Singa Laut", lokasi: "Arena singa laut", jadwal: "2025-01-08 11:00:00", kapasitas_max: 10 },
-            { nama: "Show Burung Bebas", lokasi: "Arena Burung", jadwal: "2024-04-14 08:30:00", kapasitas_max: 20 },
-            { nama: "Pertunjukan Gajah", lokasi: "Arena gajah", jadwal: "2025-03-12 13:00:00", kapasitas_max: 50 },
-            { nama: "Atraksi Harimau", lokasi: "Arena harimau", jadwal: "2024-01-19 16:00:00", kapasitas_max: 15 },
-            { nama: "Feeding Show", lokasi: "Arena tempat makan", jadwal: "2025-04-02 13:00:00", kapasitas_max: 20 },
-            { nama: "Pertunjukan lumba-lumba", lokasi: "Area Akuatik", jadwal: "2024-02-27 14:00:00", kapasitas_max: 30 },
-            { nama: "Show Kuda Laut", lokasi: "Arena Kuda laut", jadwal: "2025-02-01 10:00:00", kapasitas_max: 20 },
-            { nama: "Pertunjukan Komodo", lokasi: "Arena Komodo", jadwal: "2024-07-08 11:00:00", kapasitas_max: 20 },
-            { nama: "Atraksi Penguin", lokasi: "Arena Penguin", jadwal: "2025-04-02 12:00:00", kapasitas_max: 20 },
-            { nama: "Show Penguin", lokasi: "Arena Penguin", jadwal: "2025-04-02 13:00:00", kapasitas_max: 20 },
-            { nama: "Roller Coaster", lokasi: "Area Wahana", jadwal: "2025-02-24 10:00:00", kapasitas_max: 10 },
-            { nama: "Komedi Putar", lokasi: "Area Wahana", jadwal: "2025-02-24 10:00:00", kapasitas_max: 30 },
-            { nama: "Rumah Hantu", lokasi: "Area Wahana", jadwal: "2025-02-24 10:00:00", kapasitas_max: 5 },
-            { nama: "Tornado", lokasi: "Area Wahana", jadwal: "2025-02-24 10:00:00", kapasitas_max: 15 },
-            { nama: "Kora-kora", lokasi: "Area Wahana", jadwal: "2025-02-24 10:00:00", kapasitas_max: 35 }
-        ];
-
-        // User reservations data (simulated)
-        let userReservations = [
-            { id: 1, nama: "Pertunjukan lumba-lumba", lokasi: "Area Akuatik", tanggal: "12 Mei 2025", jam: "10:00", jumlahTiket: 10 },
-            { id: 2, nama: "Pertunjukan Gajah", lokasi: "Arena gajah", tanggal: "15 Mei 2025", jam: "13:00", jumlahTiket: 5 }
-        ];
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Populate attraction dropdown
-            const namaAtraksiSelect = document.getElementById('namaAtraksi');
-            atraksiData.forEach(atraksi => {
-                const option = document.createElement('option');
-                option.value = atraksi.nama;
-                option.textContent = atraksi.nama;
-                namaAtraksiSelect.appendChild(option);
-            });
-
-            // Handle attraction selection change
-            namaAtraksiSelect.addEventListener('change', function() {
-                const selectedAtraksi = atraksiData.find(a => a.nama === this.value);
-                if (selectedAtraksi) {
-                    document.getElementById('lokasi').value = selectedAtraksi.lokasi;
-                    
-                    // Extract time from jadwal
-                    const jadwalDate = new Date(selectedAtraksi.jadwal);
-                    const hours = jadwalDate.getHours().toString().padStart(2, '0');
-                    const minutes = jadwalDate.getMinutes().toString().padStart(2, '0');
-                    document.getElementById('jam').value = `${hours}:${minutes}`;
-                    
-                    // Update max tickets text
-                    document.getElementById('maxTiket').textContent = `Maksimal ${selectedAtraksi.kapasitas_max} tiket per reservasi`;
-                } else {
-                    document.getElementById('lokasi').value = '';
-                    document.getElementById('jam').value = '';
-                    document.getElementById('maxTiket').textContent = 'Maksimal 120 tiket per reservasi';
-                }
-            });
-
-            // Tab switching
-            document.getElementById('formReservasiTab').addEventListener('click', function(e) {
-                e.preventDefault();
-                showTab('formReservasiSection');
-                this.className = 'flex-1 bg-green-500 text-white text-center py-3 rounded-l-lg hover:bg-green-600 transition';
-                document.getElementById('daftarReservasiTab').className = 'flex-1 bg-green-100 text-green-800 text-center py-3 rounded-r-lg hover:bg-green-200 transition';
-            });
-
-            document.getElementById('daftarReservasiTab').addEventListener('click', function(e) {
-                e.preventDefault();
-                showTab('daftarReservasiSection');
-                this.className = 'flex-1 bg-green-500 text-white text-center py-3 rounded-r-lg hover:bg-green-600 transition';
-                document.getElementById('formReservasiTab').className = 'flex-1 bg-green-100 text-green-800 text-center py-3 rounded-l-lg hover:bg-green-200 transition';
-                renderReservationList();
-            });
-
-            // Calendar functionality
-            const tanggalDisplay = document.getElementById('tanggalDisplay');
-            const calendarModal = document.getElementById('calendarModal');
-            const calendarDays = document.getElementById('calendarDays');
-            let currentDate = new Date();
-            
-            tanggalDisplay.addEventListener('click', function() {
-                calendarModal.style.display = calendarModal.style.display === 'none' ? 'block' : 'none';
-                calendarModal.style.top = (this.offsetTop + this.offsetHeight + 5) + 'px';
-                calendarModal.style.left = this.offsetLeft + 'px';
-                renderCalendar(currentDate);
-            });
-
-            document.getElementById('prevMonth').addEventListener('click', function() {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                renderCalendar(currentDate);
-            });
-
-            document.getElementById('nextMonth').addEventListener('click', function() {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                renderCalendar(currentDate);
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!calendarModal.contains(e.target) && e.target !== tanggalDisplay) {
-                    calendarModal.style.display = 'none';
-                }
-            });
-
-            // Form submission
-            document.getElementById('reservasiForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveReservation();
-            });
-
-            document.getElementById('batalButton').addEventListener('click', function() {
-                resetForm();
-            });
-
-            // Delete modal functionality
-            document.getElementById('cancelDelete').addEventListener('click', function() {
-                document.getElementById('deleteModal').classList.add('hidden');
-            });
-
-            document.getElementById('confirmDelete').addEventListener('click', function() {
-                const reservationId = this.dataset.reservationId;
-                deleteReservation(reservationId);
-                document.getElementById('deleteModal').classList.add('hidden');
-            });
-
-            // Initialize with some default values
-            initializeForm();
-        });
-
-        // Helper functions
-        function showTab(tabId) {
-            document.getElementById('formReservasiSection').classList.add('hidden');
-            document.getElementById('daftarReservasiSection').classList.add('hidden');
-            document.getElementById(tabId).classList.remove('hidden');
+<script>
+    function showDeleteModal(id, name) {
+        // Set the reservation ID to delete
+        document.getElementById('deleteId').value = id;
+        
+        // Set the reservation name in the modal
+        document.getElementById('reservationName').textContent = name;
+        
+        // Show the modal
+        document.getElementById('cancelModal').classList.remove('hidden');
+    }
+    
+    // Add event listener to the cancel button
+    document.getElementById('cancelButton').addEventListener('click', function() {
+        document.getElementById('cancelModal').classList.add('hidden');
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('cancelModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
         }
-
-        function renderCalendar(date) {
-            const currentMonth = document.getElementById('currentMonth');
-            const calendarDays = document.getElementById('calendarDays');
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            
-            currentMonth.textContent = `${months[date.getMonth()]} ${date.getFullYear()}`;
-            calendarDays.innerHTML = '';
-            
-            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-            const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-            
-            // Add empty cells for days before the first day of the month
-            let dayOfWeek = firstDay.getDay();
-            dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Adjust for Monday as first day
-            
-            for (let i = 0; i < dayOfWeek; i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'p-2 text-gray-300';
-                calendarDays.appendChild(emptyDay);
-            }
-            
-            // Add days of the month
-            for (let i = 1; i <= lastDay.getDate(); i++) {
-                const dayElement = document.createElement('div');
-                dayElement.textContent = i;
-                dayElement.className = 'p-2 hover:bg-green-100 cursor-pointer rounded';
-                
-                // Check if this is the selected date
-                const currentDateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-                const hiddenDate = document.getElementById('tanggal');
-                
-                if (hiddenDate.value === currentDateStr) {
-                    dayElement.classList.add('bg-green-500', 'text-white');
-                }
-                
-                dayElement.addEventListener('click', function() {
-                    const day = i.toString().padStart(2, '0');
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const year = date.getFullYear();
-                    
-                    // Store date in hidden field
-                    document.getElementById('tanggal').value = `${year}-${month}-${day}`;
-                    
-                    // Display formatted date
-                    const formattedDate = `${day} ${months[date.getMonth()]} ${year}`;
-                    document.getElementById('tanggalDisplay').value = formattedDate;
-                    
-                    // Hide calendar
-                    document.getElementById('calendarModal').style.display = 'none';
-                });
-                
-                calendarDays.appendChild(dayElement);
-            }
-        }
-
-        function saveReservation() {
-            const nama = document.getElementById('namaAtraksi').value;
-            const lokasi = document.getElementById('lokasi').value;
-            const jam = document.getElementById('jam').value;
-            const tanggalRaw = document.getElementById('tanggal').value;
-            const tanggalDisplay = document.getElementById('tanggalDisplay').value;
-            const jumlahTiket = document.getElementById('jumlahTiket').value;
-            
-            if (!nama || !lokasi || !jam || !tanggalRaw || !jumlahTiket) {
-                alert('Silahkan lengkapi semua data');
-                return;
-            }
-            
-            // Check if editing existing or creating new
-            const editingId = document.getElementById('reservasiForm').dataset.editingId;
-            
-            if (editingId) {
-                // Update existing reservation
-                const index = userReservations.findIndex(r => r.id.toString() === editingId);
-                if (index !== -1) {
-                    userReservations[index] = {
-                        id: parseInt(editingId),
-                        nama,
-                        lokasi,
-                        jam,
-                        tanggal: tanggalDisplay,
-                        jumlahTiket
-                    };
-                }
-            } else {
-                // Create new reservation
-                const newId = userReservations.length > 0 ? Math.max(...userReservations.map(r => r.id)) + 1 : 1;
-                userReservations.push({
-                    id: newId,
-                    nama,
-                    lokasi,
-                    jam,
-                    tanggal: tanggalDisplay,
-                    jumlahTiket
-                });
-            }
-            
-            // Switch to reservations list
-            document.getElementById('daftarReservasiTab').click();
-            resetForm();
-        }
-
-        function resetForm() {
-            document.getElementById('reservasiForm').reset();
-            document.getElementById('reservasiForm').dataset.editingId = '';
-            document.getElementById('lokasi').value = '';
-            document.getElementById('tanggal').value = '';
-            document.getElementById('maxTiket').textContent = 'Maksimal 120 tiket per reservasi';
-        }
-
-        function renderReservationList() {
-            const reservasiList = document.getElementById('reservasiList');
-            reservasiList.innerHTML = '';
-            
-            userReservations.forEach(reservation => {
-                const reservationElement = document.createElement('div');
-                reservationElement.className = 'mb-6 pb-6 border-b border-gray-200 last:border-b-0';
-                reservationElement.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-xl font-semibold">${reservation.nama}</h3>
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Terjadwal</span>
-                    </div>
-                    <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 mb-1">Lokasi:</div>
-                            <div>${reservation.lokasi}</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 mb-1">Jam:</div>
-                            <div>${reservation.jam}</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 mb-1">Tanggal:</div>
-                            <div>${reservation.tanggal}</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-500 mb-1">Jumlah tiket:</div>
-                            <div>${reservation.jumlahTiket}</div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mt-4 space-x-3">
-                        <button class="edit-button px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition" data-id="${reservation.id}">
-                            Edit
-                        </button>
-                        <button class="delete-button px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition" data-id="${reservation.id}">
-                            [BATALKAN RESERVASI]
-                        </button>
-                    </div>
-                `;
-                
-                reservasiList.appendChild(reservationElement);
-            });
-            
-            // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    editReservation(this.dataset.id);
-                });
-            });
-            
-            document.querySelectorAll('.delete-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    showDeleteConfirmation(this.dataset.id);
-                });
-            });
-        }
-
-        function editReservation(id) {
-            const reservation = userReservations.find(r => r.id.toString() === id);
-            if (!reservation) return;
-            
-            // Set form to editing mode
-            document.getElementById('reservasiForm').dataset.editingId = id;
-            
-            // Fill form with reservation data
-            document.getElementById('namaAtraksi').value = reservation.nama;
-            document.getElementById('lokasi').value = reservation.lokasi;
-            document.getElementById('jam').value = reservation.jam;
-            
-            // Set date
-            document.getElementById('tanggalDisplay').value = reservation.tanggal;
-            
-            // Convert display date to backend format
-            const dateParts = reservation.tanggal.split(' ');
-            const day = dateParts[0].padStart(2, '0');
-            
-            // Map month name to number
-            const months = {'Januari': '01', 'Februari': '02', 'Maret': '03', 'April': '04', 'Mei': '05', 'Juni': '06', 
-                           'Juli': '07', 'Agustus': '08', 'September': '09', 'Oktober': '10', 'November': '11', 'Desember': '12'};
-            const month = months[dateParts[1]];
-            const year = dateParts[2];
-            
-            document.getElementById('tanggal').value = `${year}-${month}-${day}`;
-            document.getElementById('jumlahTiket').value = reservation.jumlahTiket;
-            
-            // Switch to form tab
-            document.getElementById('formReservasiTab').click();
-        }
-
-        function showDeleteConfirmation(id) {
-            const modal = document.getElementById('deleteModal');
-            modal.classList.remove('hidden');
-            document.getElementById('confirmDelete').dataset.reservationId = id;
-        }
-
-        function deleteReservation(id) {
-            userReservations = userReservations.filter(r => r.id.toString() !== id);
-            renderReservationList();
-        }
-
-        function initializeForm() {
-            // Set today's date as default
-            const today = new Date();
-            const day = today.getDate().toString().padStart(2, '0');
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-            const year = today.getFullYear();
-            
-            document.getElementById('tanggal').value = `${year}-${month}-${day}`;
-            
-            // Display formatted date
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            document.getElementById('tanggalDisplay').value = `${day} ${months[today.getMonth()]} ${year}`;
-        }
-    </script>
-</body>
-</html>
-
+    });
+</script>
 {% endblock %}

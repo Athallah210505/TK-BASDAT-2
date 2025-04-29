@@ -551,8 +551,23 @@
             </div>
         </div>
     </div>
+    
+    <!-- Delete Atraksi Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md transform transition-all duration-300 scale-95 opacity-0" id="deleteModalContent">
+            <div class="p-6 text-center">
+                <h3 class="text-2xl font-bold mb-6">HAPUS ATRAKSI</h3>
+                <p id="deleteMessage" class="text-gray-700 text-lg mb-8">Apakah anda yakin ingin menghapus atraksi ini?</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="confirmDeleteBtn" class="px-8 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors duration-200">[YA]</button>
+                    <button id="closeDeleteBtn" class="px-8 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors duration-200">[TIDAK]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
-        // Simple modal control with HTML
+        // Modal control functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Modal show/hide functions
             function showModal(modalId, contentId) {
@@ -596,6 +611,8 @@
             });
             document.getElementById('closeDeleteBtn')?.addEventListener('click', () => hideModal('deleteModal', 'deleteModalContent'));
             document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
+                // Here you would add code to actually delete the attraction
+                // For now, we just close the modal
                 hideModal('deleteModal', 'deleteModalContent');
             });
     
