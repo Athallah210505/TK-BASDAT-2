@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta %}
+<title>Detail Adopsi Hewan</title>
+{% endblock %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="bg-green-50 min-h-screen pt-24 pb-12">
+  <div class="max-w-7xl mx-auto px-8">
+    <div class="bg-white rounded-2xl shadow-lg p-8 animate__animated animate__fadeIn">
+      <h1 class="text-3xl font-bold text-green-600 mb-8">Detail Adopsi Hewan</h1>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <!-- Animal Info -->
+        <div class="bg-green-100 p-8 rounded-xl border border-green-200 safari-card">
+          <h2 class="text-2xl font-semibold text-green-700 mb-6">Informasi Hewan</h2>
+          <div class="space-y-4">
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Nama Hewan:</p>
+              <p class="font-medium text-lg">Simba</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Jenis Hewan:</p>
+              <p class="font-medium text-lg">Singa Afrika</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Kondisi:</p>
+              <p class="font-medium text-lg">Sehat</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Adopter Info -->
+        <div class="bg-blue-50 p-8 rounded-xl border border-blue-200 safari-card">
+          <h2 class="text-2xl font-semibold text-blue-700 mb-6">Informasi Adopter</h2>
+          <div class="space-y-4">
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Nama Adopter:</p>
+              <p class="font-medium text-lg">Budi Santoso</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Tipe Adopter:</p>
+              <p class="font-medium text-lg">Individu</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Alamat:</p>
+              <p class="font-medium text-lg">Jl. Merdeka No. 123, Jakarta</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Kontak:</p>
+              <p class="font-medium text-lg">08123456789</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Adoption Details -->
+      <div class="bg-green-100 p-8 rounded-xl border border-green-200 mb-8 safari-card">
+        <h2 class="text-2xl font-semibold text-green-700 mb-6">Detail Adopsi</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="space-y-4">
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Tanggal Mulai Adopsi:</p>
+              <p class="font-medium text-lg">15 Januari 2023</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Tanggal Akhir Adopsi:</p>
+              <p class="font-medium text-lg">15 Januari 2024</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Status Pembayaran:</p>
+              <p class="font-medium text-lg">Lunas</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">Kontribusi Finansial:</p>
+              <p class="font-medium text-lg">Rp 5.000.000</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex flex-wrap justify-end gap-4">
+        <a href="/adoption/reports/1" class="bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+          </svg>
+          Pantau Kondisi
+        </a>
+        <a href="/adoption/certificate/1" class="bg-purple-500 hover:bg-purple-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          Sertifikat
+        </a>
+        <a href="/adoption/extend/1" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+          </svg>
+          Perpanjang
+        </a>
+        <button id="showEndModal" class="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          Hentikan
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Konfirmasi Berhenti Adopsi -->
+<div id="endAdoptionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate__animated animate__fadeIn hidden">
+  <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4 animate__animated animate__zoomIn safari-card">
+    <div class="text-center mb-6">
+      <div class="flex justify-center">
+        <div class="bg-red-100 p-3 rounded-full inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mt-4">Hentikan Adopsi</h2>
+    </div>
+    
+    <p class="text-center text-gray-600 mb-8">
+      Apakah Anda yakin ingin berhenti mengadopsi satwa ini?
+    </p>
+    
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <button id="cancelButton" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-full btn-shine inline-flex items-center justify-center">
+        <span>Batal</span>
+      </button>
+      <a href="/adoption/end/1" id="confirmButton" class="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <span>Ya</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('showEndModal').addEventListener('click', function() {
+    document.getElementById('endAdoptionModal').classList.remove('hidden');
+  });
+  
+  document.getElementById('cancelButton').addEventListener('click', function() {
+    document.getElementById('endAdoptionModal').classList.add('hidden');
+  });
+</script>
+{% endblock %}

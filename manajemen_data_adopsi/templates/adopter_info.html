@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+
+{% block meta %}
+<title>Informasi Adopter</title>
+{% endblock %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="container mx-auto p-6">
+    {% include "navbar.html" %}
+    
+    <div class="max-w-7xl mx-auto px-4 py-10 animate__animated animate__fadeIn">
+        <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+            <h1 class="text-3xl font-bold text-green-500 mb-6">Informasi Adopter</h1>
+            
+            <div class="bg-green-50 p-8 rounded-xl border border-green-100 mb-8 hover-scale transition-all duration-300">
+                <h2 class="text-2xl font-semibold text-green-600 mb-6">Detail Adopter</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="text-gray-500 text-sm">Nama:</p>
+                        <p class="font-medium text-lg">Budi Santoso</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Username:</p>
+                        <p class="font-medium text-lg">budi123</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Tipe Adopter:</p>
+                        <p class="font-medium text-lg">Individu</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Email:</p>
+                        <p class="font-medium text-lg">budi@example.com</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-gray-500 text-sm">Alamat:</p>
+                        <p class="font-medium text-lg">Jl. Merdeka No. 123, Jakarta</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Kontak:</p>
+                        <p class="font-medium text-lg">08123456789</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-8">
+                <h2 class="text-2xl font-semibold text-green-600 mb-6">Daftar Hewan yang Diadopsi</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="safari-card rounded-xl p-6 flex flex-col items-center bg-gradient-to-b from-green-50 to-green-100 border border-green-200">
+                        <div class="bg-green-100 p-6 rounded-full mb-6 animate-float">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Simba%28TheLionKing%29.png/250px-Simba%28TheLionKing%29.png" class="h-32 w-32 rounded-full object-cover" alt="Simba Icon">
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Simba</h3>
+                        <p class="text-gray-500">Singa Afrika</p>
+                        <div class="card-description mt-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Mulai:</span>
+                                <span>15 Januari 2023</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Akhir:</span>
+                                <span>15 Januari 2024</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Kondisi:</span>
+                                <span class="text-green-600 font-medium">Sehat</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 w-full">
+                            <a href="/adoption/1" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full btn-shine transition">
+                                Lihat Detail
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-8">
+                <a href="/adoptions/" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine transition flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Kembali ke Daftar Adopsi
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Daftar Adopter</title>
+{% endblock %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="bg-green-50 min-h-screen pt-16 pb-12">
+  <div class="max-w-7xl mx-auto px-8">
+    <div class="bg-white rounded-2xl shadow-xl p-8 animate__animated animate__fadeIn">
+      <!-- Page Header -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-green-600">Daftar Adopter</h1>
+          <p class="text-gray-500 mt-2">Manajemen data seluruh adopter satwa</p>
+        </div>
+      </div>
+
+      <!-- Top Contributors Card -->
+      <div class="bg-green-100 p-6 rounded-xl border border-green-200 mb-8 safari-card">
+        <h2 class="text-xl font-semibold text-green-700 mb-4">Top 5 Kontributor</h2>
+        <p class="text-gray-600 mb-4">Adopter dengan total kontribusi tertinggi dalam setahun terakhir</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <!-- Contributor 1 -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-yellow-600 font-bold text-xl">1</span>
+            </div>
+            <h3 class="font-medium">PT Maju Bersama</h3>
+            <p class="text-green-600 font-semibold">Rp12.500.000</p>
+          </div>
+          
+          <!-- Contributor 2 -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-gray-600 font-bold text-xl">2</span>
+            </div>
+            <h3 class="font-medium">Yayasan Peduli Satwa</h3>
+            <p class="text-green-600 font-semibold">Rp8.750.000</p>
+          </div>
+          
+          <!-- Contributor 3 -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-amber-600 font-bold text-xl">3</span>
+            </div>
+            <h3 class="font-medium">Ahmad Dhani</h3>
+            <p class="text-green-600 font-semibold">Rp7.200.000</p>
+          </div>
+          
+          <!-- Contributor 4 -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-gray-600 font-bold text-xl">4</span>
+            </div>
+            <h3 class="font-medium">Bambang Pamungkas</h3>
+            <p class="text-green-600 font-semibold">Rp5.000.000</p>
+          </div>
+          
+          <!-- Contributor 5 -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-gray-600 font-bold text-xl">5</span>
+            </div>
+            <h3 class="font-medium">Cindy Claudia</h3>
+            <p class="text-green-600 font-semibold">Rp3.500.000</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Adopter Table -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-green-700 mb-4">Daftar Lengkap Adopter</h2>
+        
+        <div class="overflow-x-auto bg-white rounded-xl border border-gray-200 shadow-sm">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-green-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Adopter</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Kontribusi</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Adopsi</th>
+                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <!-- Adopter 1 -->
+              <tr class="hover:bg-green-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <span class="text-green-600 font-medium">MB</span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">PT Maju Bersama</div>
+                      <div class="text-sm text-gray-500">pt.maju@example.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">Rp12.500.000</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">5 Adopsi</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <a href="/adopters/detail/PT001/" class="text-green-600 hover:text-green-900 mr-4">Detail</a>
+                  <button onclick="confirmDeleteAdopter('PT001', 'PT Maju Bersama')" class="text-red-600 hover:text-red-900 focus:outline-none">Hapus</button>
+                </td>
+              </tr>
+              
+              <!-- Adopter 2 -->
+              <tr class="hover:bg-green-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
+                      <span class="text-purple-600 font-medium">YP</span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">Yayasan Peduli Satwa</div>
+                      <div class="text-sm text-gray-500">yayasan.peduli@example.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">Rp8.750.000</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">3 Adopsi</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <a href="/adopters/detail/YPS002/" class="text-green-600 hover:text-green-900 mr-4">Detail</a>
+                  <button onclick="confirmDeleteAdopter('YPS002', 'Yayasan Peduli Satwa')" class="text-red-600 hover:text-red-900 focus:outline-none">Hapus</button>
+                </td>
+              </tr>
+              
+              <!-- Adopter 3 -->
+              <tr class="hover:bg-green-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center">
+                      <span class="text-amber-600 font-medium">AD</span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">Ahmad Dhani</div>
+                      <div class="text-sm text-gray-500">ahmad.dhani@example.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">Rp7.200.000</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">2 Adopsi</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <a href="/adopters/detail/AD003/" class="text-green-600 hover:text-green-900 mr-4">Detail</a>
+                  <button onclick="confirmDeleteAdopter('AD003', 'Ahmad Dhani')" class="text-red-600 hover:text-red-900 focus:outline-none">Hapus</button>
+                </td>
+              </tr>
+              
+              <!-- Adopter 4 -->
+              <tr class="hover:bg-green-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span class="text-blue-600 font-medium">BP</span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">Bambang Pamungkas</div>
+                      <div class="text-sm text-gray-500">bambang.p@example.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">Rp5.000.000</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">1 Adopsi</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <a href="/adopters/detail/BP004/" class="text-green-600 hover:text-green-900 mr-4">Detail</a>
+                  <button onclick="confirmDeleteAdopter('BP004', 'Bambang Pamungkas')" class="text-red-600 hover:text-red-900 focus:outline-none">Hapus</button>
+                </td>
+              </tr>
+              
+              <!-- Adopter 5 -->
+              <tr class="hover:bg-green-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 bg-pink-100 rounded-full flex items-center justify-center">
+                      <span class="text-pink-600 font-medium">CC</span>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">Cindy Claudia</div>
+                      <div class="text-sm text-gray-500">cindy.c@example.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">Rp3.500.000</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">1 Adopsi</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <a href="/adopters/detail/CC005/" class="text-green-600 hover:text-green-900 mr-4">Detail</a>
+                  <button onclick="confirmDeleteAdopter('CC005', 'Cindy Claudia')" class="text-red-600 hover:text-red-900 focus:outline-none">Hapus</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="flex items-center justify-between border-t border-gray-200 pt-4">
+        <div class="flex-1 flex justify-between sm:hidden">
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+          </a>
+          <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+          </a>
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-gray-700">
+              Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">7</span> results
+            </p>
+          </div>
+          <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Previous</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </a>
+              <a href="#" aria-current="page" class="z-10 bg-green-50 border-green-500 text-green-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                1
+              </a>
+              <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                2
+              </a>
+              <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Next</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate__animated animate__fadeIn hidden">
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4 animate__animated animate__zoomIn safari-card">
+      <div class="text-center mb-6">
+        <div class="flex justify-center">
+          <div class="bg-red-100 p-3 rounded-full inline-block">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mt-4" id="modalTitle">Hapus Adopter</h2>
+      </div>
+      
+      <p class="text-center text-gray-600 mb-8" id="modalMessage">
+        Apakah Anda yakin ingin menghapus adopter ini?
+      </p>
+      
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <button onclick="closeModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-full btn-shine inline-flex items-center justify-center">
+          <span>Batal</span>
+        </button>
+        <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <span>Ya, Hapus</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg hidden"></div>
+  
+  <script>
+  let currentDeleteId = null;
+  let currentDeleteType = null;
+  let currentDeleteName = null;
+  
+  function showModal() {
+      document.getElementById('deleteModal').classList.remove('hidden');
+  }
+  
+  function closeModal() {
+      document.getElementById('deleteModal').classList.add('hidden');
+  }
+  
+  function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('hidden', 'bg-red-500', 'bg-green-500');
+      toast.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+      
+      setTimeout(() => {
+          toast.classList.add('hidden');
+      }, 3000);
+  }
+  
+  function confirmDeleteAdopter(id, name) {
+      currentDeleteId = id;
+      currentDeleteType = 'adopter';
+      currentDeleteName = name;
+      
+      document.getElementById('modalTitle').textContent = 'Hapus Adopter';
+      document.getElementById('modalMessage').textContent = `Apakah Anda yakin ingin menghapus adopter "${name}"? Semua data adopsi terkait juga akan dihapus.`;
+      document.getElementById('confirmDeleteBtn').onclick = deleteAdopter;
+      
+      showModal();
+  }
+  
+  function deleteAdopter() {
+      closeModal();
+      
+      const confirmBtn = document.getElementById('confirmDeleteBtn');
+      const originalText = confirmBtn.innerHTML;
+      confirmBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Menghapus...</span>
+      `;
+      confirmBtn.disabled = true;
+      
+      fetch(`/api/adopters/${currentDeleteId}/`, {
+          method: 'DELETE',
+          headers: {
+              'X-CSRFToken': getCookie('csrftoken'),
+              'Content-Type': 'application/json'
+          },
+          credentials: 'same-origin'
+      })
+      .then(response => {
+          if (!response.ok) {
+              return response.json().then(err => { throw new Error(err.message || 'Gagal menghapus adopter'); });
+          }
+          return response.json();
+      })
+      .then(data => {
+          showToast(data.message || 'Adopter berhasil dihapus');
+          setTimeout(() => {
+              window.location.reload();
+          }, 1000);
+      })
+      .catch(error => {
+          showToast(error.message, true);
+      })
+      .finally(() => {
+          confirmBtn.innerHTML = originalText;
+          confirmBtn.disabled = false;
+      });
+  }
+  
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  </script>
+  {% endblock %}

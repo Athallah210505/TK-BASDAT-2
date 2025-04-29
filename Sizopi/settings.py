@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,7 +42,16 @@ INSTALLED_APPS = [
     'main',
     'manajemen_atraksi_wahana',
     'reservasi_booking_tiket',
-    
+    'manajemen_data_adopsi',
+    'adopter_dan_riwayat', 
+    'pengaturan_profil',
+    'login_and_logout',
+    'register',
+    'animals', 
+    'habitat',   
+    'rekam_medis_hewan',
+    'penjadwalan_pemeriksaan',
+    'pemberian_pakan',  
 ]
 
 MIDDLEWARE = [
@@ -60,7 +71,11 @@ import os
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'),],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
+
+        'DIRS': [ BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
