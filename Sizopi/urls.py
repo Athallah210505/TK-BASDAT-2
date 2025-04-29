@@ -16,10 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from register.views import register
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
+    path('register/', register, name='register'),
+    path('animals/', include(('animals.urls', 'animals'), namespace='animals')),
+    path('habitat/', include(('habitat.urls', 'habitat'), namespace='habitat')),
     path('rekam_medis/', include('rekam_medis_hewan.urls')),
     path('jadwal_pemeriksaan/', include('penjadwalan_pemeriksaan.urls')),
     path('pemberian_pakan/', include('pemberian_pakan.urls')),

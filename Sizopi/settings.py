@@ -39,10 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
+    'register',
+    'animals', 
+    'habitat',   
     'rekam_medis_hewan',
     'penjadwalan_pemeriksaan',
-    'pemberian_pakan',
-    
+    'pemberian_pakan',  
 ]
 
 MIDDLEWARE = [
