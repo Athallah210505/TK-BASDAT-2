@@ -6,3 +6,4 @@
 | Cleo Excellen Iskandar | Hijau |
 | Athallah Nadhif Yuzak  | Biru  |
 | Aimee Callista Ferlintera Prudence Ernanto  | Merah |
+
