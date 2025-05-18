@@ -1,45 +1,41 @@
+
 {% load static %}
 
-<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 py-4 transition-all duration-300">
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between h-16">
       <!-- Logo -->
       <div class="flex items-center">
         <a href="#" class="flex items-center group">
           <div class="claw-container overflow-hidden">
-            <img src="{% static 'image/claw.svg' %}" class="h-10 w-10 claw-icon" alt="Claw Icon">
+            <img src="{% static 'image/claw.svg' %}" class="h-8 w-8 claw-icon" alt="Claw Icon">
           </div>
-          <span class="ml-2 text-2xl font-bold text-green-500">SIZOPI</span>
+          <span class="ml-2 text-xl font-bold text-green-500">SIZOPI</span>
         </a>
       </div>
 
-      <!-- Navigation Links -->
-      <div class="hidden md:flex items-center space-x-8">
-        <!-- Common links for all roles -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+      <!-- Navigation Links - Desktop -->
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
           Dashboard
         </a>
-        
-        <!-- Caretaker-specific links -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
           Catatan Perawatan Hewan
         </a>
-        
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
           Profile
         </a>
-        
-        <!-- Logout button -->
-        <button class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-full px-4 py-1.5 transition-all duration-300 hover:shadow-sm text-sm">
+        <a href="{% url 'logout' %}" class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm transition-all duration-200 shadow-sm">
           Logout
-        </button>
+        </a>
       </div>
 
       <!-- Mobile menu button -->
-      <div class="md:hidden">
-        <button id="mobile-menu-button" class="p-1 text-gray-500 hover:text-gray-700 focus:outline-none">
+      <div class="md:hidden flex items-center">
+        <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-green-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200">
           <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
@@ -47,33 +43,28 @@
   </div>
   
   <!-- Mobile menu, hidden by default -->
-  <div id="mobile-menu" class="md:hidden hidden">
-    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-50 hover:text-green-600 hover:bg-green-50">
+  <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100 shadow-sm">
+    <div class="py-2 space-y-1">
+      <a href="#" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
         Dashboard
       </a>
-      
-      <!-- Caretaker-specific mobile links -->
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="#" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
         Catatan Perawatan Hewan
       </a>
-      
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="#" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
         Profile
       </a>
-      
-      <!-- Logout button in mobile menu -->
-      <div class="mt-2">
-        <button class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 transition-all duration-300 text-base">
+      <div class="px-4 py-2">
+        <a href="{% url 'logout' %}" class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm text-center transition duration-200 shadow-sm">
           Logout
-        </button>
+        </a>
       </div>
     </div>
   </div>
 </nav>
 
 <style>
-  /* Navigation link styles - simpler version */
+  /* Navigation link styles - improved */
   .nav-link {
     position: relative;
     font-weight: 500;
@@ -84,33 +75,37 @@
     position: absolute;
     width: 100%;
     height: 2px;
-    bottom: -6px;
+    bottom: -4px;
     left: 0;
     background-color: #10B981;
     transform: scaleX(0);
-    transition: transform 0.2s ease;
+    transition: transform 0.3s ease;
+    border-radius: 1px;
   }
 
   .nav-link:hover::after {
     transform: scaleX(1);
   }
   
-  /* Claw animation styles */
+  /* Claw animation styles - improved */
   .claw-container {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .claw-icon {
     transition: transform 0.5s ease;
   }
   
-  /* Continuous subtle pulsing animation */
-  @keyframes pulse {
+  /* Smoother pulse animation */
+  @keyframes gentle-pulse {
     0% {
       transform: scale(1);
     }
     50% {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
     100% {
       transform: scale(1);
@@ -119,36 +114,72 @@
   
   /* Apply animation */
   .claw-icon {
-    animation: pulse 3s infinite ease-in-out;
+    animation: gentle-pulse 3s infinite ease-in-out;
   }
   
-  /* Navbar scroll effect */
+  /* Improved navbar scroll effect */
+  #navbar {
+    height: 64px;
+    transition: all 0.3s ease;
+  }
+  
   #navbar.scrolled {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: 56px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     background-color: rgba(255, 255, 255, 0.98);
+  }
+  
+  /* Smooth transitions */
+  #mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  #mobile-menu.open {
+    max-height: 300px; /* Adjust if needed */
   }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Mobile menu functionality
+  // Improved mobile menu functionality
   const mobileMenuButton = document.getElementById('mobile-menu-button');
   const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
   
   if (mobileMenuButton && mobileMenu) {
     mobileMenuButton.addEventListener('click', function() {
       mobileMenu.classList.toggle('hidden');
+      mobileMenu.classList.toggle('open');
+      
+      // Toggle between menu and close icons
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
     });
   }
   
-  // Navbar scroll effect
+  // Enhanced navbar scroll effect
   const navbar = document.getElementById('navbar');
   
   window.addEventListener('scroll', function() {
-    if (window.scrollY > 10) {
+    if (window.scrollY > 20) {
       navbar.classList.add('scrolled');
     } else {
       navbar.classList.remove('scrolled');
+    }
+  });
+  
+  // Add active state to current page
+  const currentLocation = window.location.pathname;
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  navLinks.forEach(link => {
+    const linkPath = link.getAttribute('href');
+    if (linkPath === currentLocation || (currentLocation.includes(linkPath) && linkPath !== '#')) {
+      link.classList.add('text-green-600');
+      link.classList.remove('text-gray-700');
     }
   });
 });
