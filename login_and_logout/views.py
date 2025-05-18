@@ -19,31 +19,32 @@ def login_view(request):
             with connection.cursor() as cursor:
                 cursor.execute("""
                     SELECT CASE
+                        WHEN EXISTS(SELECT 1 FROM sizopi.adopter WHERE username_adopter = %s) THEN 'pengunjung_adopter'
                         WHEN EXISTS(SELECT 1 FROM sizopi.pengunjung WHERE username_p = %s) THEN 'pengunjung'
                         WHEN EXISTS(SELECT 1 FROM sizopi.dokter_hewan WHERE username_dh = %s) THEN 'dokter'
                         WHEN EXISTS(SELECT 1 FROM sizopi.staf_admin WHERE username_sa = %s) THEN 'staff'
-                        WHEN EXISTS(SELECT 1 FROM sizopi.penjaga_hewan WHERE username_jh = %s) THEN 'pjh'
-                        WHEN EXISTS(SELECT 1 FROM sizopi.pelatih_hewan WHERE username_lh = %s) THEN 'plp'
+                        WHEN EXISTS(SELECT 1 FROM sizopi.penjaga_hewan WHERE username_jh = %s) THEN 'penjaga_hewan'
+                        WHEN EXISTS(SELECT 1 FROM sizopi.pelatih_hewan WHERE username_lh = %s) THEN 'pelatih_pertunjukan'
                         ELSE 'unknown'
                     END
-                """, [username]*5)
+                """, [username]*6)
                 role = cursor.fetchone()[0]
 
-            # Simpan ke session (opsional)
             request.session['username'] = username
             request.session['role'] = role
 
-            # Redirect ke dashboard yang sesuai
             if role == 'pengunjung':
                 return redirect('pengunjung_dashboard')
             elif role == 'dokter':
                 return redirect('dokter_hewan_dashboard')
             elif role == 'staff':
                 return redirect('show_staff_dashboard')
-            elif role == 'pjh':
+            elif role == 'penjaga_hewan':
                 return redirect('penjaga_hewan_dashboard')
-            elif role == 'plp':
+            elif role == 'pelatih_pertunjukan':
                 return redirect('pelatih_pertunjukan_dashboard')
+            elif role == 'pengunjung_adopter':
+                return redirect('pengunjung_adopter_dashboard')
             else:
                 messages.error(request, "Role tidak dikenali.")
                 return redirect('login')
