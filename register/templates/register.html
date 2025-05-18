@@ -7,6 +7,20 @@
 {% endblock %}
 
 {% block content %}
+{% include 'navbar.html' %}
+<div class="h-20"></div>
+
+{% if messages %}
+  <div class="space-y-2">
+    {% for message in messages %}
+      <div class="w-full px-4 py-2 rounded text-white {{ message.tags }} 
+                  {% if message.tags == 'error' %}bg-red-500{% elif message.tags == 'success' %}bg-green-500{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <div class="flex items-center justify-center min-h-screen bg-green-50 px-4 pt-16">
   <div class="max-w-lg w-full bg-white rounded-2xl shadow-lg p-8 space-y-6">
 
@@ -29,19 +43,24 @@
     <!-- Forms -->
     <form method="post" action="{% url 'register' %}" class="space-y-4">
       {% csrf_token %}
+      <input type="hidden" name="role" id="roleInput">
+
       <!-- Pengunjung -->
       <div id="form-pengunjung" class="hidden space-y-4">
-        {% include 'register_fields/pengunjung.html' %}
+        {% include 'pengunjung.html' %}
       </div>
+
       <!-- Dokter Hewan -->
       <div id="form-dokter" class="hidden space-y-4">
-        {% include 'register_fields/dokter.html' %}
+        {% include 'dokter.html' %}
       </div>
+
       <!-- Staff -->
       <div id="form-staff" class="hidden space-y-4">
-        {% include 'register_fields/staff.html' %}
+        {% include 'staff.html' %}
       </div>
-      <!-- Submit Button -->
+
+      <!-- Submit -->
       <button type="submit" id="submitBtn" class="w-full bg-green-500 text-white py-2 rounded btn-shine hover-scale" disabled>Daftar</button>
     </form>
   </div>
@@ -50,6 +69,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const roleSelect = document.getElementById('roleSelect');
+    const roleInput = document.getElementById('roleInput');
     const forms = {
       pengunjung: document.getElementById('form-pengunjung'),
       dokter: document.getElementById('form-dokter'),
@@ -57,29 +77,33 @@
     };
     const submitBtn = document.getElementById('submitBtn');
 
+    function disableInactiveFields(activeForm) {
+      Object.values(forms).forEach(form => {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+          input.disabled = (form !== activeForm);
+        });
+      });
+    }
+
     roleSelect.addEventListener('change', () => {
       const role = roleSelect.value;
-      // hide all
+      roleInput.value = role;
+
       Object.values(forms).forEach(div => div.classList.add('hidden'));
-      submitBtn.disabled = !role;
-      submitBtn.textContent = role ? 'Daftar ' + role.charAt(0).toUpperCase() + role.slice(1) : 'Daftar';
-      if (forms[role]) {
+
+      if (role && forms[role]) {
         forms[role].classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Daftar ' + role.charAt(0).toUpperCase() + role.slice(1);
+        disableInactiveFields(forms[role]);
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Daftar';
       }
     });
 
-    // Staff ID auto-generate
-    const staffRoleSelect = document.getElementById('staffRole');
-    const staffIdInput = document.getElementById('staffId');
-    staffRoleSelect?.addEventListener('change', () => {
-      const prefixMap = {
-        'pjh': 'PJH',
-        'adm': 'ADM',
-        'plp': 'PLP'
-      };
-      const code = prefixMap[staffRoleSelect.value] || '';
-      staffIdInput.value = code + Math.floor(100 + Math.random() * 900);
-    });
+    disableInactiveFields(null);
   });
 </script>
 {% endblock %}

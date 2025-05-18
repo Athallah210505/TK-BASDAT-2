@@ -38,9 +38,11 @@
         </a>
         
         <!-- Logout button -->
-        <button class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-full px-4 py-1.5 transition-all duration-300 hover:shadow-sm text-sm">
-          Logout
-        </button>
+        <div class="px-4 py-2">
+          <a href="{% url 'logout' %}" class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm text-center transition duration-200 shadow-sm">
+            Logout
+          </a>
+        </div>
       </div>
 
       <!-- Mobile menu button -->
@@ -78,11 +80,10 @@
         Profile
       </a>
       
-      <!-- Logout button in mobile menu -->
-      <div class="mt-2">
-        <button class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 transition-all duration-300 text-base">
+      <div class="px-4 py-2">
+        <a href="{% url 'logout' %}" class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm text-center transition duration-200 shadow-sm">
           Logout
-        </button>
+        </a>
       </div>
     </div>
   </div>
