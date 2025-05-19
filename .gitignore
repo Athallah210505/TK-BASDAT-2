@@ -1,0 +1,44 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+
+# Django migration file cache (opsional)
+*.log
+
+# SQLite database (jika digunakan untuk lokal dev)
+*.sqlite3
+
+# VSCode or JetBrains IDE
+.vscode/
+.idea/
+
+# Python environment config
+*.env
+.env
+
+# macOS system files
+.DS_Store
+
+# pycache in any folder
+**/__pycache__/
+
+# Coverage and test files
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+
+# Jupyter
+.ipynb_checkpoints
+
+# Static/media file cache (optional)
+staticfiles/
+media/
+
+# Django secret files (jika ada)
+secrets.json

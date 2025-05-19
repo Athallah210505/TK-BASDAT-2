@@ -2,9 +2,10 @@
 
 {% block content %}
 <div class="container mx-auto p-6">
-    {% include 'navbar.html' %}
+    {% include 'navbar_dokter_hewan.html' %}
+
     <!-- Header Section -->
-    <div class="mb-10">
+    <div class="mb-10 mt-20">
         <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Jadwal Pemeriksaan Kesehatan Hewan</h1>
         <p class="text-center text-gray-500 max-w-2xl mx-auto">Frekuensi Pemeriksaan Rutin: 3 bulan sekali</p>
     </div>
@@ -26,41 +27,60 @@
                     <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Usia: 3 tahun</span>
                     <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Asal: Sumatra</span>
                 </div>
-                <p class="text-gray-600 mb-4">
-                    ID: <span class="font-semibold">PET-2025-0042</span> 
-                </p>
-                <div class="flex">
-                    <button onclick="tambahJadwal()" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mr-3 transition">
+                <p class="text-gray-600 mb-4">ID: <span class="font-semibold">PET-2025-0042</span></p>
+                <div class="flex space-x-3">
+                    <button onclick="tambahJadwal()" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
                         Tambah Jadwal Pemeriksaan
+                    </button>
+                    <button onclick="editFrekuensi()" class="btn-shine bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition">
+                        Edit Frekuensi
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Examination Schedule -->
+
+    <!-- Jadwal Pemeriksaan -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="px-6 py-4 bg-green-50 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-800">Tanggal Pemeriksaan Selanjutnya</h3>
         </div>
         <div class="p-6">
-            <!-- Table to display the dates -->
             <table class="min-w-full table-auto">
                 <tbody>
+                    <!-- Baris 1 -->
                     <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="py-3 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span class="text-lg font-semibold text-gray-900">30 April 2025</span>
+                        <td class="py-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-lg font-semibold text-gray-900">30 April 2025</span>
+                                </div>
+                                <div class="space-x-2">
+                                    <button onclick="editTanggal('30 April 2025')" class="text-sm px-3 py-1 rounded bg-yellow-400 text-white hover:bg-yellow-500">Edit</button>
+                                    <button onclick="hapusTanggal('30 April 2025')" class="text-sm px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600">Hapus</button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
+
+                    <!-- Baris 2 -->
                     <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="py-3 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span class="text-lg font-semibold text-gray-900">15 Mei 2025</span>
+                        <td class="py-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-lg font-semibold text-gray-900">15 Mei 2025</span>
+                                </div>
+                                <div class="space-x-2">
+                                    <button onclick="editTanggal('15 Mei 2025')" class="text-sm px-3 py-1 rounded bg-yellow-400 text-white hover:bg-yellow-500">Edit</button>
+                                    <button onclick="hapusTanggal('15 Mei 2025')" class="text-sm px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600">Hapus</button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -68,6 +88,7 @@
         </div>
     </div>
 
+    <!-- Pop-up Tambah Jadwal -->
     <div id="tambahJadwalForm" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
         <div class="bg-white p-6 rounded-lg w-1/2">
             <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Tambah Jadwal</h2>
@@ -83,14 +104,95 @@
             </form>
         </div>
     </div>
-    <script>
-        function tambahJadwal() {
-            document.getElementById('tambahJadwalForm').classList.remove('hidden');
-        }
 
-        function closeTambahJadwal() {
-            document.getElementById('tambahJadwalForm').classList.add('hidden');
+    <!-- Pop-up Edit Tanggal -->
+    <div id="editTanggalPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border">
+            <h2 class="text-center font-bold text-lg text-black mb-6 uppercase">Edit Jadwal</h2>
+            <p class="text-black mb-2">Tanggal Pemeriksaan Selanjutnya:</p>
+            <input type="date" id="tanggal_baru" class="block w-full px-3 py-2 border border-gray-300 rounded-md mb-6 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
+            <div class="flex justify-end mt-4">
+                <button onclick="submitEditTanggal()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg">SIMPAN</button>
+                <button onclick="closeEditTanggal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">BATAL</button>
+            </div>
+        </div>
+    </div>    
+    
+    <!-- Pop-up Edit Frekuensi -->
+    <div id="editFrekuensiPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border">
+            <h2 class="text-center font-bold text-lg text-black mb-6 uppercase">Edit Frekuensi</h2>
+            <p class="text-black mb-2">Frekuensi pemeriksaan rutin:</p>
+            <div class="flex items-center justify-center mb-6">
+                <input type="number" min="1" id="frekuensi_baru" class="w-20 px-3 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
+                <span class="text-black">x bulan sekali</span>
+            </div>
+    
+            <div class="flex justify-end mt-4">
+                <button onclick="submitEditFrekuensi()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg">SIMPAN</button>
+                <button onclick="closeEditFrekuensi()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">BATAL</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="hapusJadwalPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border">
+            <h2 class="text-center font-bold text-lg text-black mb-6 uppercase">Hapus Jadwal</h2>
+            <p class="text-black mb-6 text-center">Apakah anda yakin ingin menghapus jadwal pemeriksaan ini?</p>
+    
+            <div class="flex justify-end mt-4">
+                <button onclick="confirmHapusJadwal()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg">YA</button>
+                <button onclick="closeHapusJadwal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">TIDAK</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Scripts -->
+    <script>
+        function editTanggal(tanggal) {
+            document.getElementById('editTanggalPopup').classList.remove('hidden');
+            document.getElementById('tanggal_lama').value = tanggal;
+        }
+    
+        function closeEditTanggal() {
+            document.getElementById('editTanggalPopup').classList.add('hidden');
+        }
+    
+        function submitEditTanggal() {
+            // Lakukan aksi simpan di sini
+            alert("Tanggal berhasil diperbarui (simulasi).");
+            closeEditTanggal();
+        }
+    
+        function editFrekuensi() {
+            document.getElementById('editFrekuensiPopup').classList.remove('hidden');
+        }
+    
+        function closeEditFrekuensi() {
+            document.getElementById('editFrekuensiPopup').classList.add('hidden');
+        }
+    
+        function submitEditFrekuensi() {
+            // Lakukan aksi simpan frekuensi di sini
+            alert("Frekuensi berhasil diperbarui (simulasi).");
+            closeEditFrekuensi();
+        }
+    
+        function hapusTanggal(tanggal) {
+            document.getElementById('hapusJadwalPopup').classList.remove('hidden');
+            window.tanggalToDelete = tanggal;
+        }
+    
+        function closeHapusJadwal() {
+            document.getElementById('hapusJadwalPopup').classList.add('hidden');
+        }
+    
+        function confirmHapusJadwal() {
+            alert("Jadwal pada tanggal " + window.tanggalToDelete + " telah dihapus (simulasi).");
+            closeHapusJadwal();
         }
     </script>
+    
 </div>
 {% endblock %}
