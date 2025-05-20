@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto mt-10">
+    <h1 class="text-3xl font-bold text-green-600 mb-6">Daftar Hewan</h1>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {% for animal in animals %}
+        <a href="{% url 'show_pemberian_pakan' animal.id %}" class="block bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-all">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-green-100 rounded-full overflow-hidden flex items-center justify-center">
+                    {% if animal.url_foto %}
+                    <img src="{{ animal.url_foto }}" alt="{{ animal.nama }}" class="object-cover w-full h-full">
+                    {% else %}
+                    <span class="text-lg font-bold text-green-800">{{ animal.nama.0|upper }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold">{{ animal.nama }}</h2>
+                    <p class="text-sm text-gray-500">{{ animal.spesies }}</p>
+                    <span class="text-xs inline-block mt-1 px-2 py-1 rounded-full 
+                        {% if animal.status_kesehatan == 'Sehat' %}
+                            bg-green-100 text-green-800
+                        {% else %}
+                            bg-yellow-100 text-yellow-800
+                        {% endif %}">
+                        {{ animal.status_kesehatan }}
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.fake_auth_middleware.FakeAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'Sizopi.urls'

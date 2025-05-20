@@ -3,6 +3,7 @@
 {% block content %}
 <div class="container mx-auto p-6">
     {% include 'navbar_penjaga_hewan.html' %}
+    
     <!-- Header Section -->
     <div class="mb-10 mt-20">
         <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Pemberian Pakan</h1>
@@ -14,165 +15,214 @@
         <div class="flex flex-col md:flex-row items-center">
             <div class="md:w-1/4 mb-4 md:mb-0 flex justify-center">
                 <div class="w-40 h-40 rounded-full bg-green-100 flex items-center justify-center hover-scale">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9z7mrJYa7zsRfi6n26gjfhjzjvYMO3RfYMmFSJxJuaIo5y5-W7ih9VDxE1FZEineYw0EJYSmJ8Zi4P7o62NSOo0R7W2YyoL6UjKLhEoSEP_FuwdwnWFAIRHaZ-Uxq_LKGRf_xzYXK64tg/w640-h419/1644897149271573-0.png" 
-                         alt="Harimau Sumatra Taro" 
+                    <img src="{{ animal.url_foto|default:'/api/placeholder/160/160' }}" 
+                         alt="{{ animal.nama }}" 
                          class="rounded-full w-full h-full object-cover" />
                 </div>
             </div>
             <div class="md:w-3/4 md:pl-6">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Harimau Sumatra - Taro</h2>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ animal.spesies }} - {{ animal.nama }}</h2>
                 <div class="mb-4">
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Spesies: Felis silvestris catus</span>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Usia: 3 tahun</span>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Asal: Sumatra</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">
+                        Spesies: {{ animal.spesies }}
+                    </span>
+                    {% if animal.tanggal_lahir %}
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">
+                        Tanggal Lahir: {{ animal.tanggal_lahir|date:"d M Y" }}
+                    </span>
+                    {% endif %}
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+                        Asal: {{ animal.asal_hewan }}
+                    </span>
                 </div>
                 <p class="text-gray-600 mb-4">
-                    ID: <span class="font-semibold">PET-2025-0042</span> 
+                    ID: <span class="font-semibold">{{ animal.id }}</span>
+                    {% if animal.nama_habitat %}
+                    | Habitat: <span class="font-semibold">{{ animal.nama_habitat }}</span>
+                    {% endif %}
+                    | Status: <span class="font-semibold {% if animal.status_kesehatan == 'Sehat' %}text-green-600{% else %}text-orange-600{% endif %}">{{ animal.status_kesehatan }}</span>
                 </p>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="openAddScheduleModal()" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
                         Tambah Jadwal Pemberian Pakan
                     </button>
-                    <button class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+                    <a href="{% url 'riwayat_pemberian_pakan' %}" class="btn-shine bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
                         Riwayat Pemberian Pakan
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Display Django Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} p-4 mb-4 text-sm rounded-lg 
+                    {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-200
+                    {% elif message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200
+                    {% else %}bg-blue-100 text-blue-700 border border-blue-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Add Feeding Schedule Modal -->
     <div id="addScheduleModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
         <div class="bg-white p-6 rounded-lg w-full max-w-md">
             <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Tambah Jadwal Pemberian Pakan</h2>
-            <form>
+            <form method="POST" action="{% url 'add_feeding_schedule' animal.id %}">
+                {% csrf_token %}
                 <div class="mb-4">
                     <label for="new_food_type" class="block text-sm font-medium text-gray-700">Jenis Pakan</label>
-                    <input type="text" id="new_food_type" name="new_food_type" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Masukkan jenis pakan" />
+                    <input type="text" id="new_food_type" name="new_food_type" required
+                           class="w-full p-2 border border-gray-300 rounded-md" 
+                           placeholder="Masukkan jenis pakan" />
                 </div>
                 <div class="mb-4">
                     <label for="new_food_amount" class="block text-sm font-medium text-gray-700">Jumlah Pakan (gram)</label>
-                    <input type="number" id="new_food_amount" name="new_food_amount" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Masukkan jumlah dalam gram" />
+                    <input type="number" id="new_food_amount" name="new_food_amount" required min="1"
+                           class="w-full p-2 border border-gray-300 rounded-md" 
+                           placeholder="Masukkan jumlah dalam gram" />
                 </div>
                 <div class="mb-4">
                     <label for="new_feeding_schedule" class="block text-sm font-medium text-gray-700">Jadwal Pemberian</label>
-                    <input type="datetime-local" id="new_feeding_schedule" name="new_feeding_schedule" class="w-full p-2 border border-gray-300 rounded-md" />
+                    <input type="datetime-local" id="new_feeding_schedule" name="new_feeding_schedule" required
+                           class="w-full p-2 border border-gray-300 rounded-md" />
                 </div>
                 <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" onclick="closeAddScheduleModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Simpan</button>
+                    <button type="button" onclick="closeAddScheduleModal()" 
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                        Simpan
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Feeding Records Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- First Record - Waiting -->
-        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100 h-full flex flex-col">
-            <div class="flex-grow">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Jenis Pakan</p>
-                        <p class="font-medium text-lg">Pisang</p>
+    <!-- Feeding Records Section -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">Jadwal Pemberian Pakan</h3>
+        
+        <!-- Upcoming Feedings -->
+        {% if upcoming_feedings %}
+        <div class="mb-6">
+            <h4 class="text-lg font-semibold text-gray-700 mb-3">Menunggu Pemberian</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for feeding in upcoming_feedings %}
+                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100 h-full flex flex-col">
+                    <div class="flex-grow">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Jenis Pakan</p>
+                                <p class="font-medium text-lg">{{ feeding.jenis }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Status</p>
+                                <span class="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">
+                                    {{ feeding.status }}
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Jumlah (gram)</p>
+                                <p class="font-medium text-lg">{{ feeding.jumlah }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Jadwal</p>
+                                <p class="font-medium text-lg">{{ feeding.tanggal }}</p>
+                                <p class="font-medium text-lg">{{ feeding.waktu }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Status</p>
-                        <span class="inline-block bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">Menunggu Pemberian</span>
+                    <div class="mb-4">
+                        <form method="POST" action="{% url 'mark_feeding_complete' animal.id feeding.jadwal_str %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-shine w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+                                Beri Pakan Sekarang
+                            </button>
+                        </form>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Jumlah (gram)</p>
-                        <p class="font-medium text-lg">150</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Jadwal</p>
-                        <p class="font-medium text-lg">25 April 2025</p>
-                        <p class="font-medium text-lg">14:00</p>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                        <button onclick="openEditScheduleModal('{{ animal.id }}', '{{ feeding.jadwal_str }}', '{{ feeding.jenis }}', '{{ feeding.jumlah }}')"
+                                class="text-blue-500 hover:text-blue-700 font-medium flex items-center">
+                            Edit
+                        </button>
+                        <button onclick="openDeleteModal('{{ feeding.jadwal_str }}')"
+                                class="text-red-500 hover:text-red-700 font-medium flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Hapus
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="mb-4">
-                <button class="btn-shine w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
-                    Beri Pakan Sekarang
-                </button>
-            </div>
-            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                <button onclick="openEditModal()" class="text-blue-500 hover:text-blue-700 font-medium flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                    Edit
-                </button>
-                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
-                    Hapus
-                </button>
+                {% endfor %}
             </div>
         </div>
+        {% endif %}
 
-        <!-- Second Record - Completed -->
-        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100 h-full flex flex-col">
-            <div class="flex-grow">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Jenis Pakan</p>
-                        <p class="font-medium text-lg">Daging Ayam</p>
+        <!-- Completed Feedings -->
+        {% if completed_feedings %}
+        <div class="mb-6">
+            <h4 class="text-lg font-semibold text-gray-700 mb-3">Sudah Diberikan</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for feeding in completed_feedings %}
+                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100 h-full flex flex-col">
+                    <div class="flex-grow">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Jenis Pakan</p>
+                                <p class="font-medium text-lg">{{ feeding.jenis }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Status</p>
+                                <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+                                    {{ feeding.status }}
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Jumlah (gram)</p>
+                                <p class="font-medium text-lg">{{ feeding.jumlah }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Jadwal</p>
+                                <p class="font-medium text-lg">{{ feeding.tanggal }}</p>
+                                <p class="font-medium text-lg">{{ feeding.waktu }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Status</p>
-                        <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Selesai Diberikan</span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Jumlah (gram)</p>
-                        <p class="font-medium text-lg">800</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Jadwal</p>
-                        <p class="font-medium text-lg">08:30</p>
-                        <p class="font-medium text-lg">25 April 2025</p>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                        <button onclick="openDeleteModal('{{ feeding.jadwal_str }}')"
+                                class="text-red-500 hover:text-red-700 font-medium flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Hapus
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
-                    Hapus
-                </button>
+                {% endfor %}
             </div>
         </div>
-    </div>
-    
-    <!-- Edit Modal -->
-    <div id="editModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-        <div class="bg-white p-6 rounded-lg w-full max-w-md">
-            <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Edit Pemberian Pakan</h2>
-            <form>
-                <div class="mb-4">
-                    <label for="food_type" class="block text-sm font-medium text-gray-700">Jenis Pakan</label>
-                    <input type="text" id="food_type" name="food_type" class="w-full p-2 border border-gray-300 rounded-md" value="Pisang" />
-                </div>
-                <div class="mb-4">
-                    <label for="food_amount" class="block text-sm font-medium text-gray-700">Jumlah (gram)</label>
-                    <input type="number" id="food_amount" name="food_amount" class="w-full p-2 border border-gray-300 rounded-md" value="150" />
-                </div>
-                <div class="mb-4">
-                    <label for="feeding_time" class="block text-sm font-medium text-gray-700">Waktu Pemberian</label>
-                    <input type="time" id="feeding_time" name="feeding_time" class="w-full p-2 border border-gray-300 rounded-md" value="14:00" />
-                </div>
-                <div class="mb-4">
-                    <label for="feeding_date" class="block text-sm font-medium text-gray-700">Tanggal Pemberian</label>
-                    <input type="date" id="feeding_date" name="feeding_date" class="w-full p-2 border border-gray-300 rounded-md" value="2025-04-25" />
-                </div>
-                <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Simpan Perubahan</button>
-                </div>
-            </form>
+        {% endif %}
+
+        <!-- Empty State -->
+        {% if not upcoming_feedings and not completed_feedings %}
+        <div class="text-center py-8 bg-gray-50 rounded-lg">
+            <div class="text-gray-400 text-6xl mb-4">🥄</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Jadwal Pemberian Pakan</h3>
+            <p class="text-gray-500 mb-4">Tambahkan jadwal pemberian pakan untuk hewan ini</p>
+            <button onclick="openAddScheduleModal()" 
+                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition">
+                Tambah Jadwal Sekarang
+            </button>
         </div>
+        {% endif %}
     </div>
 
     <!-- Delete Confirmation Modal -->
@@ -181,46 +231,163 @@
             <h2 class="text-2xl font-bold text-center text-red-500 mb-4">Hapus Data Pakan</h2>
             <p class="text-gray-700 text-center mb-6">Apakah anda yakin ingin menghapus data pemberian pakan ini?</p>
             <div class="flex justify-center space-x-4">
-                <button onclick="closeDeleteModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                <button onclick="closeDeleteModal()" 
+                        class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
                     Tidak
                 </button>
-                <button onclick="confirmDelete()" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
-                    Ya
-                </button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                        Ya
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Script for Modal functionality -->
+    <div id="editScheduleModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md relative">
+            <h2 class="text-2xl font-bold text-center text-blue-500 mb-4">Edit Jadwal Pemberian Pakan</h2>
+            <form id="editScheduleForm" method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="edit_food_type" class="block text-sm font-medium text-gray-700">Jenis Pakan</label>
+                    <input type="text" id="edit_food_type" name="food_type" required
+                           class="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="mb-4">
+                    <label for="edit_food_amount" class="block text-sm font-medium text-gray-700">Jumlah Pakan (gram)</label>
+                    <input type="number" id="edit_food_amount" name="food_amount" required min="1"
+                           class="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="mb-4">
+                    <label for="edit_feeding_datetime" class="block text-sm font-medium text-gray-700">Jadwal Baru</label>
+                    <input type="datetime-local" id="edit_feeding_datetime" name="feeding_date" required
+                           class="w-full p-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeEditScheduleModal()"
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+            <button class="absolute top-2 right-3 text-gray-500 text-xl" onclick="closeEditScheduleModal()">&times;</button>
+        </div>
+    </div>
+
+
+    <!-- JavaScript for Modal functionality -->
     <script>
+        let currentDeleteJadwal = null;
+
         function openAddScheduleModal() {
             document.getElementById('addScheduleModal').classList.remove('hidden');
+            // Set minimum datetime to current time
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('new_feeding_schedule').min = now.toISOString().slice(0, 16);
         }
 
         function closeAddScheduleModal() {
             document.getElementById('addScheduleModal').classList.add('hidden');
         }
 
-        function openEditModal() {
-            document.getElementById('editModal').classList.remove('hidden');
+        function openEditScheduleModal(id, jadwal, jenis, jumlah) {
+            const modal = document.getElementById('editScheduleModal');
+            modal.classList.remove('hidden');
+
+            document.getElementById('edit_food_type').value = jenis;
+            document.getElementById('edit_food_amount').value = jumlah;
+            document.getElementById('edit_feeding_datetime').value = jadwal.replace(' ', 'T');
+
+            const form = document.getElementById('editScheduleForm');
+            form.action = `/pemberian_pakan/pemberian-pakan/${id}/edit/${encodeURIComponent(jadwal)}/`;
         }
 
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
+        function closeEditScheduleModal() {
+            document.getElementById('editScheduleModal').classList.add('hidden');
         }
 
-        function openDeleteModal() {
+        function openDeleteModal(jadwal) {
+            currentDeleteJadwal = jadwal;
+            const deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = `{% url 'delete_feeding_schedule' animal.id 'PLACEHOLDER' %}`.replace('PLACEHOLDER', currentDeleteJadwal);;
             document.getElementById('deleteModal').classList.remove('hidden');
         }
         
         function closeDeleteModal() {
             document.getElementById('deleteModal').classList.add('hidden');
+            currentDeleteJadwal = null;
         }
 
-        function confirmDelete() {
-            alert('Data pakan telah dihapus');
-            closeDeleteModal();
-        }
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const addModal = document.getElementById('addScheduleModal');
+            const deleteModal = document.getElementById('deleteModal');
+            
+            if (event.target === addModal) {
+                closeAddScheduleModal();
+            }
+            if (event.target === deleteModal) {
+                closeDeleteModal();
+            }
+        });
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeAddScheduleModal();
+                closeDeleteModal();
+            }
+        });
+
+        
     </script>
+
+    <!-- CSS for animations -->
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-shine:hover::before {
+            left: 100%;
+        }
+    </style>
 </div>
 {% endblock %}

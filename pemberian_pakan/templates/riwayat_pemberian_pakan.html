@@ -5,178 +5,151 @@
     {% include 'navbar_penjaga_hewan.html' %}
     <!-- Header Section -->
     <div class="mb-10 mt-20">
-        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Pemberian Pakan</h1>
-        <p class="text-center text-gray-500 max-w-2xl mx-auto">Riwayat dalam Pemberian Pakan</p>
+        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Riwayat Pemberian Pakan</h1>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Riwayat pemberian pakan untuk semua hewan</p>
     </div>
+
+    <!-- Search and Filter Section -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex gap-2">
+                <select id="statusFilter" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="">Semua Status</option>
+                    <option value="Sudah diberikan" selected>Sudah diberikan</option>
+                </select>
+                <select id="speciesFilter" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="">Semua Spesies</option>
+                    {% for feeding in feedings %}
+                        {% if feeding.spesies not in species_list %}
+                            <option value="{{ feeding.spesies }}">{{ feeding.spesies }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display Django Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} p-4 mb-4 text-sm rounded-lg 
+                    {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-200
+                    {% elif message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200
+                    {% else %}bg-blue-100 text-blue-700 border border-blue-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Table Section -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        {% if feedings %}
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="min-w-full divide-y divide-gray-200" id="feedingTable">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(0)">
                             Hewan
+                            <span class="sort-icon">⇅</span>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(1)">
                             Spesies
+                            <span class="sort-icon">⇅</span>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(2)">
                             Asal
+                            <span class="sort-icon">⇅</span>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(3)">
                             Tanggal Lahir
+                            <span class="sort-icon">⇅</span>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(4)">
                             Habitat
+                            <span class="sort-icon">⇅</span>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(5)">
+                            Status Kesehatan
+                            <span class="sort-icon">⇅</span>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(6)">
                             Pakan
+                            <span class="sort-icon">⇅</span>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(7)">
                             Jumlah
+                            <span class="sort-icon">⇅</span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(8)">
+                            Jadwal
+                            <span class="sort-icon">⇅</span>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable(9)">
+                            Status Pemberian
+                            <span class="sort-icon">⇅</span>
                         </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jadwal
+                            Aksi
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <!-- Row 1 -->
-                    <tr class="hover:bg-gray-50 transition-colors">
+                <tbody class="bg-white divide-y divide-gray-200" id="tableBody">
+                    {% for feeding in feedings %}
+                    {% if feeding.status|lower == 'sudah diberikan' %}
+                    <tr class="hover:bg-gray-50 transition-colors feeding-row" 
+                        data-name="{{ feeding.nama|lower }}" 
+                        data-species="{{ feeding.spesies|lower }}" 
+                        data-status="{{ feeding.status|lower }}">
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center overflow-hidden">
-                                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9z7mrJYa7zsRfi6n26gjfhjzjvYMO3RfYMmFSJxJuaIo5y5-W7ih9VDxE1FZEineYw0EJYSmJ8Zi4P7o62NSOo0R7W2YyoL6UjKLhEoSEP_FuwdwnWFAIRHaZ-Uxq_LKGRf_xzYXK64tg/w640-h419/1644897149271573-0.png" 
-                                         alt="Harimau Sumatra" 
-                                         class="h-full w-full object-cover">
+                                    {% if feeding.url_foto %}
+                                    <img src="{{ feeding.url_foto }}" alt="{{ feeding.nama }}" class="h-full w-full object-cover">
+                                    {% else %}
+                                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                        <span class="text-gray-600 text-xs font-bold">{{ feeding.nama.0|upper }}</span>
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Taro</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ feeding.nama }}</div>
                                 </div>
                             </div>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ feeding.spesies }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ feeding.asal_hewan|default:"Tidak diketahui" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ feeding.tanggal_lahir_formatted|default:"Tidak diketahui" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ feeding.nama_habitat|default:"Tidak ada habitat" }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Harimau Sumatra</div>
-                          
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if feeding.status_kesehatan == 'Sehat' %}bg-green-100 text-green-800
+                                {% elif feeding.status_kesehatan == 'Sakit' %}bg-red-100 text-red-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ feeding.status_kesehatan|default:"Tidak diketahui" }}
+                            </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Kerinci, Sumatra</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                    
-                            <div class="text-sm text-gray-500">14/04/2018</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Zona Rimba</div>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ feeding.pakan }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ feeding.jumlah }} gram</td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">{{ feeding.jadwal_tanggal }}</div>
+                            <div class="text-sm text-gray-500">{{ feeding.jadwal_waktu }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                Sehat
+                                {{ feeding.status }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Daging Ayam</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">800 gram</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-900">05 Mar 2025</div>
-                            <div class="text-sm text-gray-500">08:30 WIB</div>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{% url 'show_pemberian_pakan' feeding.id %}" 
+                               class="text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200 px-3 py-1 rounded transition duration-200">
+                                Detail
+                            </a>
                         </td>
                     </tr>
-                    
-                    <!-- Row 2 -->
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80" 
-                                         alt="Golden Retriever" 
-                                         class="h-full w-full object-cover">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Buddy</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Anjing Golden</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Jakarta, Indonesia</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">15/06/2021</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Zona Domestik</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                Sakit
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Royal Canin</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">500 gram</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-900">10 Mar 2025</div>
-                            <div class="text-sm text-gray-500">07:00 WIB</div>
-                        </td>
-                        
-                    </tr>
-
-                    <!-- Row 3 -->
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1555169062-013468b47731?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80" 
-                                         alt="Orangutan" 
-                                         class="h-full w-full object-cover">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Mina</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Orangutan</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Kalimantan Tengah</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">22/11/2016</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Zona Primata</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                Sehat
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Buah-buahan</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">1200 gram</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-900">12 Mar 2025</div>
-                            <div class="text-sm text-gray-500">10:00 WIB</div>
-                        </td>
-                    
-                    </tr>
+                    {% endif %}
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -187,41 +160,309 @@
                 <div>
                     <p class="text-sm text-gray-700">
                         Menampilkan
-                        <span class="font-medium">1</span>
+                        <span class="font-medium" id="startEntry">1</span>
                         sampai
-                        <span class="font-medium">3</span>
+                        <span class="font-medium" id="endEntry">{{ feedings|length }}</span>
                         dari
-                        <span class="font-medium">12</span>
+                        <span class="font-medium" id="totalEntries">{{ feedings|length }}</span>
                         data
                     </p>
                 </div>
                 <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <span class="sr-only">Previous</span>
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                        <a href="#" aria-current="page" class="z-10 bg-green-50 border-green-500 text-green-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            1
-                        </a>
-                        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            2
-                        </a>
-                        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            3
-                        </a>
-                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <span class="sr-only">Next</span>
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination" id="pagination">
+                        <!-- Pagination buttons will be generated by JavaScript -->
                     </nav>
                 </div>
             </div>
         </div>
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-12">
+            <div class="text-gray-400 text-6xl mb-4">🥄</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Belum Ada Riwayat Pemberian Pakan</h3>
+            <p class="text-gray-500 mb-6">Tambahkan jadwal pemberian pakan untuk memulai riwayat</p>
+            <a href="{% url 'show_pemberian_pakan' %}" 
+               class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition duration-200">
+                Kelola Pemberian Pakan
+            </a>
+        </div>
+        {% endif %}
     </div>
+
+    <!-- Statistics Cards -->
+    {% if feedings %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+        <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Total Pemberian</h3>
+                    <p class="text-3xl font-bold text-blue-600" id="totalFeedings">{{ feedings|length }}</p>
+                </div>
+                <div class="text-blue-500 text-3xl">📊</div>
+            </div>
+        </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<!-- JavaScript for interactivity -->
+<script>
+let currentPage = 1;
+const itemsPerPage = 10;
+let allRows = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    allRows = Array.from(document.querySelectorAll('.feeding-row'));
+    updatePagination();
+    setupSearch();
+    updateStatistics();
+});
+
+// Search functionality
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const speciesFilter = document.getElementById('speciesFilter');
+
+    [searchInput, statusFilter, speciesFilter].forEach(element => {
+        element.addEventListener('input', filterTable);
+    });
+}
+
+function filterTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+    const speciesFilter = document.getElementById('speciesFilter').value;
+
+    allRows.forEach(row => {
+        const name = row.dataset.name;
+        const species = row.dataset.species;
+        const status = row.dataset.status;
+
+        const matchesSearch = name.includes(searchTerm) || species.includes(searchTerm);
+        const matchesStatus = !statusFilter || status === statusFilter;
+        const matchesSpecies = !speciesFilter || species === speciesFilter.toLowerCase();
+
+        if (matchesSearch && matchesStatus && matchesSpecies) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    currentPage = 1;
+    updatePagination();
+    updateStatistics();
+}
+
+
+// Sorting functionality
+let sortDirection = {};
+
+function sortTable(columnIndex) {
+    const table = document.getElementById('feedingTable');
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.querySelectorAll('tr:not([style*="display: none"])'));
+    
+    const direction = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+    sortDirection[columnIndex] = direction;
+
+    rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+
+        if (direction === 'asc') {
+            return aValue.localeCompare(bValue, undefined, { numeric: true });
+        } else {
+            return bValue.localeCompare(aValue, undefined, { numeric: true });
+        }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+    updatePagination();
+}
+
+// Pagination functionality
+function updatePagination() {
+    const visibleRows = allRows.filter(row => row.style.display !== 'none');
+    const totalItems = visibleRows.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // Show/hide rows based on current page
+    visibleRows.forEach((row, index) => {
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        
+        if (index >= start && index < end) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Update pagination info
+    const startEntry = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+    const endEntry = Math.min(currentPage * itemsPerPage, totalItems);
+    
+    document.getElementById('startEntry').textContent = startEntry;
+    document.getElementById('endEntry').textContent = endEntry;
+    document.getElementById('totalEntries').textContent = totalItems;
+
+    // Generate pagination buttons
+    generatePaginationButtons(totalPages);
+}
+
+function generatePaginationButtons(totalPages) {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    if (totalPages <= 1) return;
+
+    // Previous button
+    const prevButton = createPaginationButton('❮', currentPage > 1, () => {
+        if (currentPage > 1) {
+            currentPage--;
+            updatePagination();
+        }
+    });
+    pagination.appendChild(prevButton);
+
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        const button = createPaginationButton(i, true, () => {
+            currentPage = i;
+            updatePagination();
+        });
+        
+        if (i === currentPage) {
+            button.classList.add('bg-green-50', 'border-green-500', 'text-green-600');
+        } else {
+            button.classList.add('bg-white', 'border-gray-300', 'text-gray-500', 'hover:bg-gray-50');
+        }
+        
+        pagination.appendChild(button);
+    }
+
+    // Next button
+    const nextButton = createPaginationButton('❯', currentPage < totalPages, () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            updatePagination();
+        }
+    });
+    pagination.appendChild(nextButton);
+}
+
+function createPaginationButton(text, enabled, onClick) {
+    const button = document.createElement('button');
+    button.textContent = text;
+    button.className = 'relative inline-flex items-center px-3 py-2 border text-sm font-medium transition-colors';
+    
+    if (enabled) {
+        button.addEventListener('click', onClick);
+        button.classList.add('cursor-pointer');
+    } else {
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    
+    if (text === '❮') {
+        button.classList.add('rounded-l-md');
+    } else if (text === '❯') {
+        button.classList.add('rounded-r-md');
+    }
+    
+    return button;
+}
+
+// Statistics update
+function updateStatistics() {
+    const visibleRows = allRows.filter(row => row.style.display !== 'none');
+    const completed = visibleRows.filter(row => row.dataset.status === 'Sudah diberikan').length;
+    const pending = visibleRows.filter(row => row.dataset.status === 'Menunggu Pemberian').length;
+    const uniqueAnimals = new Set(visibleRows.map(row => row.querySelector('td:first-child .text-sm').textContent)).size;
+
+    document.getElementById('totalFeedings').textContent = visibleRows.length;
+    document.getElementById('completedFeedings').textContent = completed;
+    document.getElementById('pendingFeedings').textContent = pending;
+    document.getElementById('totalAnimals').textContent = uniqueAnimals;
+}
+</script>
+
+<!-- CSS for animations and styling -->
+<style>
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.sort-icon {
+    display: inline-block;
+    margin-left: 5px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+th:hover .sort-icon {
+    opacity: 1;
+}
+
+.feeding-row {
+    transition: all 0.3s ease;
+}
+
+.feeding-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading animation for when data is being filtered */
+.table-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.table-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .overflow-x-auto {
+        scrollbar-width: thin;
+        scrollbar-color: #10b981 #f3f4f6;
+    }
+    
+    .overflow-x-auto::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .overflow-x-auto::-webkit-scrollbar-track {
+        background: #f3f4f6;
+    }
+    
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+        background: #10b981;
+        border-radius: 3px;
+    }
+}
+</style>
 {% endblock %}
