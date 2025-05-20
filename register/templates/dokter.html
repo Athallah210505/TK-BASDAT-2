@@ -52,6 +52,12 @@
 </div>
 
 <div>
+  <label for="id_phone_number" class="block text-gray-700 font-medium mb-1">Phone Number</label>
+  <input type="tel" name="phone_number" id="id_phone_number" value="{{ form.phone_number.value|default_if_none:'' }}"
+         class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500" required>
+</div>
+
+<div>
   <span class="block text-gray-700 font-medium mb-2">Spesialisasi</span>
   <div class="space-y-1">
     <label class="inline-flex items-center">
