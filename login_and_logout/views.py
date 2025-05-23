@@ -12,7 +12,7 @@ def login_view(request):
 
         from django.db import connection
         with connection.cursor() as cursor:
-            cursor.execute("SELECT cek_kredensial(%s, %s)", [username, password])
+            cursor.execute("SELECT sizopi.cek_kredensial(%s::text, %s::text)", [username, password])
             valid = cursor.fetchone()[0]
 
         if valid:
@@ -42,7 +42,7 @@ def login_view(request):
             elif role == 'penjaga_hewan':
                 return redirect('penjaga_hewan_dashboard')
             elif role == 'pelatih_pertunjukan':
-                return redirect('pelatih_pertunjukan_dashboard')
+                return redirect('pelatih_pertunju   kan_dashboard')
             elif role == 'pengunjung_adopter':
                 return redirect('pengunjung_adopter_dashboard')
             else:
