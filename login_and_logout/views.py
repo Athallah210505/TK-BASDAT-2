@@ -12,7 +12,7 @@ def login_view(request):
 
         from django.db import connection
         with connection.cursor() as cursor:
-            cursor.execute("SELECT cek_kredensial(%s, %s)", [username, password])
+            cursor.execute("SELECT sizopi.cek_kredensial(%s::text, %s::text)", [username, password])
             valid = cursor.fetchone()[0]
 
         if valid:
