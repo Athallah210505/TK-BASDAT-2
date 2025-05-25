@@ -4,7 +4,6 @@
 {% include 'navbar_pengunjung.html' %}
 
 <div class="container mx-auto px-4 py-8 max-w-5xl mt-20">
-    <!-- Header -->
     <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket</h1>
     <p class="text-gray-600 mb-6">Lihat dan kelola reservasi tiket Anda di Taman Safari</p>
 
@@ -18,7 +17,6 @@
     </div>
     {% endif %}
 
-    <!-- Informasi Pengunjung Card -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
         <div class="bg-gray-800 p-4 flex items-center">
             <span class="text-green-400 mr-2"><i class="fas fa-user"></i></span>
@@ -35,7 +33,6 @@
         </div>
     </div>
 
-    <!-- Daftar Reservasi Section -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
         <div class="bg-gray-800 p-4 flex items-center">
             <span class="text-green-400 mr-2"><i class="fas fa-list"></i></span>
@@ -45,7 +42,6 @@
             <p class="text-gray-600">Lihat dan kelola reservasi tiket Anda</p>
         </div>
 
-        <!-- Tab Navigation -->
         <div class="border-b border-gray-200">
             <nav class="flex" aria-label="Tabs">
                 <button id="btn-tab-atraksi" class="tab-btn border-green-500 text-green-600 whitespace-nowrap py-4 px-8 border-b-2 font-medium">
@@ -57,7 +53,6 @@
             </nav>
         </div>
 
-        <!-- Atraksi Reservations Tab -->
         <div id="tab-content-atraksi" class="tab-content p-6">
             {% if reservasi_atraksi %}
                 {% for reservasi in reservasi_atraksi %}
@@ -75,7 +70,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <div class="text-gray-500 mb-1">Lokasi:</div>
-                            <div>{{ reservasi.lokasi }}</div>
+                            <div>{{ reservasi.lokasi|default:'-' }}</div>
                         </div>
                         <div>
                             <div class="text-gray-500 mb-1">Tanggal:</div>
@@ -92,10 +87,10 @@
                     </div>
                     {% if reservasi.status == 'Terjadwal' %}
                     <div class="flex justify-end mt-4 space-x-3">
-                        <a href="{% url 'show_user_edit_booking' %}?jenis=atraksi&nama={{ reservasi.nama_atraksi }}&tanggal={{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                        <a href="{% url 'show_user_edit_booking' %}?jenis=atraksi&nama={{ reservasi.nama_atraksi|urlencode }}&tanggal={{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
                             Edit
                         </a>
-                        <button type="button" onclick="showDeleteModal('atraksi', '{{ reservasi.nama_atraksi }}', '{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                        <button type="button" onclick="showCancelModal('atraksi', '{{ reservasi.nama_atraksi|escapejs }}', '{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
                             Batalkan Reservasi
                         </button>
                     </div>
@@ -113,7 +108,6 @@
             {% endif %}
         </div>
 
-        <!-- Wahana Reservations Tab -->
         <div id="tab-content-wahana" class="tab-content p-6 hidden">
             {% if reservasi_wahana %}
                 {% for reservasi in reservasi_wahana %}
@@ -131,7 +125,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <div class="text-gray-500 mb-1">Peraturan:</div>
-                            <div>{{ reservasi.peraturan }}</div>
+                            <div>{{ reservasi.peraturan|default:'-' }}</div>
                         </div>
                         <div>
                             <div class="text-gray-500 mb-1">Tanggal:</div>
@@ -148,10 +142,10 @@
                     </div>
                     {% if reservasi.status == 'Terjadwal' %}
                     <div class="flex justify-end mt-4 space-x-3">
-                        <a href="{% url 'show_user_edit_booking' %}?jenis=wahana&nama={{ reservasi.nama_wahana }}&tanggal={{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                        <a href="{% url 'show_user_edit_booking' %}?jenis=wahana&nama={{ reservasi.nama_wahana|urlencode }}&tanggal={{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
                             Edit
                         </a>
-                        <button type="button" onclick="showDeleteModal('wahana', '{{ reservasi.nama_wahana }}', '{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                        <button type="button" onclick="showCancelModal('wahana', '{{ reservasi.nama_wahana|escapejs }}', '{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
                             Batalkan Reservasi
                         </button>
                     </div>
@@ -169,31 +163,28 @@
             {% endif %}
         </div>
 
-        <!-- Add New Reservation Button -->
         <div class="p-6 bg-gray-50 border-t border-gray-200">
-            <a href="{% url 'show_user_add_booking' %}" class="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+            <a id="add-new-button" href="{% url 'show_user_add_booking' %}" class="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
                 <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                Tambah Reservasi Baru
+                <span id="add-new-button-text">Tambah Atraksi Baru</span>
             </a>
         </div>
     </div>
     
-    <!-- Cancel Confirmation Modal -->
     <div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 mx-4">
             <h3 class="text-2xl font-bold mb-2 text-center">BATALKAN <span class="text-green-600">RESERVASI</span></h3>
             <p class="text-gray-600 mb-8 text-center text-lg">Apakah anda yakin ingin membatalkan <span id="reservationName" class="bg-green-100 px-2 py-1 rounded">reservasi</span> ini?</p>
             <div class="flex justify-center gap-4">
-                <button id="cancelButton" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
+                <button id="closeModalButton" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
                     [TIDAK]
                 </button>
-                <form id="deleteForm" method="post" action="">
+                <form id="cancelForm" method="post" action="{% url 'show_user_edit_booking' %}">
                     {% csrf_token %}
-                    <input type="hidden" id="deleteType" name="jenis_reservasi" value="">
-                    <input type="hidden" id="deleteName" name="nama_fasilitas" value="">
-                    <input type="hidden" id="deleteTanggal" name="tanggal_kunjungan" value="">
+                    <input type="hidden" id="cancelName" name="nama_fasilitas" value="">
+                    <input type="hidden" id="cancelTanggal" name="tanggal_kunjungan" value="">
                     <input type="hidden" name="action" value="cancel">
                     <button type="submit" class="px-6 py-2 text-red-600 font-bold rounded-lg hover:bg-red-50 transition">
                         [YA]
@@ -211,6 +202,9 @@
         // Tab functionality
         const tabButtons = document.querySelectorAll('.tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
+        // PENAMBAHAN: Ambil elemen tombol tambah baru
+        const addNewButton = document.getElementById('add-new-button');
+        const addNewButtonText = document.getElementById('add-new-button-text');
         
         console.log("Tab buttons found:", tabButtons.length);
         console.log("Tab contents found:", tabContents.length);
@@ -238,35 +232,47 @@
                 const tabId = this.id.replace('btn-tab-', 'tab-content-');
                 console.log("Showing tab content:", tabId);
                 document.getElementById(tabId).classList.remove('hidden');
+
+                // --- PENAMBAHAN: LOGIKA UNTUK MENGUBAH TOMBOL ---
+                // Cek ID tombol tab yang diklik untuk menentukan teks dan link
+                if (this.id === 'btn-tab-atraksi') {
+                    addNewButtonText.textContent = 'Tambah Atraksi Baru';
+                    addNewButton.href = "{% url 'show_user_add_booking' %}";
+                } else if (this.id === 'btn-tab-wahana') {
+                    addNewButtonText.textContent = 'Tambah Wahana Baru';
+                    addNewButton.href = "{% url 'add_reservasi_wahana' %}";
+                }
+                // --- AKHIR PENAMBAHAN ---
             });
         });
     });
 
-    function showDeleteModal(type, name, tanggal) {
-        console.log("Showing delete modal for:", type, name, tanggal);
+    // Modal functionality
+    const modal = document.getElementById('cancelModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+
+    function showCancelModal(type, name, tanggal) {
+        console.log("Showing cancel modal for:", type, name, tanggal);
         
         // Set the form values
-        document.getElementById('deleteType').value = type;
-        document.getElementById('deleteName').value = name;
-        document.getElementById('deleteTanggal').value = tanggal;
+        document.getElementById('cancelName').value = name;
+        document.getElementById('cancelTanggal').value = tanggal;
         
         // Set the reservation name in the modal
         document.getElementById('reservationName').textContent = name;
         
-        // Set the form action
-        document.getElementById('deleteForm').action = "{% url 'show_user_edit_booking' %}";
-        
         // Show the modal
-        document.getElementById('cancelModal').classList.remove('hidden');
+        modal.classList.remove('hidden');
     }
     
-    // Add event listener to the cancel button
-    document.getElementById('cancelButton').addEventListener('click', function() {
-        document.getElementById('cancelModal').classList.add('hidden');
+    // Add event listener to the "TIDAK" button
+    closeModalButton.addEventListener('click', function() {
+        modal.classList.add('hidden');
     });
     
     // Close modal when clicking outside
-    document.getElementById('cancelModal').addEventListener('click', function(e) {
+    modal.addEventListener('click', function(e) {
+        // Cek jika yang diklik adalah area latar belakang modal
         if (e.target === this) {
             this.classList.add('hidden');
         }
