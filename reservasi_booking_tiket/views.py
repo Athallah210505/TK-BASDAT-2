@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from utils.decorators import role_required
+from django.urls import reverse
+from urllib.parse import urlencode
 
 def dictfetchall(cursor):
     """Return all rows from a cursor as a dict"""
@@ -409,9 +411,6 @@ def show_user_add_booking(request):
         
 @role_required('pengunjung')
 def show_user_edit_booking(request):
-    """
-    Menampilkan form untuk mengedit booking (pembatalan)
-    """
     # Ambil username dari session
     username = request.session.get('username', '')
     
@@ -419,17 +418,13 @@ def show_user_edit_booking(request):
     nama_fasilitas = request.GET.get('nama')
     tanggal_str = request.GET.get('tanggal')
     
-    # Debug untuk memastikan parameter diterima dengan benar
-    print(f"DEBUG - Edit booking: username={username}, jenis={jenis_reservasi}, fasilitas={nama_fasilitas}, tanggal={tanggal_str}")
-    
     if request.method == 'POST':
         try:
             nama_fasilitas = request.POST.get('nama_fasilitas')
             tanggal_str = request.POST.get('tanggal_kunjungan')
             action = request.POST.get('action')
-            
-            # Debug POST data
-            print(f"DEBUG - POST data: nama={nama_fasilitas}, tanggal={tanggal_str}, action={action}")
+            # PERBAIKAN: Ambil jenis dari POST jika ada
+            jenis_reservasi = request.GET.get('jenis') or request.POST.get('jenis_reservasi')
             
             # Validasi data yang diterima
             if not all([username, nama_fasilitas, tanggal_str]):
@@ -458,7 +453,7 @@ def show_user_edit_booking(request):
                 jumlah_tiket_asli = reservasi[1]
                 
                 if action == 'cancel':
-                    # Batalkan reservasi jika belum dibatalkan
+                    # Batalkan reservasi
                     if current_status == 'Dibatalkan':
                         messages.info(request, "Reservasi ini sudah dibatalkan sebelumnya")
                         return redirect('show_user_booking')
@@ -477,7 +472,7 @@ def show_user_edit_booking(request):
                         messages.error(request, "Gagal membatalkan reservasi")
                 
                 elif action == 'save':
-                    # Update reservasi jika statusnya terjadwal
+                    # Update reservasi
                     if current_status != 'Terjadwal':
                         messages.error(request, "Tidak dapat mengubah reservasi yang sudah dibatalkan.")
                         return redirect('show_user_booking')
@@ -489,8 +484,15 @@ def show_user_edit_booking(request):
                     # Validasi input
                     if jumlah_tiket_baru < 1:
                         messages.error(request, "Jumlah tiket harus minimal 1.")
-                        # PERBAIKAN: Gunakan path URL lengkap, bukan nama view
-                        return redirect(f'/user_edit_booking/?jenis={jenis_reservasi}&nama={nama_fasilitas}&tanggal={tanggal_str}')
+                        # PERBAIKAN: Gunakan reverse() untuk redirect yang benar
+                        base_url = reverse('show_user_edit_booking')
+                        query_params = {
+                            'jenis': jenis_reservasi or '',
+                            'nama': nama_fasilitas or '',
+                            'tanggal': tanggal_str or ''
+                        }
+                        query_string = urlencode(query_params)
+                        return redirect(f'{base_url}?{query_string}')
                     
                     tanggal_baru = datetime.strptime(tanggal_baru_str, '%Y-%m-%d').date()
                     
@@ -531,8 +533,15 @@ def show_user_edit_booking(request):
                             else:
                                 messages.error(request, f"Jumlah tiket melebihi kapasitas tersisa. Kapasitas tersisa: {kapasitas_tersisa} tiket.")
                             
-                            # PERBAIKAN: Gunakan path URL lengkap, bukan nama view
-                            return redirect(f'/user_edit_booking/?jenis={jenis_reservasi}&nama={nama_fasilitas}&tanggal={tanggal_str}')
+                            # PERBAIKAN: Gunakan reverse() untuk redirect yang benar
+                            base_url = reverse('show_user_edit_booking')
+                            query_params = {
+                                'jenis': jenis_reservasi or '',
+                                'nama': nama_fasilitas or '',
+                                'tanggal': tanggal_str or ''
+                            }
+                            query_string = urlencode(query_params)
+                            return redirect(f'{base_url}?{query_string}')
                     
                     # Update reservasi jika validasi berhasil
                     cursor.execute("""
@@ -545,21 +554,14 @@ def show_user_edit_booking(request):
                     """, [tanggal_baru, jumlah_tiket_baru, username, nama_fasilitas, tanggal_kunjungan])
                     
                     if cursor.rowcount > 0:
-                        if tanggal_baru != tanggal_kunjungan and jumlah_tiket_baru != jumlah_tiket_asli:
-                            messages.success(request, f"Reservasi berhasil diperbarui! Tanggal diubah ke {tanggal_baru.strftime('%d %B %Y')} dan jumlah tiket diubah ke {jumlah_tiket_baru}.")
-                        elif tanggal_baru != tanggal_kunjungan:
-                            messages.success(request, f"Tanggal reservasi berhasil diubah ke {tanggal_baru.strftime('%d %B %Y')}.")
-                        elif jumlah_tiket_baru != jumlah_tiket_asli:
-                            messages.success(request, f"Jumlah tiket berhasil diubah ke {jumlah_tiket_baru}.")
-                        else:
-                            messages.success(request, "Reservasi berhasil diperbarui!")
+                        messages.success(request, "Reservasi berhasil diperbarui!")
                     else:
                         messages.error(request, "Gagal memperbarui reservasi")
             
             return redirect('show_user_booking')
         
         except ValueError as e:
-            messages.error(request, "Format tanggal tidak valid. Mohon gunakan format yang benar.")
+            messages.error(request, "Format tanggal tidak valid.")
             return redirect('show_user_booking')
         except Exception as e:
             import traceback
@@ -611,38 +613,28 @@ def show_user_edit_booking(request):
                 reservasi = cursor.fetchone()
                 
                 if reservasi:
-                    # Hitung kapasitas tersisa untuk ditampilkan di template
+                    # Hitung kapasitas tersisa
                     cursor.execute("""
-                        SELECT f.kapasitas_max,
-                               COALESCE(
-                                   (SELECT SUM(r.jumlah_tiket)
-                                    FROM sizopi.RESERVASI r
-                                    WHERE r.nama_fasilitas = %s
-                                    AND r.tanggal_kunjungan = %s
-                                    AND r.status = 'Terjadwal'
-                                    AND NOT (r.username_p = %s AND r.tanggal_kunjungan = %s)
-                                   ), 0
-                               ) as tiket_terpakai
-                        FROM sizopi.FASILITAS f
-                        WHERE f.nama = %s
-                    """, [nama_fasilitas, tanggal_str, username, tanggal_str, nama_fasilitas])
+                        SELECT COALESCE(SUM(jumlah_tiket), 0) as total_tiket_terpakai
+                        FROM sizopi.RESERVASI
+                        WHERE nama_fasilitas = %s
+                        AND tanggal_kunjungan = %s
+                        AND status = 'Terjadwal'
+                        AND NOT (username_p = %s AND tanggal_kunjungan = %s)
+                    """, [nama_fasilitas, tanggal_str, username, tanggal_str])
                     
-                    kapasitas_result = cursor.fetchone()
-                    kapasitas_max = kapasitas_result[0]
-                    tiket_terpakai = kapasitas_result[1]
-                    jumlah_tiket_saat_ini = reservasi[3]
-                    
-                    # Kapasitas tersisa tidak termasuk tiket pada reservasi ini
+                    tiket_terpakai = cursor.fetchone()[0]
+                    kapasitas_max = reservasi[6]
                     kapasitas_tersisa = kapasitas_max - tiket_terpakai
                     
                     context = {
                         'jenis_reservasi': jenis_reservasi,
                         'nama_fasilitas': reservasi[1],
                         'tanggal_kunjungan': reservasi[2],
-                        'jumlah_tiket': jumlah_tiket_saat_ini,
+                        'jumlah_tiket': reservasi[3],
                         'status': reservasi[4],
                         'kapasitas_max': kapasitas_max,
-                        'kapasitas_tersisa': kapasitas_tersisa,  # Tambahkan ini ke context
+                        'kapasitas_tersisa': kapasitas_tersisa,
                         'title': f'Edit Reservasi {jenis_reservasi.capitalize()}',
                         'username': username
                     }
