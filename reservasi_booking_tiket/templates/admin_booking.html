@@ -9,7 +9,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-green-500">Manajemen Reservasi</h1>
-                    <p class="text-gray-600">Kelola semua reservasi tiket atraksi pengunjung Taman Safari</p>
+                    <p class="text-gray-600">Kelola semua reservasi tiket atraksi dan wahana pengunjung Taman Safari</p>
                 </div>
                 <div>
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
@@ -31,17 +31,31 @@
             </div>
         </div>
 
-        <!-- Reservation Table -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Tab Navigation -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                    <button id="btn-tab-atraksi" class="tab-btn border-green-500 text-green-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Atraksi
+                    </button>
+                    <button id="btn-tab-wahana" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Wahana
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Atraksi Reservation Table -->
+        <div id="tab-content-atraksi" class="tab-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="p-5 border-b border-gray-200 bg-green-50">
                     <div class="flex items-center">
                         <svg class="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                         </svg>
-                        <h2 class="ml-2 text-lg font-medium text-gray-900">DATA RESERVASI</h2>
+                        <h2 class="ml-2 text-lg font-medium text-gray-900">DATA RESERVASI ATRAKSI</h2>
                     </div>
-                    <p class="mt-1 text-sm text-gray-500">Menampilkan 5 dari 5 reservasi</p>
+                    <p class="mt-1 text-sm text-gray-500">Menampilkan {{ reservasi_atraksi|length }} reservasi</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -54,7 +68,10 @@
                                     Nama Atraksi
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tanggal reservasi
+                                    Lokasi
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tanggal kunjungan
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Jumlah tiket
@@ -67,8 +84,173 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="reservation-table-body">
-                            <!-- Reservation data will be populated here -->
+                        <tbody class="bg-white divide-y divide-gray-200" id="atraksi-table-body">
+                            {% for reservasi in reservasi_atraksi %}
+                            <tr class="reservation-row" data-username="{{ reservasi.username_p }}" data-nama="{{ reservasi.nama_atraksi }}" data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" data-status="{{ reservasi.status }}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ reservasi.username_p }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ reservasi.nama_atraksi }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ reservasi.lokasi }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ reservasi.tanggal_kunjungan|date:"d-m-Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ reservasi.jumlah_tiket }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if reservasi.status == 'Terjadwal' %} bg-green-100 text-green-800 
+                                        {% elif reservasi.status == 'Dibatalkan' %} bg-red-100 text-red-800 
+                                        {% else %} bg-yellow-100 text-yellow-800 {% endif %}">
+                                        {{ reservasi.status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    {% if reservasi.status == 'Terjadwal' %}
+                                        <button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" 
+                                            data-type="atraksi" 
+                                            data-username="{{ reservasi.username_p }}" 
+                                            data-nama="{{ reservasi.nama_atraksi }}" 
+                                            data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}"
+                                            data-jumlah="{{ reservasi.jumlah_tiket }}"
+                                            data-lokasi="{{ reservasi.lokasi }}">
+                                            [Edit]
+                                        </button>
+                                        <button class="delete-btn text-red-500 hover:text-red-700" 
+                                            data-type="atraksi" 
+                                            data-username="{{ reservasi.username_p }}" 
+                                            data-nama="{{ reservasi.nama_atraksi }}" 
+                                            data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}">
+                                            [Batalkan]
+                                        </button>
+                                    {% else %}
+                                        <button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" 
+                                            data-type="atraksi" 
+                                            data-username="{{ reservasi.username_p }}" 
+                                            data-nama="{{ reservasi.nama_atraksi }}" 
+                                            data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}"
+                                            data-jumlah="{{ reservasi.jumlah_tiket }}"
+                                            data-lokasi="{{ reservasi.lokasi }}">
+                                            [Lihat]
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    Tidak ada data reservasi atraksi yang tersedia
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wahana Reservation Table -->
+        <div id="tab-content-wahana" class="tab-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 hidden">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="p-5 border-b border-gray-200 bg-blue-50">
+                    <div class="flex items-center">
+                        <svg class="flex-shrink-0 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        </svg>
+                        <h2 class="ml-2 text-lg font-medium text-gray-900">DATA RESERVASI WAHANA</h2>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Menampilkan {{ reservasi_wahana|length }} reservasi</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Username pengunjung
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nama Wahana
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tanggal kunjungan
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Jumlah tiket
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Aksi
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="wahana-table-body">
+                            {% for reservasi in reservasi_wahana %}
+                            <tr class="reservation-row" data-username="{{ reservasi.username_p }}" data-nama="{{ reservasi.nama_wahana }}" data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" data-status="{{ reservasi.status }}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ reservasi.username_p }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ reservasi.nama_wahana }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ reservasi.tanggal_kunjungan|date:"d-m-Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ reservasi.jumlah_tiket }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if reservasi.status == 'Terjadwal' %} bg-green-100 text-green-800 
+                                        {% elif reservasi.status == 'Dibatalkan' %} bg-red-100 text-red-800 
+                                        {% else %} bg-yellow-100 text-yellow-800 {% endif %}">
+                                        {{ reservasi.status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    {% if reservasi.status == 'Terjadwal' %}
+                                        <button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" 
+                                            data-type="wahana" 
+                                            data-username="{{ reservasi.username_p }}" 
+                                            data-nama="{{ reservasi.nama_wahana }}" 
+                                            data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}"
+                                            data-jumlah="{{ reservasi.jumlah_tiket }}"
+                                            data-peraturan="{{ reservasi.peraturan }}">
+                                            [Edit]
+                                        </button>
+                                        <button class="delete-btn text-red-500 hover:text-red-700" 
+                                            data-type="wahana" 
+                                            data-username="{{ reservasi.username_p }}" 
+                                            data-nama="{{ reservasi.nama_wahana }}" 
+                                            data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}">
+                                            [Batalkan]
+                                        </button>
+                                    {% else %}
+                                        <button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" 
+                                            data-type="wahana" 
+                                            data-username="{{ reservasi.username_p }}" 
+                                            data-nama="{{ reservasi.nama_wahana }}" 
+                                            data-tanggal="{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}"
+                                            data-jumlah="{{ reservasi.jumlah_tiket }}"
+                                            data-peraturan="{{ reservasi.peraturan }}">
+                                            [Lihat]
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    Tidak ada data reservasi wahana yang tersedia
+                                </td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -94,45 +276,27 @@
                     </div>
                     <p class="text-sm text-gray-500 mt-1">Edit detail reservasi tiket pengunjung</p>
                     <div class="mt-4">
-                        <form id="edit-form">
-                            <input type="hidden" id="edit-id">
+                        <form id="edit-form" method="post" action="">
+                            {% csrf_token %}
+                            <input type="hidden" id="edit-type" name="jenis_reservasi">
+                            <input type="hidden" id="edit-username" name="username">
+                            <input type="hidden" id="edit-nama-fasilitas" name="nama_fasilitas">
+                            <input type="hidden" id="edit-tanggal-asli" name="tanggal_asli">
+                            
                             <div class="mb-4">
-                                <label for="edit-username" class="block text-sm font-medium text-gray-700">Username pengunjung:</label>
-                                <input type="text" id="edit-username" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" disabled>
+                                <label class="block text-sm font-medium text-gray-700">Username pengunjung:</label>
+                                <div id="display-username" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded-md shadow-sm text-sm text-gray-700"></div>
                             </div>
                             
                             <div class="mb-4">
-                                <label for="edit-attraction" class="block text-sm font-medium text-gray-700">Nama Atraksi:</label>
-                                <div class="mt-1 relative">
-                                    <select id="edit-attraction" class="block appearance-none w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
-                                        <option value="Pertunjukan lumba-lumba">Pertunjukan lumba-lumba</option>
-                                        <option value="Feeding time harimau">Feeding time harimau</option>
-                                        <option value="Pertunjukan Gajah">Pertunjukan Gajah</option>
-                                        <option value="Show Burung Bebas">Show Burung Bebas</option>
-                                        <option value="Atraksi Harimau">Atraksi Harimau</option>
-                                    </select>
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                </div>
+                                <label class="block text-sm font-medium text-gray-700">Nama Fasilitas:</label>
+                                <div id="display-fasilitas" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-50 rounded-md shadow-sm text-sm text-gray-700"></div>
                             </div>
 
                             <div class="mb-4">
-                                <label for="edit-location" class="block text-sm font-medium text-gray-700">Lokasi:</label>
-                                <input type="text" id="edit-location" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="edit-time" class="block text-sm font-medium text-gray-700">Jam:</label>
-                                <input type="time" id="edit-time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="edit-date" class="block text-sm font-medium text-gray-700">Tanggal:</label>
+                                <label for="edit-tanggal" class="block text-sm font-medium text-gray-700">Tanggal Kunjungan:</label>
                                 <div class="mt-1 relative rounded-md shadow-sm">
-                                    <input type="date" id="edit-date" class="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md">
+                                    <input type="date" id="edit-tanggal" name="tanggal_kunjungan" class="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
@@ -142,14 +306,14 @@
                             </div>
 
                             <div class="mb-4">
-                                <label for="edit-tickets" class="block text-sm font-medium text-gray-700">Jumlah tiket yang ingin dibeli:</label>
-                                <input type="number" id="edit-tickets" min="1" max="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                                <label for="edit-jumlah" class="block text-sm font-medium text-gray-700">Jumlah tiket:</label>
+                                <input type="number" id="edit-jumlah" name="jumlah_tiket" min="1" max="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
                                 <p class="mt-1 text-xs text-gray-500">Maksimal 100 tiket per reservasi</p>
                             </div>
 
                             <div class="mb-4">
                                 <label for="edit-status" class="block text-sm font-medium text-gray-700">Status:</label>
-                                <select id="edit-status" class="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                                <select id="edit-status" name="status" class="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
                                     <option value="Terjadwal">Terjadwal</option>
                                     <option value="Dibatalkan">Dibatalkan</option>
                                 </select>
@@ -181,241 +345,164 @@
                             <h3 class="text-lg font-medium text-gray-900" id="modal-title">BATALKAN RESERVASI</h3>
                             <div class="mt-2">
                                 <p class="text-sm text-gray-500">Apakah anda yakin ingin membatalkan reservasi ini?</p>
+                                <div class="mt-2 py-2 px-3 bg-gray-50 rounded-md">
+                                    <p class="text-sm text-gray-700" id="delete-details"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="confirm-delete-btn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        [YA]
-                    </button>
-                    <button type="button" class="close-modal mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        [TIDAK]
-                    </button>
-                </div>
+                <form id="delete-form" method="post" action="">
+                    {% csrf_token %}
+                    <input type="hidden" id="delete-type" name="jenis_reservasi">
+                    <input type="hidden" id="delete-username" name="username">
+                    <input type="hidden" id="delete-nama-fasilitas" name="nama_fasilitas">
+                    <input type="hidden" id="delete-tanggal" name="tanggal_kunjungan">
+                    <input type="hidden" name="action" value="cancel">
+                    
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            [YA]
+                        </button>
+                        <button type="button" class="close-modal mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            [TIDAK]
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <script>
-        // Sample reservation data
-        const reservationData = [
-            {
-                id: 1,
-                username: 'eunlee',
-                attraction: 'Pertunjukan lumba-lumba',
-                location: 'Area Akuatik',
-                date: '2025-05-12',
-                time: '10:00',
-                tickets: 10,
-                status: 'Terjadwal'
-            },
-            {
-                id: 2,
-                username: 'minlee',
-                attraction: 'Feeding time harimau',
-                location: 'Kandang Harimau',
-                date: '2025-05-11',
-                time: '13:30',
-                tickets: 3,
-                status: 'Dibatalkan'
-            },
-            {
-                id: 3,
-                username: 'jooncho',
-                attraction: 'Pertunjukan Gajah',
-                location: 'Area Gajah',
-                date: '2025-05-15',
-                time: '11:00',
-                tickets: 5,
-                status: 'Terjadwal'
-            },
-            {
-                id: 4,
-                username: 'jicho',
-                attraction: 'Show Burung Bebas',
-                location: 'Aviary',
-                date: '2025-05-14',
-                time: '14:15',
-                tickets: 2,
-                status: 'Terjadwal'
-            },
-            {
-                id: 5,
-                username: 'eunkang',
-                attraction: 'Atraksi Harimau',
-                location: 'Arena Harimau',
-                date: '2025-05-13',
-                time: '09:30',
-                tickets: 4,
-                status: 'Terjadwal'
-            }
-        ];
-
-        // Format date for display (DD-MM-YYYY)
-        function formatDateForDisplay(dateString) {
-            const date = new Date(dateString);
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}-${month}-${year}`;
-        }
-
-        // Populate table with reservation data
-        function populateTable(data) {
-            const tableBody = document.getElementById('reservation-table-body');
-            tableBody.innerHTML = '';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
             
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                
-                // Add status class for styling
-                const statusClass = item.status === 'Terjadwal' ? 
-                    'bg-green-100 text-green-800' : 
-                    'bg-red-100 text-red-800';
-                
-                // Add action buttons based on status
-                const actionButtons = item.status === 'Terjadwal' ?
-                    `<button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" data-id="${item.id}">[Edit]</button>
-                     <button class="delete-btn text-red-500 hover:text-red-700" data-id="${item.id}">[Batalkan]</button>` :
-                    `<button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" data-id="${item.id}">[Edit]</button>`;
-                
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ${item.username}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${item.attraction}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${formatDateForDisplay(item.date)}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${item.tickets}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
-                            ${item.status}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        ${actionButtons}
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all tab buttons
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('border-green-500', 'text-green-600');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    // Add active class to clicked tab button
+                    this.classList.remove('border-transparent', 'text-gray-500');
+                    this.classList.add('border-green-500', 'text-green-600');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Show the corresponding tab content
+                    const tabId = this.id.replace('btn-tab-', 'tab-content-');
+                    document.getElementById(tabId).classList.remove('hidden');
+                });
             });
-            
-            // Add event listeners to buttons
-            addEventListeners();
-        }
 
-        // Search functionality
-        function setupSearch() {
+            // Search functionality
             const searchInput = document.getElementById('search-input');
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase();
-                const filteredData = reservationData.filter(item => {
-                    return item.username.toLowerCase().includes(query) ||
-                           item.attraction.toLowerCase().includes(query) ||
-                           formatDateForDisplay(item.date).includes(query) ||
-                           item.status.toLowerCase().includes(query);
-                });
-                populateTable(filteredData);
-            });
-        }
-
-        // Modal functionality
-        function setupModals() {
-            const editModal = document.getElementById('edit-modal');
-            const deleteModal = document.getElementById('delete-modal');
-            const closeButtons = document.querySelectorAll('.close-modal');
-            
-            // Close modals when clicking close buttons
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    editModal.classList.add('hidden');
-                    deleteModal.classList.add('hidden');
-                });
-            });
-            
-            // Save edit changes
-            document.getElementById('save-edit-btn').addEventListener('click', function() {
-                const id = parseInt(document.getElementById('edit-id').value);
-                const index = reservationData.findIndex(item => item.id === id);
+                const rows = document.querySelectorAll('.reservation-row');
                 
-                if (index !== -1) {
-                    reservationData[index].attraction = document.getElementById('edit-attraction').value;
-                    reservationData[index].location = document.getElementById('edit-location').value;
-                    reservationData[index].time = document.getElementById('edit-time').value;
-                    reservationData[index].date = document.getElementById('edit-date').value;
-                    reservationData[index].tickets = parseInt(document.getElementById('edit-tickets').value);
-                    reservationData[index].status = document.getElementById('edit-status').value;
+                rows.forEach(row => {
+                    const username = row.getAttribute('data-username').toLowerCase();
+                    const nama = row.getAttribute('data-nama').toLowerCase();
+                    const tanggal = row.getAttribute('data-tanggal').toLowerCase();
+                    const status = row.getAttribute('data-status').toLowerCase();
                     
-                    populateTable(reservationData);
-                    editModal.classList.add('hidden');
-                    
-                    // Show success notification
-                    alert('Reservasi berhasil diperbarui!');
-                }
-            });
-            
-            // Confirm delete
-            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
-                const id = parseInt(this.getAttribute('data-id'));
-                const index = reservationData.findIndex(item => item.id === id);
-                
-                if (index !== -1) {
-                    // Instead of deleting, change the status to 'Dibatalkan'
-                    reservationData[index].status = 'Dibatalkan';
-                    
-                    populateTable(reservationData);
-                    deleteModal.classList.add('hidden');
-                    
-                    // Show success notification
-                    alert('Reservasi berhasil dibatalkan!');
-                }
-            });
-        }
-
-        // Add event listeners to table buttons
-        function addEventListeners() {
-            // Edit buttons
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const id = parseInt(this.getAttribute('data-id'));
-                    const reservation = reservationData.find(item => item.id === id);
-                    
-                    if (reservation) {
-                        document.getElementById('edit-id').value = reservation.id;
-                        document.getElementById('edit-username').value = reservation.username;
-                        document.getElementById('edit-attraction').value = reservation.attraction;
-                        document.getElementById('edit-location').value = reservation.location;
-                        document.getElementById('edit-time').value = reservation.time;
-                        document.getElementById('edit-date').value = reservation.date;
-                        document.getElementById('edit-tickets').value = reservation.tickets;
-                        document.getElementById('edit-status').value = reservation.status;
-                        
-                        document.getElementById('edit-modal').classList.remove('hidden');
+                    if (username.includes(query) || nama.includes(query) || 
+                        tanggal.includes(query) || status.includes(query)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
                     }
                 });
             });
             
-            // Delete buttons
+            // Edit buttons functionality
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    const username = this.getAttribute('data-username');
+                    const nama = this.getAttribute('data-nama');
+                    const tanggal = this.getAttribute('data-tanggal');
+                    const jumlah = this.getAttribute('data-jumlah');
+                    
+                    // Set form values
+                    document.getElementById('edit-type').value = type;
+                    document.getElementById('edit-username').value = username;
+                    document.getElementById('edit-nama-fasilitas').value = nama;
+                    document.getElementById('edit-tanggal-asli').value = tanggal;
+                    document.getElementById('display-username').textContent = username;
+                    document.getElementById('display-fasilitas').textContent = nama;
+                    document.getElementById('edit-tanggal').value = tanggal;
+                    document.getElementById('edit-jumlah').value = jumlah;
+                    
+                    // Set form action based on type
+                    if (type === 'atraksi') {
+                        document.getElementById('edit-form').action = "{% url 'show_user_edit_booking' %}?jenis=atraksi";
+                    } else {
+                        document.getElementById('edit-form').action = "{% url 'show_user_edit_booking' %}?jenis=wahana";
+                    }
+                    
+                    // Show modal
+                    document.getElementById('edit-modal').classList.remove('hidden');
+                });
+            });
+            
+            // Delete buttons functionality
             document.querySelectorAll('.delete-btn').forEach(button => {
                 button.addEventListener('click', function() {
-                    const id = parseInt(this.getAttribute('data-id'));
-                    document.getElementById('confirm-delete-btn').setAttribute('data-id', id);
+                    const type = this.getAttribute('data-type');
+                    const username = this.getAttribute('data-username');
+                    const nama = this.getAttribute('data-nama');
+                    const tanggal = this.getAttribute('data-tanggal');
+                    
+                    // Set form values
+                    document.getElementById('delete-type').value = type;
+                    document.getElementById('delete-username').value = username;
+                    document.getElementById('delete-nama-fasilitas').value = nama;
+                    document.getElementById('delete-tanggal').value = tanggal;
+                    
+                    // Set form action based on type
+                    if (type === 'atraksi') {
+                        document.getElementById('delete-form').action = "{% url 'show_user_edit_booking' %}?jenis=atraksi";
+                        document.getElementById('delete-details').textContent = `${username} - ${nama} (${formatDate(tanggal)})`;
+                    } else {
+                        document.getElementById('delete-form').action = "{% url 'show_user_edit_booking' %}?jenis=wahana";
+                        document.getElementById('delete-details').textContent = `${username} - ${nama} (${formatDate(tanggal)})`;
+                    }
+                    
+                    // Show modal
                     document.getElementById('delete-modal').classList.remove('hidden');
                 });
             });
-        }
-
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            populateTable(reservationData);
-            setupSearch();
-            setupModals();
+            
+            // Close modals
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.getElementById('edit-modal').classList.add('hidden');
+                    document.getElementById('delete-modal').classList.add('hidden');
+                });
+            });
+            
+            // Save edit form submission
+            document.getElementById('save-edit-btn').addEventListener('click', function() {
+                document.getElementById('edit-form').submit();
+            });
+            
+            // Helper function to format date
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
         });
     </script>
 </body>
