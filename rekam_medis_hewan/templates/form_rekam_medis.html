@@ -3,60 +3,65 @@
 {% block content %}
 <div class="container mx-auto p-6">
     {% include 'navbar_dokter_hewan.html' %}
-    <!-- Header Section -->
+
+    <!-- Notifikasi -->
     <div class="mb-8 mt-20">
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="rounded p-4 mb-2
+                {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-300
+                {% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-300
+                {% else %}bg-gray-100 text-gray-800 border border-gray-300{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Form Catatan Medis Hewan</h1>
         <p class="text-center text-gray-500 max-w-2xl mx-auto">Isi data pemeriksaan kesehatan hewan dengan lengkap dan akurat</p>
     </div>
 
+    <!-- Informasi Hewan -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-l-4 border-green-500">
         <div class="flex flex-col md:flex-row items-center">
-            <!-- Gambar -->
             <div class="md:w-1/4 mb-4 md:mb-0 flex justify-center">
                 <div class="w-40 h-40 rounded-full bg-green-100 flex items-center justify-center hover-scale">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9z7mrJYa7zsRfi6n26gjfhjzjvYMO3RfYMmFSJxJuaIo5y5-W7ih9VDxE1FZEineYw0EJYSmJ8Zi4P7o62NSOo0R7W2YyoL6UjKLhEoSEP_FuwdwnWFAIRHaZ-Uxq_LKGRf_xzYXK64tg/w640-h419/1644897149271573-0.png" alt="Harimau Sumatra Taro" class="rounded-full w-full h-full object-cover" />
+                    <img src="{{ hewan.url_foto }}" alt="{{ hewan.nama }}" class="rounded-full w-full h-full object-cover" />
                 </div>
             </div>
-            
-            <!-- Informasi -->
             <div class="md:w-3/4 md:pl-6">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Harimau Sumatra - Taro</h2>
-                
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ hewan.nama }}</h2>
                 <div class="mb-4">
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Spesies: Felis silvestris catus</span>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Usia: 3 tahun</span>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Asal: Sumatra</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Spesies: {{ hewan.spesies }}</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Asal: {{ hewan.asal_hewan }}</span>
                 </div>
-                
                 <p class="text-gray-600 mb-4">
-                    ID: <span class="font-semibold">PET-2025-0042</span>
+                    ID: <span class="font-semibold">{{ hewan.id_hewan }}</span>
                 </p>
             </div>
         </div>
     </div>
-    
 
-    <!-- Medical Record Form -->
-    <form id="medicalRecordForm" class="bg-white rounded-xl shadow-lg p-6">
+    <!-- Form Input Catatan Medis -->
+    <form method="POST" action="{% url 'form_rekam_medis' %}?id={{ id_hewan }}" class="bg-white rounded-xl shadow-lg p-6">
+        {% csrf_token %}
         <h2 class="text-xl font-bold text-gray-800 mb-6">Data Pemeriksaan</h2>
-        
-        <!-- Basic Info Section -->
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dokter Hewan</label>
                 <div class="block w-full px-3 py-2 border border-gray-300 bg-gray-100 rounded-md shadow-sm text-gray-700">
-                    dr. Lisa
+                    {{ username_dh }}
                 </div>
-                <input type="hidden" name="username_dh" value="dr. Lisa">
+                <input type="hidden" name="username_dh" value="{{ username_dh }}">
             </div>
-            
             <div>
                 <label for="tanggal_pemeriksaan" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pemeriksaan*</label>
                 <input type="date" id="tanggal_pemeriksaan" name="tanggal_pemeriksaan" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required>
             </div>
         </div>
-        
-        <!-- Clinical Data Section -->
+
         <div class="mb-8">
             <h3 class="text-lg font-medium text-gray-800 mb-4">Data Klinis</h3>
             <div class="mb-6">
@@ -64,21 +69,20 @@
                 <textarea id="gejala" name="gejala" rows="3" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" placeholder="Deskripsikan gejala yang terlihat pada hewan..."></textarea>
             </div>
         </div>
-        
-        <!-- Diagnosis and Treatment Section -->
+
         <div class="mb-8">
             <h3 class="text-lg font-medium text-gray-800 mb-4">Diagnosis dan Pengobatan</h3>
-            
+
             <div class="mb-6">
                 <label for="diagnosis" class="block text-sm font-medium text-gray-700 mb-1">Diagnosis*</label>
                 <textarea id="diagnosis" name="diagnosis" rows="2" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required placeholder="Masukkan diagnosis kondisi hewan..."></textarea>
             </div>
-            
+
             <div class="mb-6">
                 <label for="pengobatan" class="block text-sm font-medium text-gray-700 mb-1">Pengobatan*</label>
                 <textarea id="pengobatan" name="pengobatan" rows="3" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required placeholder="Berikan rincian pengobatan yang diberikan..."></textarea>
             </div>
-            
+
             <div class="mb-6">
                 <label for="status_kesehatan" class="block text-sm font-medium text-gray-700 mb-1">Status Kesehatan*</label>
                 <select id="status_kesehatan" name="status_kesehatan" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required>
@@ -88,21 +92,17 @@
                 </select>
             </div>
         </div>
-            </div>
-        </div>
-        
-        <!-- Form Buttons -->
+
         <div class="flex justify-center mt-8 space-x-4">
-            <button type="button" id="cancelBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            <a href="{% url 'show_rekam_medis' %}?id={{ id_hewan }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                 Batal
-            </button>
-            <button class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mr-3 transition">
+            </a>
+            <button type="submit" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
                 Simpan Catatan Medis
             </button>
         </div>
     </form>
-    
-    <!-- Help Text -->
+
     <div class="mt-6 text-center text-sm text-gray-500">
         <p>Bidang dengan tanda (*) wajib diisi. Pastikan data yang dimasukkan akurat dan lengkap.</p>
     </div>
