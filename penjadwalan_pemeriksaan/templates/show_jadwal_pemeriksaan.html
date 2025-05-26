@@ -3,24 +3,11 @@
 {% block content %}
 <div class="container mx-auto p-6">
     {% include 'navbar_dokter_hewan.html' %}
+
     <!-- Header Section -->
     <div class="mb-10 mt-20">
         <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Jadwal Pemeriksaan Hewan</h1>
         <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi jadwal pemeriksaan rutin dan tindak lanjut untuk hewan peliharaan</p>
-    </div>
-
-    <!-- Search and Filter -->
-    <div class="bg-white rounded-xl shadow-md p-4 mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="relative flex-grow md:max-w-md">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <input type="text" class="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500" placeholder="Cari hewan...">
-            </div>
-        </div>
     </div>
 
     <!-- Schedule Table -->
@@ -29,195 +16,43 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Hewan
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tanggal Pemeriksaan Selanjutnya
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Frekuensi Pemeriksaan Rutin
-                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hewan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Pemeriksaan Selanjutnya</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frekuensi Pemeriksaan Rutin</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <!-- Row 1 -->
+                    {% for item in jadwal_list %}
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                                    
+                                <div class="h-10 w-10 rounded-full overflow-hidden">
+                                    <img src="{{ item.url_foto }}" alt="{{ item.nama }}" class="h-10 w-10 object-cover" />
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Harimau Sumatra - Taro</div>
-                                    <div class="text-sm text-gray-500">ID: PET-2025-0042</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ item.nama }}</div>
+                                    <div class="text-sm text-gray-500">ID: {{ item.id }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">30 April 2025</div>
-                            
+                            <div class="text-sm text-gray-900">{{ item.tgl_selanjutnya|date:"d M Y" }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">3 Bulan Sekali</div>
+                            <div class="text-sm text-gray-900">{{ item.frekuensi }} Bulan Sekali</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-green-500 hover:text-red-700 font-medium">Lihat</button>
+                            <a href="{% url 'show_jadwal_satu_hewan' %}?id={{ item.id }}" class="text-green-500 hover:text-red-700 font-medium">Lihat</a>
                         </td>
                     </tr>
-                    
-                    <!-- Row 2 -->
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                                    
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Anjing Golden - Buddy</div>
-                                    <div class="text-sm text-gray-500">ID: PET-2025-0043</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">25 April 2025</div>
-                            
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">6 Bulan Sekali</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-green-500 hover:text-red-700 font-medium">Lihat</button>
-                        </td>
-                        
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center px-6 py-4 text-gray-500">Belum ada jadwal pemeriksaan yang tersedia.</td>
                     </tr>
-                    
-                    <!-- Row 3 -->
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                    
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Kelinci - Hoppy</div>
-                                    <div class="text-sm text-gray-500">ID: PET-2025-0044</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">20 April 2025</div>
-                          
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">4 Bulan Sekali</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-green-500 hover:text-red-700 font-medium">Lihat</button>
-                        </td>
-                    </tr>
-                    
-                    <!-- Row 4 -->
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                    
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Burung Kakaktua - Rio</div>
-                                    <div class="text-sm text-gray-500">ID: PET-2025-0045</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">15 Mei 2025</div>
-                           
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">4 Bulan Sekali</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-green-500 hover:text-red-700 font-medium">Lihat</button>
-                        </td>
-                    </tr>
-                    
-                    <!-- Row 5 -->
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                                    
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Ikan Koi - Orange</div>
-                                    <div class="text-sm text-gray-500">ID: PET-2025-0046</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">10 Mei 2025</div>
-                            
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">5 Bulan Sekali</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="text-green-500 hover:text-red-700 font-medium">Lihat</button>
-                        </td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-    
-    <!-- Pagination -->
-    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-xl">
-        <div class="flex-1 flex justify-between sm:hidden">
-            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Sebelumnya
-            </a>
-            <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Berikutnya
-            </a>
-        </div>
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-                <p class="text-sm text-gray-700">
-                    Menampilkan <span class="font-medium">1</span> sampai <span class="font-medium">5</span> dari <span class="font-medium">12</span> hasil
-                </p>
-            </div>
-            <div>
-                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                        <span class="sr-only">Previous</span>
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                    <a href="#" aria-current="page" class="z-10 bg-green-50 border-green-500 text-green-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                        1
-                    </a>
-                    <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                        2
-                    </a>
-                    <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium">
-                        3
-                    </a>
-                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                        ...
-                    </span>
-                    <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                        8
-                    </a>
-                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                        <span class="sr-only">Next</span>
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </nav>
-            </div>
         </div>
     </div>
 </div>

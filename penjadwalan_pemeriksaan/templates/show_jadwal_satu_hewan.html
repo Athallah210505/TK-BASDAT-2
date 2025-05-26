@@ -7,7 +7,7 @@
     <!-- Header Section -->
     <div class="mb-10 mt-20">
         <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Jadwal Pemeriksaan Kesehatan Hewan</h1>
-        <p class="text-center text-gray-500 max-w-2xl mx-auto">Frekuensi Pemeriksaan Rutin: 3 bulan sekali</p>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Frekuensi Pemeriksaan Rutin: {{ frekuensi_rutin }} bulan sekali</p>
     </div>
 
     <!-- Animal Profile Card -->
@@ -15,19 +15,17 @@
         <div class="flex flex-col md:flex-row items-center">
             <div class="md:w-1/4 mb-4 md:mb-0 flex justify-center">
                 <div class="w-40 h-40 rounded-full bg-green-100 flex items-center justify-center hover-scale">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj9z7mrJYa7zsRfi6n26gjfhjzjvYMO3RfYMmFSJxJuaIo5y5-W7ih9VDxE1FZEineYw0EJYSmJ8Zi4P7o62NSOo0R7W2YyoL6UjKLhEoSEP_FuwdwnWFAIRHaZ-Uxq_LKGRf_xzYXK64tg/w640-h419/1644897149271573-0.png" 
-                         alt="Harimau Sumatra Taro" 
-                         class="rounded-full w-full h-full object-cover" />
+                    <img src="{{ hewan.url_foto }}" alt="{{ hewan.nama }}" class="rounded-full w-full h-full object-cover" />
                 </div>
             </div>
             <div class="md:w-3/4 md:pl-6">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Harimau Sumatra - Taro</h2>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ hewan.nama }}</h2>
                 <div class="mb-4">
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Spesies: Felis silvestris catus</span>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Usia: 3 tahun</span>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Asal: Sumatra</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Spesies: {{ hewan.spesies }}</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mr-2">Usia: {{ hewan.usia }}</span>
+                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">Asal: {{ hewan.asal }}</span>
                 </div>
-                <p class="text-gray-600 mb-4">ID: <span class="font-semibold">PET-2025-0042</span></p>
+                <p class="text-gray-600 mb-4">ID: <span class="font-semibold">{{ hewan.id }}</span></p>
                 <div class="flex space-x-3">
                     <button onclick="tambahJadwal()" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
                         Tambah Jadwal Pemeriksaan
@@ -48,7 +46,7 @@
         <div class="p-6">
             <table class="min-w-full table-auto">
                 <tbody>
-                    <!-- Baris 1 -->
+                    {% for jadwal in jadwal_list %}
                     <tr class="border-b border-gray-200 hover:bg-gray-50">
                         <td class="py-3">
                             <div class="flex items-center justify-between">
@@ -56,143 +54,116 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span class="text-lg font-semibold text-gray-900">30 April 2025</span>
+                                    <span class="text-lg font-semibold text-gray-900">{{ jadwal }}</span>
                                 </div>
                                 <div class="space-x-2">
-                                    <button onclick="editTanggal('30 April 2025')" class="text-sm px-3 py-1 rounded bg-yellow-400 text-white hover:bg-yellow-500">Edit</button>
-                                    <button onclick="hapusTanggal('30 April 2025')" class="text-sm px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600">Hapus</button>
+                                    <button onclick="editTanggal('{{ jadwal }}')" class="text-sm px-3 py-1 rounded bg-yellow-400 text-white hover:bg-yellow-500">Edit</button>
+                                    <button onclick="hapusTanggal('{{ jadwal }}')" class="text-sm px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600">Hapus</button>
                                 </div>
                             </div>
                         </td>
                     </tr>
-
-                    <!-- Baris 2 -->
-                    <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="py-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span class="text-lg font-semibold text-gray-900">15 Mei 2025</span>
-                                </div>
-                                <div class="space-x-2">
-                                    <button onclick="editTanggal('15 Mei 2025')" class="text-sm px-3 py-1 rounded bg-yellow-400 text-white hover:bg-yellow-500">Edit</button>
-                                    <button onclick="hapusTanggal('15 Mei 2025')" class="text-sm px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600">Hapus</button>
-                                </div>
-                            </div>
-                        </td>
+                    {% empty %}
+                    <tr>
+                        <td class="py-4 text-center text-gray-500">Belum ada jadwal pemeriksaan.</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Pop-up Tambah Jadwal -->
-    <div id="tambahJadwalForm" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-        <div class="bg-white p-6 rounded-lg w-1/2">
-            <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Tambah Jadwal</h2>
-            <form>
-                <div class="mb-4">
-                    <label for="tanggal_pemeriksaan" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pemeriksaan Selanjutnya</label>
-                    <input type="date" id="tanggal_pemeriksaan" name="tanggal_pemeriksaan" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required>
-                </div>
-                <div class="flex justify-end mt-4">
-                    <button type="button" onclick="closeTambahJadwal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">Batal</button>
-                    <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-lg">Simpan</button>
+    <!-- Popup Section -->
+    <div id="editTanggalPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h3 class="text-lg font-semibold mb-4">Edit Tanggal Pemeriksaan</h3>
+            <form method="POST" action="{% url 'edit_jadwal_pemeriksaan' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id_hewan" value="{{ hewan.id }}">
+                <input type="hidden" id="tanggal_lama" name="tanggal_lama">
+                <label for="tanggal_baru" class="block text-sm font-medium mb-1">Tanggal Pemeriksaan selanjutnya</label>
+                <input type="date" id="tanggal_baru" name="tanggal_baru" required class="block w-full mb-4 border border-gray-300 rounded-md px-3 py-2">
+                <div class="flex justify-end space-x-2">
+                    <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded">Simpan</button>
+                    <button type="button" onclick="closeEditTanggal()" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Pop-up Edit Tanggal -->
-    <div id="editTanggalPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-        <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border">
-            <h2 class="text-center font-bold text-lg text-black mb-6 uppercase">Edit Jadwal</h2>
-            <p class="text-black mb-2">Tanggal Pemeriksaan Selanjutnya:</p>
-            <input type="date" id="tanggal_baru" class="block w-full px-3 py-2 border border-gray-300 rounded-md mb-6 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
-            <div class="flex justify-end mt-4">
-                <button onclick="submitEditTanggal()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg">SIMPAN</button>
-                <button onclick="closeEditTanggal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">BATAL</button>
-            </div>
-        </div>
-    </div>    
-    
-    <!-- Pop-up Edit Frekuensi -->
-    <div id="editFrekuensiPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-        <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border">
-            <h2 class="text-center font-bold text-lg text-black mb-6 uppercase">Edit Frekuensi</h2>
-            <p class="text-black mb-2">Frekuensi pemeriksaan rutin:</p>
-            <div class="flex items-center justify-center mb-6">
-                <input type="number" min="1" id="frekuensi_baru" class="w-20 px-3 py-2 border border-gray-300 rounded-md mr-2 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" />
-                <span class="text-black">x bulan sekali</span>
-            </div>
-    
-            <div class="flex justify-end mt-4">
-                <button onclick="submitEditFrekuensi()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg">SIMPAN</button>
-                <button onclick="closeEditFrekuensi()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">BATAL</button>
-            </div>
+    <div id="hapusJadwalPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus Jadwal</h3>
+            <form method="POST" action="{% url 'hapus_jadwal_pemeriksaan' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id_hewan" value="{{ hewan.id }}">
+                <input type="hidden" id="tanggal_hapus" name="tanggal_hapus">
+                <p class="mb-4">Apakah Anda yakin ingin menghapus jadwal ini?</p>
+                <div class="flex justify-end space-x-2">
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Hapus</button>
+                    <button type="button" onclick="closeHapusJadwal()" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+                </div>
+            </form>
         </div>
     </div>
-    
-    <div id="hapusJadwalPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-        <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg border">
-            <h2 class="text-center font-bold text-lg text-black mb-6 uppercase">Hapus Jadwal</h2>
-            <p class="text-black mb-6 text-center">Apakah anda yakin ingin menghapus jadwal pemeriksaan ini?</p>
-    
-            <div class="flex justify-end mt-4">
-                <button onclick="confirmHapusJadwal()" class="px-6 py-2 bg-yellow-500 text-white rounded-lg">YA</button>
-                <button onclick="closeHapusJadwal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">TIDAK</button>
-            </div>
-        </div>
-    </div>
-    
 
-    <!-- Scripts -->
+    <!-- Popup Tambah Jadwal -->
+<div id="tambahJadwalPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h3 class="text-lg font-semibold mb-4">Tambah Jadwal Pemeriksaan</h3>
+        <form method="POST" action="{% url 'tambah_jadwal_pemeriksaan' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id_hewan" value="{{ hewan.id }}">
+            <label for="tanggal_baru" class="block text-sm font-medium mb-1">Tanggal Pemeriksaan Baru</label>
+            <input type="date" id="tanggal_baru" name="tanggal_baru" required class="block w-full mb-4 border border-gray-300 rounded-md px-3 py-2">
+            <div class="flex justify-end space-x-2">
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Simpan</button>
+                <button type="button" onclick="document.getElementById('tambahJadwalPopup').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup Edit Frekuensi -->
+<div id="editFrekuensiPopup" class="hidden fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h3 class="text-lg font-semibold mb-4">Edit Frekuensi Pemeriksaan</h3>
+        <form method="POST" action="{% url 'edit_frekuensi_pemeriksaan' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id_hewan" value="{{ hewan.id }}">
+            <label for="frekuensi_baru" class="block text-sm font-medium mb-1">Frekuensi Pemeriksaan (bulan)</label>
+            <input type="number" id="frekuensi_baru" name="frekuensi_baru" min="1" required class="block w-full mb-4 border border-gray-300 rounded-md px-3 py-2">
+            <div class="flex justify-end space-x-2">
+                <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded">Simpan</button>
+                <button type="button" onclick="document.getElementById('editFrekuensiPopup').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
     <script>
         function editTanggal(tanggal) {
             document.getElementById('editTanggalPopup').classList.remove('hidden');
             document.getElementById('tanggal_lama').value = tanggal;
         }
-    
         function closeEditTanggal() {
             document.getElementById('editTanggalPopup').classList.add('hidden');
         }
-    
-        function submitEditTanggal() {
-            // Lakukan aksi simpan di sini
-            alert("Tanggal berhasil diperbarui (simulasi).");
-            closeEditTanggal();
-        }
-    
-        function editFrekuensi() {
-            document.getElementById('editFrekuensiPopup').classList.remove('hidden');
-        }
-    
-        function closeEditFrekuensi() {
-            document.getElementById('editFrekuensiPopup').classList.add('hidden');
-        }
-    
-        function submitEditFrekuensi() {
-            // Lakukan aksi simpan frekuensi di sini
-            alert("Frekuensi berhasil diperbarui (simulasi).");
-            closeEditFrekuensi();
-        }
-    
         function hapusTanggal(tanggal) {
             document.getElementById('hapusJadwalPopup').classList.remove('hidden');
-            window.tanggalToDelete = tanggal;
+            document.getElementById('tanggal_hapus').value = tanggal;
         }
-    
         function closeHapusJadwal() {
             document.getElementById('hapusJadwalPopup').classList.add('hidden');
         }
-    
-        function confirmHapusJadwal() {
-            alert("Jadwal pada tanggal " + window.tanggalToDelete + " telah dihapus (simulasi).");
-            closeHapusJadwal();
+        function tambahJadwal() {
+            document.getElementById('tambahJadwalPopup').classList.remove('hidden');
+        }
+        function editFrekuensi() {
+            document.getElementById('editFrekuensiPopup').classList.remove('hidden');
         }
     </script>
-    
 </div>
 {% endblock %}
