@@ -3,9 +3,6 @@ from django.contrib import messages
 from django.db import connection
 
 def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('show_main')
-
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')

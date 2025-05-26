@@ -4,8 +4,6 @@
 {% block content %}
 {%include 'navbar.html'%}
 
-
-
     <style>
         /* Custom animations */
         @keyframes float {
@@ -96,17 +94,6 @@
                     Join our adventure in managing Taman Safari - where conservation meets fun, and every animal has a story!
                 </p>
                 
-                <div class="flex flex-wrap gap-4">
-                    <button class="px-6 py-3 bg-green-500 text-white rounded-full font-medium hover:bg-green-600 transition flex items-center btn-shine">
-                        Start Your Safari
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <button class="px-6 py-3 bg-white border border-gray-300 rounded-full font-medium hover:bg-gray-100 transition">
-                        Explore Features
-                    </button>
-                </div>
             </div>
             
             <!-- Right Column -->
@@ -148,83 +135,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Meet Our Safari Stars Section -->
-    <div class="py-24 animate__animated animate__fadeIn" style="animation-delay: 0.3s">
-        <div class="max-w-7xl mx-auto px-8 text-center">
-            <h2 class="text-5xl font-bold text-green-500 mb-4 animate__animated animate__fadeInDown">Meet Our Safari Stars</h2>
-            <p class="text-xl text-gray-500 mb-16">SIZOPI helps us take care of our amazing animal friends!</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Simba Card -->
-                <div class="safari-card rounded-xl p-8 flex flex-col items-center bg-gradient-to-b from-green-50 to-green-100 border border-green-200 animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
-                    <div class="bg-green-100 p-6 rounded-full mb-6 animate-float" style="animation-delay: 0.2s">
-                        <img src="{% static 'image/simba.svg' %}" class="h-12 w-12 text-green-500" alt="Simba Icon">
-                    </div>
-                    <h3 class="text-2xl font-bold mb-2">Simba</h3>
-                    <p class="text-gray-500">King of the Savanna</p>
-                    <div class="card-description mt-4">
-                        <p class="text-gray-600 text-sm">Simba is our majestic lion who leads the pride. Learn about his conservation story and how you can help protect wild lions.</p>
-                    </div>
-                </div>
-                
-                <!-- Zazu Card -->
-                <div class="safari-card rounded-xl p-8 flex flex-col items-center bg-gradient-to-b from-blue-50 to-blue-100 border border-blue-200 animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
-                    <div class="bg-blue-100 p-6 rounded-full mb-6 animate-float" style="animation-delay: 0.4s">
-                        <img src="{% static 'image/zazu.svg' %}" class="h-12 w-12 text-blue-500" alt="Zazu Icon">
-                    </div>
-                    <h3 class="text-2xl font-bold mb-2">Zazu</h3>
-                    <p class="text-gray-500">Bird Show Star</p>
-                    <div class="card-description mt-4">
-                        <p class="text-gray-600 text-sm">Click to learn more about Zazu's story and how you can help with conservation efforts!</p>
-                    </div>
-                </div>
-                
-                <!-- Crush Card -->
-                <div class="safari-card rounded-xl p-8 flex flex-col items-center bg-gradient-to-b from-yellow-50 to-yellow-100 border border-yellow-200 animate__animated animate__fadeInUp" style="animation-delay: 0.6s">
-                    <div class="bg-yellow-100 p-6 rounded-full mb-6 animate-float" style="animation-delay: 0.6s">
-                        <img src="{% static 'image/crush.svg' %}" class="h-12 w-12 text-yellow-500" alt="Crush Icon">
-                    </div>
-                    <h3 class="text-2xl font-bold mb-2">Crush</h3>
-                    <p class="text-gray-500">Reptile Ambassador</p>
-                    <div class="card-description mt-4">
-                        <p class="text-gray-600 text-sm">Meet our friendly turtle who helps educate visitors about reptile conservation and ocean protection initiatives.</p>
-                    </div>
-                </div>
-                
-                <!-- Nemo Card -->
-                <div class="safari-card rounded-xl p-8 flex flex-col items-center bg-gradient-to-b from-cyan-50 to-cyan-100 border border-cyan-200 animate__animated animate__fadeInUp" style="animation-delay: 0.8s">
-                    <div class="bg-cyan-100 p-6 rounded-full mb-6 animate-float" style="animation-delay: 0.8s">
-                        <img src="{% static 'image/nemo.svg' %}" class="h-12 w-12 text-cyan-500" alt="Nemo Icon">
-                    </div>
-                    <h3 class="text-2xl font-bold mb-2">Nemo</h3>
-                    <p class="text-gray-500">Aquatic Friend</p>
-                    <div class="card-description mt-4">
-                        <p class="text-gray-600 text-sm">Discover how Nemo and his friends help us learn about coral reef conservation and marine ecosystem protection.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Join Safari Section -->
-    <div class="bg-green-50 py-24 animate__animated animate__fadeIn" style="animation-delay: 0.5s">
-        <div class="max-w-7xl mx-auto px-8 text-center">
-            <div class="inline-flex items-center bg-green-100 px-4 py-2 rounded-full mb-6">
-                <img src="{% static 'image/claw.svg' %}" class="h-5 w-5 mr-2" alt="Lion Icon">
-                <span class="text-green-800 font-medium">Hop on board!</span>
-            </div>
-            
-            <h2 class="text-5xl font-bold text-green-500 mb-4">Join Our Safari Adventure</h2>
-            <p class="text-xl text-gray-500 mb-10">Create an account and become part of our wild conservation family!</p>
-            
-            <button class="px-8 py-4 bg-green-500 text-white rounded-full font-medium hover:bg-green-600 transition inline-flex items-center btn-shine">
-                Join the Pack
-                <img src="{% static 'image/claw.svg' %}" class="h-5 w-5 ml-2" alt="Lion Icon">
-            </button>
-        </div>
-    </div>
-
 
     <!-- Animation script -->
     <script>
