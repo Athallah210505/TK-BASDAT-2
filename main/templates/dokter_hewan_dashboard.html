@@ -1,7 +1,7 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
 
 {% block content %}
-{% include 'navbar_dokter_hewan.html'%}
+{% include 'navbar_dokter_hewan.html' %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,19 +17,6 @@
             background-color: #10b981;
             border-radius: 4px;
         }
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 0.125rem 0.5rem;
-            border-radius: 0.25rem;
-        }
-        .status-sehat {
-            background-color: #ecfdf5;
-            color: #10b981;
-        }
-        .status-perawatan {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
     </style>
 </head>
 <body class="font-sans">
@@ -40,29 +27,22 @@
                 <h1 class="text-2xl font-bold text-green-500">Safari Dashboard</h1>
                 <p class="text-sm text-gray-600">Welcome to the SIZOPI management system for Taman Safari.</p>
             </div>
-            <div class="flex items-center">
-                <span class="text-sm mr-2"></span>
-                <div class="relative inline-block text-left">
-                   
-                    </select>
-                </div>
-            </div>
         </header>
 
         <!-- ID Card Section -->
         <div class="bg-green-100 rounded-lg p-2 mb-2 flex flex-wrap gap-2">
             <span class="inline-block bg-white text-xs px-3 py-1 rounded-full text-green-700 font-medium">
-                Nomor Sertifikasi: STR-0001
+                Nomor Sertifikasi: {{ dokter.no_str }}
             </span>
             <span class="inline-block bg-blue-100 text-xs px-3 py-1 rounded-full text-blue-700 font-medium">
-                Spesialisasi: Reptil
+                Spesialisasi: {{ dokter.spesialisasi }}
             </span>
         </div>
 
         <!-- User Profile Card -->
         <div class="bg-white rounded-lg p-6 shadow-sm mb-6">
             <div class="mb-4">
-                <h2 class="text-lg font-medium">Min Jung</h2>
+                <h2 class="text-lg font-medium">{{ dokter.nama }}</h2>
                 <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Dokter Hewan</span>
             </div>
             
@@ -73,7 +53,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Username</p>
-                        <p>minjung51</p>
+                        <p>{{ dokter.username }}</p>
                     </div>
                 </div>
                 
@@ -83,7 +63,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Nomor Telepon</p>
-                        <p>08129876543</p>
+                        <p>{{ dokter.no_telepon }}</p>
                     </div>
                 </div>
                 
@@ -93,7 +73,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Email</p>
-                        <p>minjung51@example.com</p>
+                        <p>{{ dokter.email }}</p>
                     </div>
                 </div>
                 
@@ -109,15 +89,6 @@
             </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <div class="mb-6">
-            <div class="flex border-b border-gray-200">
-                <button class="px-4 py-2 bg-green-500 text-white rounded-t-lg">Overview</button>
-                <button class="px-4 py-2 text-gray-600">Analytics</button>
-                <button class="px-4 py-2 text-gray-600">Reports</button>
-            </div>
-        </div>
-
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <!-- Professional Certificate Card -->
@@ -126,7 +97,7 @@
                     <span class="text-sm text-gray-600">Nomor Sertifikasi Profesional</span>
                     <i class="fas fa-certificate text-green-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-1">STR-0001</h3>
+                <h3 class="text-2xl font-bold mb-1">{{ dokter.no_str }}</h3>
                 <p class="text-xs text-gray-500">Nomor Sertifikasi Dokter Hewan</p>
             </div>
 
@@ -136,7 +107,7 @@
                     <span class="text-sm text-gray-600">Spesialisasi</span>
                     <i class="fas fa-stethoscope text-green-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-1">Reptil</h3>
+                <h3 class="text-2xl font-bold mb-1">{{ dokter.spesialisasi }}</h3>
                 <p class="text-xs text-gray-500">Bidang spesialisasi utama</p>
             </div>
 
@@ -146,200 +117,11 @@
                     <span class="text-sm text-gray-600">Hewan Ditangani</span>
                     <i class="fas fa-paw text-green-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-1">78</h3>
+                <h3 class="text-2xl font-bold mb-1">{{ dokter.jumlah_hewan_ditangani }}</h3>
                 <p class="text-xs text-gray-500">Jumlah hewan yang ditangani rekam medisnya</p>
             </div>
         </div>
-
-        <!-- Recent Medical Records -->
-        <div class="bg-white p-5 rounded-lg shadow-sm mb-6">
-            <div class="flex items-center mb-4">
-                <i class="fas fa-clipboard-list text-green-500 mr-2"></i>
-                <h3 class="text-lg font-medium">Rekam Medis Terbaru</h3>
-            </div>
-            <p class="text-xs text-gray-500 mb-4">Rekam medis hewan yang baru ditangani</p>
-            
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead>
-                        <tr class="text-left text-sm text-gray-600">
-                            <th class="pb-3 pl-1">Tanggal</th>
-                            <th class="pb-3">Hewan</th>
-                            <th class="pb-3">Prosedur</th>
-                            <th class="pb-3 text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">2024-04-25</td>
-                            <td class="py-3">Komodo (Naga)</td>
-                            <td class="py-3">Pemeriksaan Rutin</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-sehat">Sehat</span>
-                            </td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">2024-04-24</td>
-                            <td class="py-3">Iguana Hijau</td>
-                            <td class="py-3">Pengobatan Luka</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-perawatan">Dalam Perawatan</span>
-                            </td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">2024-04-23</td>
-                            <td class="py-3">Ular Python</td>
-                            <td class="py-3">Pemeriksaan Gigi</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-sehat">Sehat</span>
-                            </td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">2024-04-22</td>
-                            <td class="py-3">Kura-kura Aldabra</td>
-                            <td class="py-3">Perawatan Cangkang</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-sehat">Sehat</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="text-center mt-6">
-                <button class="text-sm text-green-600 hover:text-green-700">
-                    Lihat Semua Rekam Medis
-                </button>
-            </div>
-        </div>
-
-        <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Today's Examination Schedule -->
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-calendar-alt text-green-500 mr-2"></i>
-                    <h3 class="text-lg font-medium">Jadwal Pemeriksaan Hari Ini</h3>
-                </div>
-                <p class="text-xs text-gray-500 mb-4">Jadwal pemeriksaan hewan yang dijadwalkan hari ini</p>
-                
-                <div class="space-y-4">
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="font-medium">09:00 - Komodo (Naga)</p>
-                                    <p class="text-xs text-gray-500">Kandang Reptil</p>
-                                </div>
-                                <span class="status-badge status-sehat">Selesai</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="font-medium">11:30 - Iguana Hijau</p>
-                                    <p class="text-xs text-gray-500">Kandang Reptil</p>
-                                </div>
-                                <span class="status-badge status-perawatan">Menunggu</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="font-medium">14:00 - Ular Python</p>
-                                    <p class="text-xs text-gray-500">Kandang Reptil</p>
-                                </div>
-                                <span class="status-badge status-perawatan">Menunggu</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Treatment Statistics -->
-            <div class="bg-white p-5 rounded-lg shadow-sm">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-chart-bar text-green-500 mr-2"></i>
-                    <h3 class="text-lg font-medium">Statistik Perawatan</h3>
-                </div>
-                <p class="text-xs text-gray-500 mb-6">Statistik perawatan hewan berdasarkan jenis</p>
-                
-                <!-- Progress bars -->
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm">Pemeriksaan Rutin</span>
-                            <span class="text-sm">45 kasus (58%)</span>
-                        </div>
-                        <div class="progress-bar" style="width: 58%"></div>
-                    </div>
-                    
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm">Pengobatan</span>
-                            <span class="text-sm">22 kasus (28%)</span>
-                        </div>
-                        <div class="progress-bar" style="width: 28%"></div>
-                    </div>
-                    
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm">Operasi</span>
-                            <span class="text-sm">11 kasus (14%)</span>
-                        </div>
-                        <div class="progress-bar" style="width: 14%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add functionality for tabs
-            const tabs = document.querySelectorAll('.flex.border-b button');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Remove active class from all tabs
-                    tabs.forEach(t => {
-                        t.classList.remove('bg-green-500', 'text-white');
-                        t.classList.add('text-gray-600');
-                    });
-                    
-                    // Add active class to clicked tab
-                    this.classList.remove('text-gray-600');
-                    this.classList.add('bg-green-500', 'text-white');
-                });
-            });
-            
-            // Progress bar animations
-            const progressBars = document.querySelectorAll('.progress-bar');
-            progressBars.forEach(bar => {
-                const originalWidth = bar.style.width;
-                bar.style.width = '0';
-                setTimeout(() => {
-                    bar.style.transition = 'width 1s ease-out';
-                    bar.style.width = originalWidth;
-                }, 300);
-            });
-        });
-    </script>
 </body>
 </html>
-
 {% endblock %}

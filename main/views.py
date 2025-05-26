@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from utils.decorators import role_required
+from django.db import connection
 
 # Create your views here.
 def show_main(request):
@@ -11,7 +12,45 @@ def show_staff_dashboard(request):
 
 @role_required('dokter')
 def dokter_hewan_dashboard(request):
-    return render(request, 'dokter_hewan_dashboard.html')
+    username = request.user.username
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                p.username, 
+                CONCAT_WS(' ', p.nama_depan, p.nama_tengah, p.nama_belakang) AS nama_lengkap,
+                p.email,
+                p.no_telepon,
+                d.no_STR,
+                (
+                    SELECT s.nama_spesialisasi
+                    FROM sizopi.spesialisasi s
+                    WHERE s.username_SH = d.username_DH
+                    LIMIT 1
+                ) AS spesialisasi,
+                (
+                    SELECT COUNT(DISTINCT cm.id_hewan)
+                    FROM sizopi.catatan_medis cm
+                    WHERE cm.username_dh = d.username_DH
+                ) AS jumlah_hewan_ditangani
+            FROM sizopi.pengguna p
+            JOIN sizopi.dokter_hewan d ON p.username = d.username_DH
+            WHERE p.username = %s
+        """, [username])
+        row = cursor.fetchone()
+
+    dokter = {
+        'username': row[0],
+        'nama': row[1],
+        'email': row[2],
+        'no_telepon': row[3],
+        'no_str': row[4],
+        'spesialisasi': row[5] or 'Belum ada',
+        'jumlah_hewan_ditangani': row[6]
+    } if row else {}
+
+    return render(request, 'dokter_hewan_dashboard.html', {'dokter': dokter})
+
 
 @role_required('pengunjung')
 def pengunjung_dashboard(request):

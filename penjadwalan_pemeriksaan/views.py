@@ -2,7 +2,8 @@ from datetime import date
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from utils.decorators import role_required
-from django.db import connection
+from django.db import connection, DatabaseError
+from psycopg2 import errors
 
 @role_required('dokter')
 def show_jadwal_pemeriksaan(request):
@@ -96,14 +97,17 @@ def edit_jadwal_pemeriksaan(request):
         tanggal_lama = request.POST.get('tanggal_lama')
         tanggal_baru = request.POST.get('tanggal_baru')
 
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE sizopi.jadwal_pemeriksaan_kesehatan
-                SET tgl_pemeriksaan_selanjutnya = %s
-                WHERE id_hewan = %s AND tgl_pemeriksaan_selanjutnya = %s
-            """, [tanggal_baru, id_hewan, tanggal_lama])
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE sizopi.jadwal_pemeriksaan_kesehatan
+                    SET tgl_pemeriksaan_selanjutnya = %s
+                    WHERE id_hewan = %s AND tgl_pemeriksaan_selanjutnya = %s
+                """, [tanggal_baru, id_hewan, tanggal_lama])
+            messages.success(request, "Tanggal berhasil diperbarui.")
+        except Exception as e:
+            messages.error(request, f"Gagal mengubah tanggal: {str(e)}")
 
-        messages.success(request, "Tanggal berhasil diperbarui.")
         return redirect(f"/jadwal_pemeriksaan/jadwal_satu_hewan?id={id_hewan}")
 
 @role_required('dokter')
@@ -112,33 +116,45 @@ def hapus_jadwal_pemeriksaan(request):
         id_hewan = request.POST.get('id_hewan')
         tanggal_hapus = request.POST.get('tanggal_hapus')
 
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                DELETE FROM sizopi.jadwal_pemeriksaan_kesehatan
-                WHERE id_hewan = %s AND tgl_pemeriksaan_selanjutnya = %s
-            """, [id_hewan, tanggal_hapus])
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    DELETE FROM sizopi.jadwal_pemeriksaan_kesehatan
+                    WHERE id_hewan = %s AND tgl_pemeriksaan_selanjutnya = %s
+                """, [id_hewan, tanggal_hapus])
+            messages.success(request, "Jadwal berhasil dihapus.")
+        except Exception as e:
+            messages.error(request, f"Gagal menghapus jadwal: {str(e)}")
 
-        messages.success(request, "Jadwal berhasil dihapus.")
         return redirect(f"/jadwal_pemeriksaan/jadwal_satu_hewan?id={id_hewan}")
-    
+
 @role_required('dokter')
 def tambah_jadwal_pemeriksaan(request):
     if request.method == 'POST':
         id_hewan = request.POST.get('id_hewan')
         tanggal_baru = request.POST.get('tanggal_baru')
 
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT freq_pemeriksaan_rutin FROM sizopi.jadwal_pemeriksaan_kesehatan
-                WHERE id_hewan = %s LIMIT 1
-            """, [id_hewan])
-            freq = cursor.fetchone()
-            freq_value = freq[0] if freq else 3
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT freq_pemeriksaan_rutin FROM sizopi.jadwal_pemeriksaan_kesehatan
+                    WHERE id_hewan = %s LIMIT 1
+                """, [id_hewan])
+                freq = cursor.fetchone()
+                freq_value = freq[0] if freq else 3
 
-            cursor.execute("""
-                INSERT INTO sizopi.jadwal_pemeriksaan_kesehatan (id_hewan, tgl_pemeriksaan_selanjutnya, freq_pemeriksaan_rutin)
-                VALUES (%s, %s, %s)
-            """, [id_hewan, tanggal_baru, freq_value])
+                cursor.execute("""
+                    INSERT INTO sizopi.jadwal_pemeriksaan_kesehatan (id_hewan, tgl_pemeriksaan_selanjutnya, freq_pemeriksaan_rutin)
+                    VALUES (%s, %s, %s)
+                """, [id_hewan, tanggal_baru, freq_value])
+
+            messages.success(request, "Jadwal pemeriksaan berhasil ditambahkan.")
+        except DatabaseError as e:
+            error_message = getattr(e, 'pgerror', str(e))
+            if "SUKSES:" in error_message:
+                messages.success(request, error_message.strip())
+            else:
+                messages.error(request, f"Gagal menambahkan jadwal: {error_message}")
 
         return redirect(f"/jadwal_pemeriksaan/jadwal_satu_hewan?id={id_hewan}")
 
@@ -148,11 +164,16 @@ def edit_frekuensi_pemeriksaan(request):
         id_hewan = request.POST.get('id_hewan')
         frekuensi_baru = request.POST.get('frekuensi_baru')
 
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE sizopi.jadwal_pemeriksaan_kesehatan
-                SET freq_pemeriksaan_rutin = %s
-                WHERE id_hewan = %s
-            """, [frekuensi_baru, id_hewan])
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE sizopi.jadwal_pemeriksaan_kesehatan
+                    SET freq_pemeriksaan_rutin = %s
+                    WHERE id_hewan = %s
+                """, [frekuensi_baru, id_hewan])
+
+            messages.success(request, "Frekuensi berhasil diperbarui.")
+        except Exception as e:
+            messages.error(request, f"Gagal memperbarui frekuensi: {str(e)}")
 
         return redirect(f"/jadwal_pemeriksaan/jadwal_satu_hewan?id={id_hewan}")
