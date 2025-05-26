@@ -18,13 +18,14 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for animal in animals %}
     <div id="animal-card-{{ animal.id }}" class="bg-white rounded-2xl shadow-lg border-l-4 border-green-500 overflow-hidden flex flex-col"
-         data-id="{{ animal.id }}"
-         data-species="{{ animal.species }}"
-         data-name="{{ animal.name }}"
-         data-origin="{{ animal.origin }}"
-         data-birth-date="{{ animal.birth_date|date:'Y-m-d' }}"
-         data-health-status="{{ animal.health_status }}"
-         data-photo-url="{{ animal.photo_url }}">
+      data-id="{{ animal.id }}"
+      data-species="{{ animal.species }}"
+      data-name="{{ animal.name }}"
+      data-origin="{{ animal.origin }}"
+      data-birth-date="{{ animal.birth_date|date:'Y-m-d' }}"
+      data-health-status="{{ animal.health_status }}"
+      data-habitat="{{ animal.habitat }}"
+      data-photo-url="{{ animal.photo_url }}">
       <!-- Foto Satwa -->
       <div class="h-48 bg-green-50 flex items-center justify-center overflow-hidden">
         {% if animal.photo_url %}
@@ -97,6 +98,16 @@
         <input type="text" name="health_status" id="edit-health-status" class="input-field" required />
       </div>
       <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Habitat</label>
+          <select name="habitat" id="edit-habitat"
+              class="input-field" required>
+            <option value="">Pilih habitat</option>
+            {% for h in habitats %}
+          <option value="{{ h }}">{{ h }}</option>
+          {% endfor %}
+        </select>
+      </div>
+        <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">URL Foto</label>
         <input type="url" name="photo_url" id="edit-photo-url" class="input-field" />
       </div>
@@ -121,77 +132,218 @@
 </div>
 
 <script>
-// CSRF helper
-let csrftoken;
-document.cookie.split(';').forEach(c => {
-  if (c.trim().startsWith('csrftoken=')) csrftoken = c.trim().split('=')[1];
+document.addEventListener('DOMContentLoaded', () => {
+  // === CSRF helper ===
+  let csrftoken = null;
+  document.cookie.split(';').forEach(c => {
+    const cookie = c.trim();
+    if (cookie.startsWith('csrftoken=')) {
+      csrftoken = cookie.split('=')[1];
+    }
+  });
+  function getCookie() { return csrftoken; }
+
+  // === Modal controls ===
+  window.openEditModal = function(id) {
+    const card = document.getElementById(`animal-card-${id}`);
+    document.getElementById('edit-id').value            = id;
+    document.getElementById('edit-name').value          = card.dataset.name;
+    document.getElementById('edit-species').value       = card.dataset.species;
+    document.getElementById('edit-origin').value        = card.dataset.origin;
+    document.getElementById('edit-birth-date').value    = card.dataset.birthDate || '';
+    document.getElementById('edit-health-status').value = card.dataset.healthStatus;
+    document.getElementById('edit-habitat').value       = card.dataset.habitat;
+    document.getElementById('edit-photo-url').value     = card.dataset.photoUrl;
+    document.getElementById('editModal').classList.remove('hidden');
+  }
+  window.closeEditModal = function() {
+    document.getElementById('editModal').classList.add('hidden');
+  }
+
+  let deleteId = null;
+  window.openDeleteModal = function(id) {
+    deleteId = id;
+    const card = document.getElementById(`animal-card-${id}`);
+    document.getElementById('deleteAnimalName').textContent =
+      card.dataset.name || card.dataset.species;
+    document.getElementById('deleteModal').classList.remove('hidden');
+  }
+  window.closeDeleteModal = function() {
+    document.getElementById('deleteModal').classList.add('hidden');
+  }
+
+  // === Attach button handlers ===
+  document.querySelectorAll('.edit-btn').forEach(btn =>
+    btn.addEventListener('click', e =>
+      openEditModal(e.currentTarget.dataset.id)
+    )
+  );
+  document.querySelectorAll('.delete-btn').forEach(btn =>
+    btn.addEventListener('click', e =>
+      openDeleteModal(e.currentTarget.dataset.id)
+    )
+  );
+
+  // === Handle Edit Submit (AJAX) ===
+  document.getElementById('editForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const id  = document.getElementById('edit-id').value;
+    const url = `/animals/${id}/update/`;
+
+    const formData = new FormData(e.target);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie() },
+      credentials: 'same-origin',
+      body: formData
+    });
+
+    let text = await response.text();
+    let updated;
+    try {
+      updated = JSON.parse(text);
+    } catch {
+      return alert("Gagal memperbarui: response bukan JSON\n" + text);
+    }
+
+    if (!response.ok) {
+      showError(updated.error || JSON.stringify(updated));
+      return;
+    }
+
+    // Update DOM sesuai JSON
+    const card = document.getElementById(`animal-card-${id}`);
+    card.dataset.name          = updated.name;
+    card.dataset.species       = updated.species;
+    card.dataset.origin        = updated.origin;
+    card.dataset.birthDate     = updated.birth_date;
+    card.dataset.healthStatus  = updated.health_status;
+    card.dataset.habitat       = updated.habitat;
+    card.dataset.photoUrl      = updated.photo_url;
+
+    card.querySelector('h2').textContent =
+      `${updated.species}${updated.name? ' – '+updated.name: ''}`;
+
+    const badges = card.querySelector('.badges');
+    badges.innerHTML = `
+      <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+        Asal: ${updated.origin}
+      </span>
+      ${updated.birth_date? `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+        Lahir: ${updated.birth_date}
+      </span>` : ''}
+      <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+        Status: ${updated.health_status}
+      </span>
+      <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+        Habitat: ${updated.habitat}
+      </span>
+    `;
+    if (updated.photo_url) {
+      let img = card.querySelector('img');
+      if (!img) {
+        img = document.createElement('img');
+        img.className = "object-cover h-full w-full hover-scale";
+        card.querySelector('.h-48').innerHTML = '';
+        card.querySelector('.h-48').appendChild(img);
+      }
+      img.src = updated.photo_url;
+      img.alt = `${updated.species} ${updated.name}`;
+    }
+
+    closeEditModal();
+    setTimeout(() => {
+      showSuccess(updated.notice || "Data berhasil disimpan!");
+    }, 300);
+  });
+
+  // === Handle Delete Confirm (AJAX) ===
+  document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    if (!deleteId) return;
+    const url = `/animals/${deleteId}/delete/`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie() },
+      credentials: 'same-origin'
+    });
+
+    let result;
+    try {
+      result = await response.json();
+    } catch {
+      const text = await response.text();
+      return alert("Gagal menghapus: response bukan JSON\n" + text);
+    }
+
+    if (!response.ok || !result.success) {
+      return alert("Gagal menghapus:\n" + (result.error || JSON.stringify(result)));
+    }
+
+    document.getElementById(`animal-card-${deleteId}`).remove();
+    closeDeleteModal();
+  });
+
+  // === Tambah Satwa Button ===
+  document.getElementById('addAnimalBtn').addEventListener('click', () => {
+    window.location.href = '{% url "animals:animal_create" %}';
+  });
+
+  // Fungsi showError
+  function showError(msg) {
+    const alert = document.createElement('div');
+    alert.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded fixed top-8 left-1/2 transform -translate-x-1/2 shadow-lg z-[9999]';
+    alert.style.position = 'fixed';
+    alert.style.top = '30px';
+    alert.style.left = '50%';
+    alert.style.transform = 'translateX(-50%)';
+    alert.style.zIndex = 9999;
+    alert.innerHTML = `<strong class="font-bold">Error: </strong><span>${msg}</span>`;
+    document.body.appendChild(alert);
+    setTimeout(() => alert.remove(), 5000);
+  }
+
+  function showSuccess(msg) {
+    const alert = document.createElement('div');
+    alert.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded fixed top-8 left-1/2 transform -translate-x-1/2 shadow-lg z-[9999]';
+    alert.style.position = 'fixed';
+    alert.style.top = '30px';
+    alert.style.left = '50%';
+    alert.style.transform = 'translateX(-50%)';
+    alert.style.zIndex = 9999;
+    alert.innerHTML = `<strong class="font-bold">Sukses: </strong><span>${msg}</span>`;
+    document.body.appendChild(alert);
+    setTimeout(() => alert.remove(), 3000);
+  }
 });
-function getCookie() { return csrftoken; }
-
-// Modal control functions
-function openEditModal(id) {
-  const card = document.getElementById(`animal-card-${id}`);
-  document.getElementById('edit-id').value = id;
-  document.getElementById('edit-name').value = card.dataset.name;
-  document.getElementById('edit-species').value = card.dataset.species;
-  document.getElementById('edit-origin').value = card.dataset.origin;
-  document.getElementById('edit-birth-date').value = card.dataset.birthDate;
-  document.getElementById('edit-health-status').value = card.dataset.healthStatus;
-  document.getElementById('edit-photo-url').value = card.dataset.photoUrl;
-  document.getElementById('editModal').classList.remove('hidden');
-}
-function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
-let deleteId = null;
-function openDeleteModal(id) {
-  deleteId = id;
-  const card = document.getElementById(`animal-card-${id}`);
-  document.getElementById('deleteAnimalName').textContent = card.dataset.name || card.dataset.species;
-  document.getElementById('deleteModal').classList.remove('hidden');
-}
-function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); }
-
-// Attach Edit/Delete button handlers
-document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => openEditModal(btn.dataset.id)));
-document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => openDeleteModal(btn.dataset.id)));
-
-// Handle Edit Submit
-const editForm = document.getElementById('editForm');
-editForm.addEventListener('submit', async e => {
-  e.preventDefault(); const id = document.getElementById('edit-id').value;
-  const formData = new FormData(editForm);
-  const res = await fetch(`/animals/${id}/update/`, { method: 'POST', headers: {'X-CSRFToken': getCookie()}, body: formData });
-  if (!res.ok) return alert('Gagal memperbarui.');
-  const updated = await res.json(); const card = document.getElementById(`animal-card-${id}`);
-  card.dataset.species = updated.species; card.dataset.name = updated.name;
-  card.dataset.origin = updated.origin; card.dataset.birthDate = updated.birth_date;
-  card.dataset.healthStatus = updated.health_status; card.dataset.photoUrl = updated.photo_url;
-  card.querySelector('h2').textContent = `${updated.species}${updated.name? ' - '+updated.name: ''}`;
-  const badges = card.querySelector('.badges'); badges.innerHTML =
-    `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Asal: ${updated.origin}</span>`+
-    (updated.birth_date? `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Lahir: ${new Date(updated.birth_date).toLocaleDateString()}</span>`:'')+
-    `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">Status: ${updated.health_status}</span>`;
-  if (updated.photo_url) card.querySelector('img').src = updated.photo_url;
-  closeEditModal();
-});
-
-// Handle Delete Confirm
-const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-confirmDeleteBtn.addEventListener('click', async () => {
-  if (!deleteId) return;
-  const res = await fetch(`/animals/${deleteId}/delete/`, { method: 'POST', headers: {'X-CSRFToken': getCookie()} });
-  if (!res.ok) return alert('Gagal menghapus.');
-  document.getElementById(`animal-card-${deleteId}`).remove(); closeDeleteModal();
-});
-
-// Tambah Satwa
-const addAnimalBtn = document.getElementById('addAnimalBtn');
-addAnimalBtn.addEventListener('click', () => window.location.href = '{% url "animals:animal_create" %}');
 </script>
+
 
 <style>
 .input-field { width: 100%; padding: .5rem; border: 1px solid #D1D5DB; border-radius: .375rem; }
 .btn-cancel { background: #E5E7EB; color: #374151; padding: .5rem 1rem; border-radius: .5rem; }
 .btn-confirm { background: #10B981; color: white; padding: .5rem 1rem; border-radius: .5rem; }
 .btn-delete { background: #EF4444; color: white; padding: .5rem 1rem; border-radius: .5rem; }
+#editModal .bg-white,
+#deleteModal .bg-white {
+  z-index: 60;
+  position: relative;
+}
+#editModal,
+#deleteModal {
+  z-index: 50;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+.alert-fade {
+  animation: fadeIn 0.3s, fadeOut 0.5s 2.5s;
+}
 </style>
 {% endblock %}
