@@ -120,21 +120,36 @@ def admin_edit_booking(request):
             tanggal_baru = datetime.strptime(tanggal_baru_str, '%Y-%m-%d').date()
             
             with connection.cursor() as cursor:
-                # Update reservasi di tabel RESERVASI baru
-                cursor.execute("""
-                    UPDATE sizopi.RESERVASI
-                    SET tanggal_kunjungan = %s,
-                        jumlah_tiket = %s,
-                        status = %s
-                    WHERE username_p = %s
-                    AND nama_fasilitas = %s
-                    AND tanggal_kunjungan = %s
-                """, [tanggal_baru, jumlah_tiket, status, username, nama_fasilitas, tanggal_asli])
-                
-                if cursor.rowcount > 0:
-                    messages.success(request, f"Reservasi {jenis_reservasi} berhasil diperbarui!")
-                else:
-                    messages.error(request, f"Gagal memperbarui reservasi {jenis_reservasi}")
+                try:
+                    # Update reservasi di tabel RESERVASI
+                    # TRIGGER AKAN OTOMATIS DIJALANKAN DI SINI
+                    cursor.execute("""
+                        UPDATE sizopi.RESERVASI
+                        SET tanggal_kunjungan = %s,
+                            jumlah_tiket = %s,
+                            status = %s
+                        WHERE username_p = %s
+                        AND nama_fasilitas = %s
+                        AND tanggal_kunjungan = %s
+                    """, [tanggal_baru, jumlah_tiket, status, username, nama_fasilitas, tanggal_asli])
+                    
+                    if cursor.rowcount > 0:
+                        messages.success(request, f"Reservasi {jenis_reservasi} berhasil diperbarui!")
+                    else:
+                        messages.error(request, f"Gagal memperbarui reservasi {jenis_reservasi}")
+                        
+                except Exception as db_error:
+                    # TANGKAP PESAN ERROR DARI TRIGGER
+                    error_message = str(db_error)
+                    print(f"DEBUG - Database error: {error_message}")
+                    
+                    # Periksa apakah error berasal dari trigger kapasitas
+                    if "Kapasitas tersisa" in error_message and "tiket yang diminta" in error_message:
+                        # Tampilkan pesan error dari trigger langsung ke user
+                        messages.error(request, error_message)
+                    else:
+                        # Error database lainnya
+                        messages.error(request, f"Gagal memperbarui reservasi: {error_message}")
             
             return redirect('show_admin_booking')
         
@@ -144,7 +159,6 @@ def admin_edit_booking(request):
     
     # Redirect jika bukan POST request
     return redirect('show_admin_booking')
-
 
 def admin_cancel_booking(request):
     """
@@ -265,6 +279,7 @@ def show_user_booking(request):
         })
 
 # @login_required
+
 @role_required('pengunjung')
 def show_user_add_booking(request):
     """
@@ -291,41 +306,34 @@ def show_user_add_booking(request):
             tanggal_kunjungan = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
             
             with connection.cursor() as cursor:
-                # Cek ketersediaan untuk fasilitas
-                cursor.execute("""
-                    SELECT f.kapasitas_max,
-                           COALESCE((SELECT SUM(r.jumlah_tiket)
-                                    FROM sizopi.RESERVASI r
-                                    WHERE r.nama_fasilitas = %s
-                                    AND r.tanggal_kunjungan = %s
-                                    AND r.status = 'Terjadwal'), 0) as tiket_terpakai
-                    FROM sizopi.FASILITAS f
-                    WHERE f.nama = %s
-                """, [nama_fasilitas, tanggal_kunjungan, nama_fasilitas])
-                
-                result = cursor.fetchone()
-                
-                if result:
-                    kapasitas_max, tiket_terpakai = result
-                    kapasitas_tersisa = kapasitas_max - tiket_terpakai
-                    
-                    if jumlah_tiket > kapasitas_tersisa:
-                        messages.error(request, f"Jumlah tiket melebihi kapasitas tersisa. Kapasitas tersisa: {kapasitas_tersisa}")
-                        return redirect('show_user_add_booking')
-                    
-                    # Simpan reservasi ke tabel RESERVASI baru
+                try:
+                    # Simpan reservasi ke tabel RESERVASI - trigger akan otomatis memvalidasi kapasitas
                     cursor.execute("""
                         INSERT INTO sizopi.RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
                         VALUES (%s, %s, %s, %s, %s)
                     """, [username, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, 'Terjadwal'])
                     
                     messages.success(request, f"Reservasi {jenis_reservasi} berhasil dibuat!")
-                else:
-                    messages.error(request, "Fasilitas tidak ditemukan atau tidak terdaftar")
+                    return redirect('show_user_booking')
+                    
+                except Exception as db_error:
+                    # Tangkap pesan error dari trigger
+                    error_message = str(db_error)
+                    print(f"DEBUG - Database error: {error_message}")
+                    
+                    # Periksa apakah error berasal dari trigger kapasitas
+                    if "Kapasitas tersisa" in error_message and "tiket yang diminta" in error_message:
+                        # Tampilkan pesan error dari trigger langsung ke user
+                        messages.error(request, error_message)
+                    else:
+                        # Error lainnya
+                        messages.error(request, f"Gagal membuat reservasi: {error_message}")
+                    
                     return redirect('show_user_add_booking')
             
-            return redirect('show_user_booking')
-        
+        except ValueError as ve:
+            messages.error(request, f"Format data tidak valid: {str(ve)}")
+            return redirect('show_user_add_booking')
         except Exception as e:
             import traceback
             print(f"ERROR: {str(e)}")
@@ -410,6 +418,7 @@ def show_user_add_booking(request):
         
         
 @role_required('pengunjung')
+@role_required('pengunjung')
 def add_reservasi_wahana(request):
     """
     Menampilkan form untuk menambahkan reservasi wahana saja
@@ -435,28 +444,7 @@ def add_reservasi_wahana(request):
             tanggal_kunjungan = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
             
             with connection.cursor() as cursor:
-                # Cek ketersediaan untuk fasilitas wahana
-                cursor.execute("""
-                    SELECT f.kapasitas_max,
-                           COALESCE((SELECT SUM(r.jumlah_tiket)
-                                    FROM sizopi.RESERVASI r
-                                    WHERE r.nama_fasilitas = %s
-                                    AND r.tanggal_kunjungan = %s
-                                    AND r.status = 'Terjadwal'), 0) as tiket_terpakai
-                    FROM sizopi.FASILITAS f
-                    WHERE f.nama = %s
-                """, [nama_fasilitas, tanggal_kunjungan, nama_fasilitas])
-                
-                result = cursor.fetchone()
-                
-                if result:
-                    kapasitas_max, tiket_terpakai = result
-                    kapasitas_tersisa = kapasitas_max - tiket_terpakai
-                    
-                    if jumlah_tiket > kapasitas_tersisa:
-                        messages.error(request, f"Jumlah tiket melebihi kapasitas tersisa. Kapasitas tersisa: {kapasitas_tersisa}")
-                        return redirect('add_reservasi_wahana')
-                    
+                try:
                     # Cek apakah nama_fasilitas adalah wahana yang valid
                     cursor.execute("""
                         SELECT nama_wahana FROM sizopi.WAHANA WHERE nama_wahana = %s
@@ -467,18 +455,29 @@ def add_reservasi_wahana(request):
                         messages.error(request, "Fasilitas yang dipilih bukan wahana yang valid")
                         return redirect('add_reservasi_wahana')
                     
-                    # Simpan reservasi wahana ke tabel RESERVASI
+                    # Simpan reservasi wahana ke tabel RESERVASI - trigger akan otomatis memvalidasi kapasitas
                     cursor.execute("""
                         INSERT INTO sizopi.RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
                         VALUES (%s, %s, %s, %s, %s)
                     """, [username, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, 'Terjadwal'])
                     
                     messages.success(request, f"Reservasi wahana berhasil dibuat!")
-                else:
-                    messages.error(request, "Wahana tidak ditemukan atau tidak terdaftar")
+                    return redirect('show_user_booking')
+                    
+                except Exception as db_error:
+                    # Tangkap pesan error dari trigger
+                    error_message = str(db_error)
+                    print(f"DEBUG - Database error: {error_message}")
+                    
+                    # Periksa apakah error berasal dari trigger kapasitas
+                    if "Kapasitas tersisa" in error_message and "tiket yang diminta" in error_message:
+                        # Tampilkan pesan error dari trigger langsung ke user
+                        messages.error(request, error_message)
+                    else:
+                        # Error lainnya
+                        messages.error(request, f"Gagal membuat reservasi wahana: {error_message}")
+                    
                     return redirect('add_reservasi_wahana')
-            
-            return redirect('show_user_booking')
         
         except Exception as e:
             import traceback
@@ -548,7 +547,7 @@ def add_reservasi_wahana(request):
         })
         
         
-        
+@role_required('pengunjung')
 @role_required('pengunjung')
 def show_user_edit_booking(request):
     # Ambil username dari session
@@ -661,64 +660,36 @@ def show_user_edit_booking(request):
                         form_context['error_message'] = "Format tanggal tidak valid."
                         return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
                     
-                    # Validasi kapasitas jika ada perubahan
-                    if tanggal_baru != tanggal_kunjungan or jumlah_tiket_baru != jumlah_tiket_asli:
-                        # Ambil kapasitas maksimum fasilitas
+                    try:
+                        # Update reservasi - trigger akan otomatis memvalidasi kapasitas
                         cursor.execute("""
-                            SELECT kapasitas_max
-                            FROM sizopi.FASILITAS
-                            WHERE nama = %s
-                        """, [nama_fasilitas])
-                        
-                        kapasitas_result = cursor.fetchone()
-                        if not kapasitas_result:
-                            form_context['error_message'] = "Fasilitas tidak ditemukan."
-                            return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
-                        
-                        kapasitas_max = kapasitas_result[0]
-                        
-                        # Hitung total tiket yang sudah dipesan untuk tanggal baru (kecuali reservasi ini)
-                        cursor.execute("""
-                            SELECT COALESCE(SUM(jumlah_tiket), 0) as total_tiket_terpakai
-                            FROM sizopi.RESERVASI
-                            WHERE nama_fasilitas = %s
+                            UPDATE sizopi.RESERVASI
+                            SET tanggal_kunjungan = %s,
+                                jumlah_tiket = %s
+                            WHERE username_p = %s
+                            AND nama_fasilitas = %s
                             AND tanggal_kunjungan = %s
-                            AND status = 'Terjadwal'
-                            AND NOT (username_p = %s AND tanggal_kunjungan = %s)
-                        """, [nama_fasilitas, tanggal_baru, username, tanggal_kunjungan])
+                        """, [tanggal_baru, jumlah_tiket_baru, username, nama_fasilitas, tanggal_kunjungan])
                         
-                        tiket_terpakai = cursor.fetchone()[0]
-                        kapasitas_tersisa = kapasitas_max - tiket_terpakai
-                        
-                        print(f"DEBUG - Kapasitas max: {kapasitas_max}, Terpakai: {tiket_terpakai}, Tersisa: {kapasitas_tersisa}, Diminta: {jumlah_tiket_baru}")
-                        
-                        # Update data kapasitas di context
-                        form_context.update({
-                            'kapasitas_max': kapasitas_max,
-                            'kapasitas_tersisa': kapasitas_tersisa
-                        })
-                        
-                        if jumlah_tiket_baru > kapasitas_tersisa:
-                            if tanggal_baru != tanggal_kunjungan:
-                                form_context['error_message'] = f"Jumlah tiket melebihi kapasitas tersisa untuk tanggal {tanggal_baru.strftime('%d %B %Y')}. Kapasitas tersisa: {kapasitas_tersisa} tiket."
-                            else:
-                                form_context['error_message'] = f"Jumlah tiket melebihi kapasitas tersisa. Kapasitas tersisa: {kapasitas_tersisa} tiket."
+                        if cursor.rowcount > 0:
+                            messages.success(request, "Reservasi berhasil diperbarui!")
+                        else:
+                            form_context['error_message'] = "Gagal memperbarui reservasi"
                             return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
-                    
-                    # Update reservasi jika validasi berhasil
-                    cursor.execute("""
-                        UPDATE sizopi.RESERVASI
-                        SET tanggal_kunjungan = %s,
-                            jumlah_tiket = %s
-                        WHERE username_p = %s
-                        AND nama_fasilitas = %s
-                        AND tanggal_kunjungan = %s
-                    """, [tanggal_baru, jumlah_tiket_baru, username, nama_fasilitas, tanggal_kunjungan])
-                    
-                    if cursor.rowcount > 0:
-                        messages.success(request, "Reservasi berhasil diperbarui!")
-                    else:
-                        form_context['error_message'] = "Gagal memperbarui reservasi"
+                            
+                    except Exception as db_error:
+                        # Tangkap pesan error dari trigger
+                        error_message = str(db_error)
+                        print(f"DEBUG - Database error: {error_message}")
+                        
+                        # Periksa apakah error berasal dari trigger kapasitas
+                        if "Kapasitas tersisa" in error_message and "tiket yang diminta" in error_message:
+                            # Tampilkan pesan error dari trigger langsung ke user
+                            form_context['error_message'] = error_message
+                        else:
+                            # Error lainnya
+                            form_context['error_message'] = f"Gagal memperbarui reservasi: {error_message}"
+                        
                         return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
             
             return redirect('show_user_booking')
@@ -732,6 +703,7 @@ def show_user_edit_booking(request):
     
     # GET request - tampilkan form
     return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
+
 
 def load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, context=None):
     """
