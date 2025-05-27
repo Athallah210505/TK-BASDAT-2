@@ -1,22 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import connection
+from django.db.utils import DatabaseError
+from psycopg2 import Error as Psycopg2Error
 
 def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('show_main')
-
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        from django.db import connection
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT sizopi.cek_kredensial(%s::text, %s::text)", [username, password])
-            valid = cursor.fetchone()[0]
-
-        if valid:
+        try:
             with connection.cursor() as cursor:
+                cursor.execute("SELECT sizopi.cek_kredensial(%s::text, %s::text)", [username, password])
+
                 cursor.execute("""
                     SELECT CASE
                         WHEN EXISTS(SELECT 1 FROM sizopi.adopter WHERE username_adopter = %s) THEN 'pengunjung_adopter'
@@ -33,23 +29,24 @@ def login_view(request):
             request.session['username'] = username
             request.session['role'] = role
 
-            if role == 'pengunjung':
-                return redirect('pengunjung_dashboard')
-            elif role == 'dokter':
-                return redirect('dokter_hewan_dashboard')
-            elif role == 'staff':
-                return redirect('show_staff_dashboard')
-            elif role == 'penjaga_hewan':
-                return redirect('penjaga_hewan_dashboard')
-            elif role == 'pelatih_pertunjukan':
-                return redirect('pelatih_pertunjukan_dashboard')
-            elif role == 'pengunjung_adopter':
-                return redirect('pengunjung_adopter_dashboard')
+            redirect_map = {
+                'pengunjung': 'pengunjung_dashboard',
+                'dokter': 'dokter_hewan_dashboard',
+                'staff': 'show_staff_dashboard',
+                'penjaga_hewan': 'penjaga_hewan_dashboard',
+                'pelatih_pertunjukan': 'pelatih_pertunjukan_dashboard',
+                'pengunjung_adopter': 'pengunjung_adopter_dashboard',
+            }
+
+            if role in redirect_map:
+                return redirect(redirect_map[role])
             else:
                 messages.error(request, "Role tidak dikenali.")
                 return redirect('login')
-        else:
-            messages.error(request, "Username atau password salah, silakan coba lagi.")
+
+        except DatabaseError as e:
+            error_message = str(e).splitlines()[0].replace('ERROR:', '').strip()
+            messages.error(request, error_message)
             return redirect('login')
 
     return render(request, 'login.html')

@@ -1,9 +1,10 @@
-import uuid
-import re
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import connection
-from psycopg2 import errors
+from psycopg2 import Error as Psycopg2Error
+from django.db import DatabaseError
+import uuid
+import re
 
 def register(request):
     if request.method == 'POST':
@@ -65,14 +66,9 @@ def register(request):
             messages.success(request, f"Akun '{username}' berhasil dibuat!")
             return redirect('login')
 
-        except errors.RaiseException as e:
-            raw = str(e)
-            cleaned = raw.split('CONTEXT:')[0].replace('ERROR:', '').strip()
-            messages.error(request, cleaned)
-            return redirect('register')
-
-        except Exception as e:
-            messages.error(request, f"Gagal membuat akun: {e}")
+        except DatabaseError as e:
+            error_message = str(e).splitlines()[0].replace('ERROR:', '').strip()
+            messages.error(request, error_message)
             return redirect('register')
 
     return render(request, 'register.html')
