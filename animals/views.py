@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse, Http404
 from django.urls import reverse
 from django.db import connection, DatabaseError
+from utils.decorators import role_required
 
 HEALTH_STATUS_CHOICES = [
     ('Sehat', 'Sehat'),
@@ -11,12 +12,14 @@ HEALTH_STATUS_CHOICES = [
     ('Dalam Pemantauan', 'Dalam Pemantauan'),
     ('Lain-lain', 'Lain-lain'),
 ]
+
 def get_habitats():
     with connection.cursor() as cur:
         cur.execute("SELECT nama FROM sizopi.habitat ORDER BY nama;")
         return [row[0] for row in cur.fetchall()]
     
 
+@role_required(('dokter', 'penjaga_hewan', 'staff'))
 def animal_list(request):
     """
     Tampilkan semua hewan dari schema sizopi.hewan,
@@ -41,14 +44,16 @@ def animal_list(request):
 
     # sekarang keys di dict akan match: name, origin, habitat, dsb.
     animals = [ dict(zip(cols, row)) for row in rows ]
-
+    role = request.session.get('role')
     return render(request, 'animals/animal_list.html', {
         'animals': animals,
         'habitats': get_habitats(),
-        'health_choices': HEALTH_STATUS_CHOICES,   
+        'health_choices': HEALTH_STATUS_CHOICES,
+        'user_role': role,
     })
 
 
+@role_required(('dokter', 'penjaga_hewan', 'staff'))
 def animal_create(request):
     """
     Tambah hewan baru. Trigger fn_check_duplicate_satwa() akan dijalankan otomatis.
@@ -86,12 +91,15 @@ def animal_create(request):
             messages.error(request, clean_msg)
             return redirect('animals:animal_create')
 
+    role = request.session.get('role')
     return render(request, 'animals/animal_form.html', {
         'animal': None,
         'habitats': get_habitats(), 
-        'health_choices': HEALTH_STATUS_CHOICES,  
+        'health_choices': HEALTH_STATUS_CHOICES,
+        'user_role': role,
     })
 
+@role_required(('dokter', 'penjaga_hewan', 'staff'))
 def animal_update(request, pk):
     """
     AJAX endpoint untuk update record hewan.
@@ -146,13 +154,14 @@ def animal_update(request, pk):
             'health_status': status,
             'habitat': habitat,
             'photo_url': photo_url,
-            'notice': notice_msg,  # <-- kirim ke frontend
+            'notice': notice_msg, 
         })
     except DatabaseError as e:
         err_msg = getattr(e, 'pgerror', str(e))
         clean_msg = err_msg.split('\n')[0]
         return JsonResponse({'error': clean_msg}, status=400)
 
+@role_required(('dokter', 'penjaga_hewan', 'staff'))
 def animal_delete(request, pk):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method'}, status=405)

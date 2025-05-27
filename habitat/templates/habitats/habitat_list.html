@@ -1,149 +1,186 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-{% include 'navbar_staff.html' %} 
-<div class="h-20"></div> <!-- Spacer adjusted to match navbar height -->
+{% if user_role == 'penjaga_hewan' %}
+  {% include 'navbar_penjaga_hewan.html' %}
+{% elif user_role == 'staff' %}
+  {% include 'navbar_staff.html' %}
+{% else %}
+  {% include 'navbar_staff.html' %}
+{% endif %}
+
+<div class="h-20"></div>
 <div class="container mx-auto p-6">
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="mb-10">
-        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float"> Daftar Habitat</h1>
+        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Daftar Habitat</h1>
         <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi lengkap mengenai habitat para hewan di SIZOPI</p>
     </div>
-    
+
+    <!-- Pesan -->
+    {% if messages %}
+      <div id="django-messages">
+        {% for msg in messages %}
+          <div class="
+            {% if msg.tags == 'error' %}
+              bg-red-100 border border-red-400 text-red-700
+            {% elif msg.tags == 'success' %}
+              bg-green-100 border border-green-400 text-green-700
+            {% else %}
+              bg-gray-100 border border-gray-400 text-gray-700
+            {% endif %}
+            px-4 py-3 rounded fixed top-8 left-1/2 transform -translate-x-1/2 shadow-lg z-[9999] my-2
+          ">
+            <strong class="font-bold">
+              {% if msg.tags == 'error' %}Error:{% elif msg.tags == 'success' %}Sukses:{% endif %}
+            </strong>
+            <span>{{ msg }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <script>
+        setTimeout(function() {
+          var el = document.getElementById('django-messages');
+          if (el) el.remove();
+        }, 4000);
+      </script>
+    {% endif %}
+
+    <!-- List Habitat -->
     <div class="space-y-6">
-        <!-- First Record -->
-        <div class="bg-white p-6 rounded-xl shadow-md hover-scale">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                <h3 class="text-2xl font-bold text-green-600 truncate">Savana</h3>
-                <div class="flex items-center mt-2 md:mt-0">
-                </div>
+      {% for h in habitats %}
+        <div class="bg-white p-6 rounded-xl shadow-md hover-scale" id="habitat-card-{{ h.nama|slugify }}">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+            <h3 class="text-2xl font-bold text-green-600 truncate">{{ h.nama }}</h3>
+            <div class="flex items-center mt-2 md:mt-0 space-x-2">
+              <a href="{% url 'habitat:habitat_detail' h.nama %}" class="text-green-500 hover:text-green-700 font-medium">Detail</a>
+              <a href="{% url 'habitat:habitat_edit' h.nama %}" class="text-blue-500 hover:text-blue-700 font-medium">Edit</a>
+              <a href="javascript:void(0);" onclick="openDeleteHabitatModal('{{ h.nama }}')" class="text-red-500 hover:text-red-700 font-medium">Hapus</a>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Luas Area</p>
-                    <p class="font-medium">5.000 m²</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Kapasitas Maksimal</p>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">25 hewan</span>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg mt-4">
-                    <p class="text-sm text-gray-500 mb-2">Status Lingkungan</p>
-                    <p class="text-gray-700">Suhu: 30°C, Kelembapan: 40%, Vegetasi: Rumput luas.</p>
-                </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Luas Area</p>
+              <p class="font-medium">{{ h.luas_area|floatformat:2 }} m²</p>
             </div>
-            
-            <div class="flex justify-end mt-4 space-x-4">
-                <button onclick="openDetailModal()" class="text-green-500 hover:text-green-700 font-medium">Detail</button>
-                <button onclick="openModal()" class="text-blue-500 hover:text-blue-700 font-medium">Edit</button>
-                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium">Hapus</button>
-            </div> 
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Kapasitas Maksimal</p>
+              <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">{{ h.kapasitas }} hewan</span>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg mt-4 md:col-span-2">
+              <p class="text-sm text-gray-500 mb-2">Status Lingkungan</p>
+              <p class="text-gray-700">{{ h.status }}</p>
+            </div>
+          </div>
         </div>
-        
-        <!-- Second Record -->
-        <div class="bg-white p-6 rounded-xl shadow-md hover-scale">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                <h3 class="text-2xl font-bold text-green-600 truncate">Hutan Tropis</h3>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Luas Area</p>
-                    <p class="font-medium">8.200 m²</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500 mb-1">Kapasitas Maksimal</p>
-                    <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">40 hewan</span>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg mt-4">
-                    <p class="text-sm text-gray-500 mb-2">Status Lingkungan</p>
-                    <p class="text-gray-700">Suhu: 28°C, Kelembapan: 85%, Pepohonan lebat.</p>
-                </div>
-            </div>
-            
-            <div class="flex justify-end mt-4 space-x-4">
-                <button onclick="openDetailModal()" class="text-green-500 hover:text-green-700 font-medium">Detail</button>
-                <button onclick="openModal()" class="text-blue-500 hover:text-blue-700 font-medium">Edit</button>
-                <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 font-medium">Hapus</button>
-            </div> 
-        </div>
-        
-    
+      {% empty %}
+        <div class="text-center text-gray-500">Belum ada data habitat.</div>
+      {% endfor %}
+    </div>
+
     <!-- Add Record Button -->
     <div class="flex justify-center mt-8">
-        <button class="btn-shine bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
-            Tambah Habitat Baru
-        </button>
+      <a href="{% url 'habitat:habitat_create' %}" class="btn-shine bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Tambah Habitat Baru
+      </a>
     </div>
-    <!-- Modal for Editing Rekam Medis -->
-    <div id="editModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-        <div class="bg-white p-6 rounded-lg w-1/2">
-            <h2 class="text-2xl font-bold text-center text-green-500 mb-4">Edit Data Habitat</h2>
-            <form>
-                <div class="mb-4">
-                    <label for="nama_habitat" class="block text-sm font-medium text-gray-700">Nama Habitat</label>
-                    <input type="text" id="nama_habitat" name="nama_habitat" class="w-full p-2 border border-gray-300 rounded-md" />
-                </div>
-                <div class="mb-4">
-                    <label for="luas_area" class="block text-sm font-medium text-gray-700">Luas Area (m²)</label>
-                    <input type="number" id="luas_area" name="luas_area" class="w-full p-2 border border-gray-300 rounded-md" />
-                </div>
-                <div class="mb-4">
-                    <label for="kapasitas_maksimal" class="block text-sm font-medium text-gray-700">Kapasitas Maksimal (jumlah hewan)</label>
-                    <input type="number" id="kapasitas_maksimal" name="kapasitas_maksimal" class="w-full p-2 border border-gray-300 rounded-md" />
-                </div>
-                <div class="mb-4">
-                    <label for="status_lingkungan" class="block text-sm font-medium text-gray-700">Status Lingkungan</label>
-                    <textarea id="status_lingkungan" name="status_lingkungan" rows="4" placeholder="Contoh: Suhu: 30°C, Kelembapan: 40%, Vegetasi: Rumput luas" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
-                </div>
-                <div class="flex justify-end mt-4">
-                    <button type="button" onclick="closeModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg mr-3">Batal</button>
-                    <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-lg">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-
-    <div id="deleteModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-        <div class="bg-white p-6 rounded-lg w-96 max-w-md">
-            <h2 class="text-2xl font-bold text-center text-red-500 mb-4">HAPUS DATA HABITAT</h2>
-            <p class="text-gray-700 text-center mb-6">Apakah anda yakin ingin menghapus habitat ini?</p>
-            <div class="flex justify-center space-x-4">
-                <button onclick="closeDeleteModal()" id="cancelDeleteBtn" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
-                    Tidak
-                </button>
-                <button onclick="confirmDelete()" id="confirmDeleteBtn" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
-                    Ya
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script for Modal functionality -->
-    <script>
-        function openModal() {
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
-
-        function openDeleteModal(recordId) {
-            currentRecordToDelete = recordId;
-            document.getElementById('deleteModal').classList.remove('hidden');
-        }
-        
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.add('hidden');
-            currentRecordToDelete = null;
-        }
-    </script>
-
 </div>
+
+<!-- Modal Konfirmasi Hapus Habitat -->
+<div id="deleteHabitatModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+  <div class="bg-white p-6 rounded-lg w-96 max-w-md">
+    <h2 class="text-2xl font-bold text-center text-red-500 mb-4">Hapus Habitat</h2>
+    <p class="text-gray-700 text-center mb-6">
+      Apakah Anda yakin ingin menghapus habitat <strong id="deleteHabitatName"></strong>?
+    </p>
+    <div class="flex justify-center space-x-4">
+      <button onclick="closeDeleteHabitatModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Tidak</button>
+      <button id="confirmDeleteHabitatBtn" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let habitatToDelete = null;
+
+function openDeleteHabitatModal(nama) {
+  habitatToDelete = nama;
+  document.getElementById('deleteHabitatName').textContent = nama;
+  document.getElementById('deleteHabitatModal').classList.remove('hidden');
+}
+function closeDeleteHabitatModal() {
+  document.getElementById('deleteHabitatModal').classList.add('hidden');
+  habitatToDelete = null;
+}
+
+document.getElementById('confirmDeleteHabitatBtn').onclick = function() {
+  if (!habitatToDelete) return;
+  fetch(`/habitat/${encodeURIComponent(habitatToDelete)}/delete/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie(),
+      'Accept': 'application/json'
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showSuccess(data.message || "Habitat berhasil dihapus!");
+      // Hapus card habitat dari DOM
+      const card = document.getElementById('habitat-card-' + slugify(habitatToDelete));
+      if (card) card.remove();
+      closeDeleteHabitatModal();
+    } else {
+      showError(data.error || "Gagal menghapus habitat.");
+    }
+  })
+  .catch(() => showError("Gagal menghapus habitat (network error)."));
+};
+
+// CSRF helper
+function getCookie(name='csrftoken') {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Pop up helpers
+function showSuccess(msg) {
+  const alert = document.createElement('div');
+  alert.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded fixed top-8 left-1/2 transform -translate-x-1/2 shadow-lg z-[9999]';
+  alert.innerHTML = `<strong class="font-bold">Sukses: </strong><span>${msg}</span>`;
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 3000);
+}
+function showError(msg) {
+  const alert = document.createElement('div');
+  alert.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded fixed top-8 left-1/2 transform -translate-x-1/2 shadow-lg z-[9999]';
+  alert.innerHTML = `<strong class="font-bold">Error: </strong><span>${msg}</span>`;
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 4000);
+}
+
+function slugify(text) {
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start of text
+    .replace(/-+$/, '');            // Trim - from end of text
+}
+</script>
 {% endblock %}

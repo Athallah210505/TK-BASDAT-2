@@ -2,7 +2,16 @@
 {% load static %}
 
 {% block content %}
-{% include 'navbar_staff.html' %} 
+{% if user_role == 'dokter_hewan' or user_role == 'dokter' %}
+  {% include 'navbar_dokter_hewan.html' %}
+{% elif user_role == 'penjaga_hewan' %}
+  {% include 'navbar_penjaga_hewan.html' %}
+{% elif user_role == 'staf_admin' %}
+  {% include 'navbar_staff.html' %}
+{% else %}
+  {% include 'navbar_staff.html' %}
+{% endif %}
+
 <div class="h-20"></div> <!-- Spacer adjusted to match navbar height -->
 <div class="max-w-md mx-auto mt-12 bg-white p-8 rounded-2xl shadow animate-float">
   

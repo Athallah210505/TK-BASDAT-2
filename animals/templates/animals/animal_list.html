@@ -2,7 +2,15 @@
 {% load static %}
 
 {% block content %}
-{% include 'navbar_staff.html' %} 
+{% if user_role == 'dokter_hewan' or user_role == 'dokter' %}
+  {% include 'navbar_dokter_hewan.html' %}
+{% elif user_role == 'penjaga_hewan' %}
+  {% include 'navbar_penjaga_hewan.html' %}
+{% elif user_role == 'staf_admin' %}
+  {% include 'navbar_staff.html' %}
+{% else %}
+  {% include 'navbar_staff.html' %}
+{% endif %}
 
 <!-- Spacer to offset fixed navbar height -->
 <div class="h-20"></div> <!-- Spacer adjusted to match navbar height -->
