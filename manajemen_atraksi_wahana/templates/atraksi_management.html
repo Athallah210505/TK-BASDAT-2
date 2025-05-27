@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Atraksi dan Wahana</title>
+    <title>Manajemen Atraksi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
@@ -15,35 +15,6 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f0fff4;
-        }
-        
-        /* Tab styles */
-        .tab-container {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .tab-selector {
-            position: absolute;
-            height: 100%;
-            top: 0;
-            left: 0;
-            width: 50%;
-            background-color: #10b981;
-            border-radius: 8px;
-            transition: transform 0.4s ease;
-            z-index: 1;
-        }
-        
-        .tab-selector.wahana {
-            transform: translateX(100%);
-        }
-        
-        .tab {
-            position: relative;
-            z-index: 2;
-            transition: color 0.3s ease;
         }
         
         /* Elegant buttons */
@@ -120,6 +91,21 @@
         .data-row:hover {
             background-color: #f0fff4;
         }
+
+        /* Modal scrollable content */
+        .modal-body {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        /* Checkbox container scrolling */
+        .checkbox-container {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+        }
     </style>
 </head>
 <body>
@@ -129,24 +115,36 @@
             <!-- Header -->
             <div class="flex justify-between items-center mb-6 mt-20">
                 <div>
-                    <h1 class="text-3xl font-bold text-green-500">Manajemen Atraksi dan Wahana</h1>
-                    <p class="text-gray-600">Kelola semua atraksi dan wahana di Taman Safari</p>
+                    <h1 class="text-3xl font-bold text-green-500">Manajemen Atraksi</h1>
+                    <p class="text-gray-600">Kelola semua atraksi di Taman Safari</p>
                 </div>
                 <div class="text-sm text-gray-700 bg-green-100 px-4 py-2 rounded-full">
                     Staf Administrasi
                 </div>
             </div>
 
-            <!-- Tab Navigation -->
+            <!-- Message display for Django messages -->
+            {% if messages %}
             <div class="mb-6">
-                <div class="tab-container bg-green-50 w-64 h-12 flex">
-                    <div id="tabSelector" class="tab-selector"></div>
-                    <a href="{% url 'show_atraksi_management' %}" class="tab flex-1 flex items-center justify-center cursor-pointer text-white font-medium py-3">
-                        Atraksi
-                    </a>
-                    <a href="{% url 'show_wahana_management' %}" class="tab flex-1 flex items-center justify-center cursor-pointer text-green-800 font-medium py-3">
-                        Wahana
-                    </a>
+                {% for message in messages %}
+                <div class="p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Navigation tabs -->
+            <div class="mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex">
+                        <a href="{% url 'show_atraksi_management' %}" class="py-2 px-4 text-center border-b-2 border-green-500 text-green-600 font-medium">
+                            Atraksi
+                        </a>
+                        <a href="{% url 'show_wahana_management' %}" class="py-2 px-4 text-center border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300">
+                            Wahana
+                        </a>
+                    </nav>
                 </div>
             </div>
 
@@ -156,7 +154,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
-                    <input type="text" class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 w-64" placeholder="Cari atraksi...">
+                    <input type="text" id="searchInput" class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 w-64" placeholder="Cari atraksi...">
                 </div>
                 <button id="tambahBtn" class="btn-elegant flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-md shadow-sm">
                     <i class="fas fa-plus mr-2"></i>
@@ -201,67 +199,27 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <!-- Data Rows -->
+                            <!-- Dynamic Data Rows from Database -->
+                            {% for attraction in attractions %}
                             <tr class="data-row">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pertunjukan Singa Laut</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Arena singa laut</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">100 orang</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10:00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Singa Laut</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Joon Choi</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ attraction.nama }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ attraction.lokasi }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ attraction.kapasitas }} orang</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ attraction.jadwal }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ attraction.hewan_terlibat|default:"-" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ attraction.pelatih|default:"-" }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="edit-btn action-btn text-blue-600 hover:text-blue-900 mr-3">[Edit]</button>
-                                    <button class="hapus-btn action-btn text-red-600 hover:text-red-900">[Hapus]</button>
+                                    <button class="edit-btn action-btn text-blue-600 hover:text-blue-900 mr-3" data-id="{{ attraction.id }}">[Edit]</button>
+                                    <button class="hapus-btn action-btn text-red-600 hover:text-red-900" data-id="{{ attraction.id }}" data-name="{{ attraction.nama }}">[Hapus]</button>
                                 </td>
                             </tr>
-                            <tr class="data-row">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Show Burung Bebas</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Arena Burung</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">150 orang</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">09:30</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Kakaktua, Parrot</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yoon Jang</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="edit-btn action-btn text-blue-600 hover:text-blue-900 mr-3">[Edit]</button>
-                                    <button class="hapus-btn action-btn text-red-600 hover:text-red-900">[Hapus]</button>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    Tidak ada data atraksi yang tersedia.
                                 </td>
                             </tr>
-                            <tr class="data-row">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pertunjukan Gajah</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Arena gajah</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">120 orang</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">13:00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Gajah</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Ji Park</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="edit-btn action-btn text-blue-600 hover:text-blue-900 mr-3">[Edit]</button>
-                                    <button class="hapus-btn action-btn text-red-600 hover:text-red-900">[Hapus]</button>
-                                </td>
-                            </tr>
-                            <tr class="data-row">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Atraksi Harimau</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Arena harimau</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">75 orang</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">11:30</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Harimau</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Soo Kim</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="edit-btn action-btn text-blue-600 hover:text-blue-900 mr-3">[Edit]</button>
-                                    <button class="hapus-btn action-btn text-red-600 hover:text-red-900">[Hapus]</button>
-                                </td>
-                            </tr>
-                            <tr class="data-row">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Feeding Show</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Arena tempat makan</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80 orang</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">13:00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Berbagai hewan</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Hyun Park</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="edit-btn action-btn text-blue-600 hover:text-blue-900 mr-3">[Edit]</button>
-                                    <button class="hapus-btn action-btn text-red-600 hover:text-red-900">[Hapus]</button>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -270,76 +228,45 @@
     </div>
 
     <!-- Tambah Atraksi Modal -->
-    <div id="tambahModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md transform transition-all duration-300 scale-95 opacity-0" id="tambahModalContent">
-            <div class="flex justify-between items-center px-6 py-4 border-b">
+    <div id="tambahModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] transform transition-all duration-300 scale-95 opacity-0 my-6" id="tambahModalContent">
+            <div class="flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10">
                 <h3 class="text-lg font-bold">FORM TAMBAH ATRAKSI</h3>
                 <button id="closeTambahModal" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="p-6">
+            <div class="p-6 overflow-y-auto modal-body">
                 <p class="text-gray-600 mb-4">Masukkan detail atraksi baru di bawah ini.</p>
-                <form>
+                <form id="tambahForm" method="post" action="{% url 'add_atraksi' %}">
+                    {% csrf_token %}
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Nama Atraksi:</label>
-                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        <input type="text" name="nama" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Lokasi:</label>
-                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        <input type="text" name="lokasi" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Kapasitas Maksimum:</label>
                         <div class="flex items-center">
-                            <input type="number" value="50" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <input type="number" name="kapasitas" value="50" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
                             <span class="ml-2 text-gray-700">orang</span>
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Pelatih Pertunjukan:</label>
-                        <div class="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-3">
+                        <div class="checkbox-container">
                             <div class="grid grid-cols-1 gap-2">
+                                {% for trainer in trainers %}
                                 <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="joonchoi76" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Joon Choi (joonchoi76)</span>
+                                    <input type="checkbox" name="pelatih" value="{{ trainer.id }}" class="form-checkbox h-4 w-4 text-green-600 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">{{ trainer.nama }}</span>
                                 </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="yoonjang77" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Yoon Jang (yoonjang77)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="jipark78" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Ji Park (jipark78)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="sookim79" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Soo Kim (sookim79)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="hyunpark80" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Hyun Park (hyunpark80)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="taejang81" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Tae Jang (taejang81)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="taeyoon82" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Tae Yoon (taeyoon82)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="seoyoon83" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Seo Yoon (seoyoon83)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="hyunkang84" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Hyun Kang (hyunkang84)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="hyelee85" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Hye Lee (hyelee85)</span>
-                                </label>
+                                {% empty %}
+                                <span class="text-sm text-gray-500">Tidak ada data pelatih</span>
+                                {% endfor %}
                             </div>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Pilih satu atau lebih pelatih untuk atraksi ini</p>
@@ -347,14 +274,18 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Jadwal:</label>
                         <div class="relative">
-                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none">
-                                <option>Pilih jadwal</option>
-                                <option>09:30</option>
-                                <option>10:00</option>
-                                <option>11:30</option>
-                                <option>13:00</option>
-                                <option>14:30</option>
-                                <option>16:00</option>
+                            <select name="jadwal" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none">
+                                <option value="">Pilih jadwal</option>
+                                <option value="08:30">08:30</option>
+                                <option value="09:30">09:30</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="11:30">11:30</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="14:30">14:30</option>
+                                <option value="16:00">16:00</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                                 <i class="fas fa-chevron-down text-gray-400"></i>
@@ -363,125 +294,64 @@
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Hewan yang Terlibat:</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Singa Laut</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Kakaktua</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Parrot</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Gajah</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Harimau</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Lumba-lumba</span>
-                                </label>
+                        <div class="checkbox-container">
+                            <div class="grid grid-cols-2 gap-2">
+                                {% for animal in animals %}
+                                <div>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" name="hewan" value="{{ animal.id }}" class="form-checkbox h-4 w-4 text-green-600 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">{{ animal.nama }}</span>
+                                    </label>
+                                </div>
+                                {% empty %}
+                                <span class="text-sm text-gray-500">Tidak ada data hewan</span>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
+                    <div class="pt-4 border-t flex justify-end space-x-2">
+                        <button type="button" id="batalTambah" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200">BATAL</button>
+                        <button type="submit" class="btn-elegant px-4 py-2 text-white bg-green-500 hover:bg-green-600 rounded-md"><span>SIMPAN</span></button>
+                    </div>
                 </form>
-            </div>
-            <div class="px-6 py-4 border-t flex justify-end space-x-2">
-                <button id="batalTambah" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200">BATAL</button>
-                <button class="btn-elegant px-4 py-2 text-white bg-green-500 hover:bg-green-600 rounded-md"><span>SIMPAN</span></button>
             </div>
         </div>
     </div>
     
-    <!-- Edit Atraksi Modal - Updated with multiple select -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md transform transition-all duration-300 scale-95 opacity-0" id="editModalContent">
-            <div class="flex justify-between items-center px-6 py-4 border-b">
+    <!-- Edit Atraksi Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] transform transition-all duration-300 scale-95 opacity-0 my-6" id="editModalContent">
+            <div class="flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10">
                 <h3 class="text-lg font-bold">FORM EDIT ATRAKSI</h3>
                 <button id="closeEditModal" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="p-6">
+            <div class="p-6 overflow-y-auto modal-body">
                 <p class="text-gray-600 mb-4">Edit detail atraksi di bawah ini.</p>
-                <form>
+                <form id="editForm" method="post">
+                    {% csrf_token %}
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Nama Atraksi:</label>
-                        <input type="text" value="Pertunjukan Singa Laut" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        <input type="text" id="edit_nama" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700">
+                        <p class="text-xs text-gray-500 mt-1">Nama atraksi tidak dapat diubah</p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Lokasi:</label>
-                        <input type="text" value="Arena singa laut" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        <input type="text" name="lokasi" id="edit_lokasi" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Kapasitas Maksimum:</label>
                         <div class="flex items-center">
-                            <input type="number" value="100" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <input type="number" name="kapasitas" id="edit_kapasitas" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
                             <span class="ml-2 text-gray-700">orang</span>
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Pelatih Pertunjukan:</label>
-                        <div class="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-3">
-                            <div class="grid grid-cols-1 gap-2">
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="joonchoi76" class="form-checkbox h-4 w-4 text-green-600 rounded" checked>
-                                    <span class="ml-2 text-sm text-gray-700">Joon Choi (joonchoi76)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="yoonjang77" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Yoon Jang (yoonjang77)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="jipark78" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Ji Park (jipark78)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="sookim79" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Soo Kim (sookim79)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="hyunpark80" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Hyun Park (hyunpark80)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="taejang81" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Tae Jang (taejang81)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="taeyoon82" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Tae Yoon (taeyoon82)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="seoyoon83" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Seo Yoon (seoyoon83)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="hyunkang84" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Hyun Kang (hyunkang84)</span>
-                                </label>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" name="pelatih[]" value="hyelee85" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Hye Lee (hyelee85)</span>
-                                </label>
+                        <div class="checkbox-container">
+                            <div class="grid grid-cols-1 gap-2" id="edit_pelatih_container">
+                                <!-- Will be populated by JavaScript -->
                             </div>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Pilih satu atau lebih pelatih untuk atraksi ini</p>
@@ -489,13 +359,17 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Jadwal:</label>
                         <div class="relative">
-                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none">
-                                <option>10:00</option>
-                                <option>09:30</option>
-                                <option>11:30</option>
-                                <option>13:00</option>
-                                <option>14:30</option>
-                                <option>16:00</option>
+                            <select name="jadwal" id="edit_jadwal" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none">
+                                <option value="08:30">08:30</option>
+                                <option value="09:30">09:30</option>
+                                <option value="10:00">10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="11:30">11:30</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="14:30">14:30</option>
+                                <option value="16:00">16:00</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                                 <i class="fas fa-chevron-down text-gray-400"></i>
@@ -504,50 +378,17 @@
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Hewan yang Terlibat:</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded" checked>
-                                    <span class="ml-2 text-sm text-gray-700">Singa Laut</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Kakaktua</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Parrot</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Gajah</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Harimau</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-green-600 rounded">
-                                    <span class="ml-2 text-sm text-gray-700">Lumba-lumba</span>
-                                </label>
+                        <div class="checkbox-container">
+                            <div class="grid grid-cols-2 gap-2" id="edit_hewan_container">
+                                <!-- Will be populated by JavaScript -->
                             </div>
                         </div>
                     </div>
+                    <div class="pt-4 border-t flex justify-end space-x-2">
+                        <button type="button" id="batalEdit" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200">BATAL</button>
+                        <button type="submit" class="btn-elegant px-4 py-2 text-white bg-green-500 hover:bg-green-600 rounded-md"><span>SIMPAN</span></button>
+                    </div>
                 </form>
-            </div>
-            <div class="px-6 py-4 border-t flex justify-end space-x-2">
-                <button id="batalEdit" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-200">BATAL</button>
-                <button class="btn-elegant px-4 py-2 text-white bg-green-500 hover:bg-green-600 rounded-md"><span>SIMPAN</span></button>
             </div>
         </div>
     </div>
@@ -558,10 +399,13 @@
             <div class="p-6 text-center">
                 <h3 class="text-2xl font-bold mb-6">HAPUS ATRAKSI</h3>
                 <p id="deleteMessage" class="text-gray-700 text-lg mb-8">Apakah anda yakin ingin menghapus atraksi ini?</p>
-                <div class="flex justify-center space-x-4">
-                    <button id="confirmDeleteBtn" class="px-8 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors duration-200">[YA]</button>
-                    <button id="closeDeleteBtn" class="px-8 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors duration-200">[TIDAK]</button>
-                </div>
+                <form id="deleteForm" method="post">
+                    {% csrf_token %}
+                    <div class="flex justify-center space-x-4">
+                        <button type="submit" id="confirmDeleteBtn" class="px-8 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors duration-200">[YA]</button>
+                        <button type="button" id="closeDeleteBtn" class="px-8 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors duration-200">[TIDAK]</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -587,6 +431,10 @@
                 }, 300);
             }
     
+            // Make these functions available globally
+            window.showModal = showModal;
+            window.hideModal = hideModal;
+    
             // Setup event listeners
             // Tambah modal
             document.getElementById('tambahBtn')?.addEventListener('click', () => showModal('tambahModal', 'tambahModalContent'));
@@ -595,7 +443,77 @@
     
             // Edit modal
             document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', () => showModal('editModal', 'editModalContent'));
+                btn.addEventListener('click', (e) => {
+                    const atraksiId = e.target.dataset.id;
+                    
+                    // Set form action URL with encoding for spaces and special characters
+                    document.getElementById('editForm').action = `/manajemen_atraksi_wahana/edit/${encodeURIComponent(atraksiId)}/`;
+                    
+                    // Fetch attraction details via AJAX with encoding
+                    fetch(`/manajemen_atraksi_wahana/${encodeURIComponent(atraksiId)}/data/`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("Retrieved data:", data); // Debug data
+                            
+                            // Populate form fields
+                            document.getElementById('edit_nama').value = data.nama;
+                            document.getElementById('edit_lokasi').value = data.lokasi;
+                            document.getElementById('edit_kapasitas').value = data.kapasitas;
+                            document.getElementById('edit_jadwal').value = data.jadwal;
+                            
+                            // Populate trainers
+                            const pelatihContainer = document.getElementById('edit_pelatih_container');
+                            pelatihContainer.innerHTML = '';
+                            
+                            data.trainers.forEach(trainer => {
+                                // Convert to string for safer comparison
+                                const isSelected = data.selected_trainers.some(
+                                    id => String(id) === String(trainer.id)
+                                );
+                                
+                                const checked = isSelected ? 'checked' : '';
+                                pelatihContainer.innerHTML += `
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" name="pelatih" value="${trainer.id}" class="form-checkbox h-4 w-4 text-green-600 rounded" ${checked}>
+                                        <span class="ml-2 text-sm text-gray-700">${trainer.nama}</span>
+                                    </label>
+                                `;
+                            });
+                            
+                            // Populate animals
+                            const hewanContainer = document.getElementById('edit_hewan_container');
+                            hewanContainer.innerHTML = '';
+                            
+                            data.animals.forEach(animal => {
+                                // Convert to string for safer comparison
+                                const isSelected = data.selected_animals.some(
+                                    id => String(id) === String(animal.id)
+                                );
+                                
+                                const checked = isSelected ? 'checked' : '';
+                                hewanContainer.innerHTML += `
+                                    <div>
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="hewan" value="${animal.id}" class="form-checkbox h-4 w-4 text-green-600 rounded" ${checked}>
+                                            <span class="ml-2 text-sm text-gray-700">${animal.nama}</span>
+                                        </label>
+                                    </div>
+                                `;
+                            });
+                            
+                            // Show modal
+                            showModal('editModal', 'editModalContent');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Gagal mengambil data atraksi: ' + error);
+                        });
+                });
             });
             document.getElementById('closeEditModal')?.addEventListener('click', () => hideModal('editModal', 'editModalContent'));
             document.getElementById('batalEdit')?.addEventListener('click', () => hideModal('editModal', 'editModalContent'));
@@ -603,28 +521,36 @@
             // Delete modal
             document.querySelectorAll('.hapus-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const row = e.target.closest('tr');
-                    const atraksiName = row.querySelector('td:first-child').textContent;
+                    const atraksiId = e.target.dataset.id;
+                    const atraksiName = e.target.dataset.name;
+                    
+                    // Set form action URL with encoding
+                    document.getElementById('deleteForm').action = `/manajemen_atraksi_wahana/delete/${encodeURIComponent(atraksiId)}/`;
+                    
+                    // Set confirmation message
                     document.getElementById('deleteMessage').textContent = `Apakah anda yakin ingin menghapus atraksi "${atraksiName}"?`;
+                    
+                    // Show modal
                     showModal('deleteModal', 'deleteModalContent');
                 });
             });
             document.getElementById('closeDeleteBtn')?.addEventListener('click', () => hideModal('deleteModal', 'deleteModalContent'));
-            document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
-                // Here you would add code to actually delete the attraction
-                // For now, we just close the modal
-                hideModal('deleteModal', 'deleteModalContent');
-            });
-    
-            // Tab functionality
-            const wahanaTab = document.querySelector('.tab:nth-child(2)');
-            if (wahanaTab) {
-                wahanaTab.addEventListener('click', function() {
-                    document.getElementById('tabSelector').classList.add('wahana');
-                    document.querySelectorAll('.tab')[0].classList.remove('text-white');
-                    document.querySelectorAll('.tab')[0].classList.add('text-green-800');
-                    document.querySelectorAll('.tab')[1].classList.remove('text-green-800');
-                    document.querySelectorAll('.tab')[1].classList.add('text-white');
+            
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('.data-row');
+                    
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
                 });
             }
         });
