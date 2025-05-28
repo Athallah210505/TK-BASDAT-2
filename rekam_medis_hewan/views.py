@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.urls import reverse
 from utils.decorators import role_required
 from psycopg2 import errors
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 @role_required('dokter')
 def show_rekam_medis(request):
@@ -75,22 +76,42 @@ def form_rekam_medis(request):
 
         try:
             with connection.cursor() as cursor:
+                connection.ensure_connection()
+                raw_conn = connection.connection
+                raw_conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+
                 cursor.execute("""
-                    INSERT INTO SIZOPI.CATATAN_MEDIS (
+                    INSERT INTO sizopi.catatan_medis (
                         id_hewan, username_dh, tanggal_pemeriksaan, 
                         diagnosis, pengobatan, status_kesehatan, catatan_tindak_lanjut
                     ) VALUES (%s, %s, %s, %s, %s, %s, NULL)
                 """, [id_hewan, username_dh, tanggal_pemeriksaan,
                       diagnosis, pengobatan, status_kesehatan])
-            messages.success(request, 'Rekam medis berhasil ditambahkan.')
+
+                # Ambil pesan dari trigger
+                cursor.execute("SHOW app.message;")
+                result = cursor.fetchone()
+
+                if result and result[0]:
+                    success_message = result[0]
+                    messages.success(request, success_message)
+                else:
+                    messages.success(request, "Rekam medis berhasil ditambahkan.")
+
+                # Tambahan jika status sakit
+                if status_kesehatan == 'Sakit':
+                    cursor.execute("""
+                        SELECT nama FROM sizopi.hewan WHERE id = %s
+                    """, [id_hewan])
+                    nama_row = cursor.fetchone()
+                    if nama_row:
+                        nama_hewan = nama_row[0]
+                        trigger_message = f'SUKSES: Jadwal pemeriksaan hewan "{nama_hewan}" telah diperbarui karena status kesehatan "Sakit".'
+                        messages.success(request, trigger_message)
+
         except DatabaseError as e:
-            error_message = getattr(e, 'pgerror', str(e))
-            print(error_message)
-            if "SUKSES:" in error_message:
-                messages.success(request, error_message.strip())
-            else:
-                messages.error(request, f'Gagal menambahkan catatan medis: {error_message}')
-        
+            messages.error(request, f'Gagal menambahkan catatan medis: {str(e)}')
+
         return redirect(reverse('show_rekam_medis') + f'?id={id_hewan}')
 
     elif request.method == 'GET':
@@ -124,7 +145,6 @@ def form_rekam_medis(request):
             'hewan': hewan,
             'username_dh': username_dh,
         })
-
 
 
 @role_required('dokter')

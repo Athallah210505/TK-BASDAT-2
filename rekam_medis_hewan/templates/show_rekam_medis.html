@@ -5,7 +5,10 @@
     {% include 'navbar_dokter_hewan.html' %}
     <!-- Header Section -->
     <div class="mb-10 mt-20">
-        {% if messages %}
+        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float"> Rekam Medis Hewan</h1>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi lengkap mengenai riwayat medis hewan peliharaan</p>
+    </div>
+    {% if messages %}
             <div class="mb-6">
                 {% for message in messages %}
                 <div class="rounded p-4 mb-2
@@ -17,10 +20,6 @@
                 {% endfor %}
             </div>
             {% endif %}
-        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float"> Rekam Medis Hewan</h1>
-        <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi lengkap mengenai riwayat medis hewan peliharaan</p>
-    </div>
-
     <!-- Animal Profile Card -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-l-4 border-green-500">
         {% if hewan %}
