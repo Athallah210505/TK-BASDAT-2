@@ -58,7 +58,38 @@ def pengunjung_dashboard(request):
 
 @role_required('penjaga_hewan')
 def penjaga_hewan_dashboard(request):
-    return render(request, 'penjaga_hewan_dashboard.html')
+    username = request.user.username
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                p.username,
+                CONCAT_WS(' ', p.nama_depan, p.nama_tengah, p.nama_belakang) AS nama_lengkap,
+                p.email,
+                p.no_telepon,
+                j.id_staf,
+                (
+                    SELECT COUNT(*) 
+                    FROM sizopi.memberi m
+                    WHERE m.username_jh = j.username_jh
+                ) AS jumlah_pakan_diberikan
+            FROM sizopi.pengguna p
+            JOIN sizopi.penjaga_hewan j ON p.username = j.username_jh
+            WHERE p.username = %s
+        """, [username])
+        row = cursor.fetchone()
+
+    penjaga = {
+        'username': row[0],
+        'nama_lengkap': row[1],
+        'email': row[2],
+        'no_telepon': row[3],
+        'id_staf': row[4],
+        'jumlah_pakan_diberikan': row[5],
+    } if row else {}
+
+    return render(request, 'penjaga_hewan_dashboard.html', {'penjaga': penjaga})
+
 
 @role_required('pelatih_pertunjukan')
 def pelatih_pertunjukan_dashboard(request):
