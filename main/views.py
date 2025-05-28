@@ -5,13 +5,181 @@ from django.contrib import messages
 from django.db import connection
 from datetime import date
 
+
 # Create your views here.
 def show_main(request):
     return render(request, 'main.html')
 
+
 @role_required('staff')
 def show_staff_dashboard(request):
-    return render(request, 'staff_dashboard.html')
+    if 'username' not in request.session:
+        messages.error(request, "Silakan login terlebih dahulu.")
+        return redirect('login')
+    
+    username = request.session['username']
+    today = date.today()
+    
+    # Harga tiket per unit
+    HARGA_TIKET = 20000
+
+    try:
+        with connection.cursor() as cursor:
+            # Ambil data staff
+            cursor.execute("""
+                SELECT p.username, p.email, p.nama_depan, p.nama_tengah, p.nama_belakang, 
+                       p.no_telepon
+                FROM sizopi.pengguna p
+                JOIN sizopi.staf_admin sa ON p.username = sa.username_sa
+                WHERE p.username = %s
+            """, [username])
+            user_data = cursor.fetchone()
+            if not user_data:
+                messages.error(request, "Data staff tidak ditemukan.")
+                return redirect('login')
+
+            # Total tiket terjual (semua data)
+            cursor.execute("""
+                SELECT COUNT(*) as total_tiket
+                FROM sizopi.reservasi
+                WHERE status != 'Dibatalkan'
+            """)
+            tiket_total = cursor.fetchone()[0] or 0
+
+            # Total tiket terjual hari ini - tetap tampilkan untuk referensi
+            cursor.execute("""
+                SELECT COUNT(*) as total_tiket
+                FROM sizopi.reservasi
+                WHERE tanggal_kunjungan = %s AND status != 'Dibatalkan'
+            """, [today])
+            tiket_hari_ini = cursor.fetchone()[0] or 0
+
+            # Total pengunjung (semua data)
+            pengunjung_total = tiket_total
+
+            # Pendapatan total
+            pendapatan_total = tiket_total * HARGA_TIKET
+
+            # Rata-rata pendapatan per hari
+            # Hitung jumlah hari unik dalam data reservasi
+            cursor.execute("""
+                SELECT COUNT(DISTINCT tanggal_kunjungan) as jumlah_hari
+                FROM sizopi.reservasi
+                WHERE status != 'Dibatalkan'
+            """)
+            jumlah_hari = cursor.fetchone()[0] or 1  # minimal 1 untuk menghindari pembagian dengan 0
+            rata_rata_pendapatan = (pendapatan_total / jumlah_hari)
+
+            # Data pendapatan mingguan (gunakan data terbaru 7 hari)
+            cursor.execute("""
+                SELECT tanggal_kunjungan, COUNT(*) as total_tiket
+                FROM sizopi.reservasi
+                WHERE status != 'Dibatalkan'
+                GROUP BY tanggal_kunjungan
+                ORDER BY tanggal_kunjungan DESC
+                LIMIT 7
+            """)
+            data_terbaru = cursor.fetchall()
+
+            # Pendapatan mingguan
+            pendapatan_mingguan = []
+            
+            # Jika ada data
+            if data_terbaru:
+                for tanggal, jumlah in data_terbaru:
+                    # Format tanggal jadi hari (Sen, Sel, dsb)
+                    hari_index = tanggal.weekday()
+                    hari_names = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
+                    hari = hari_names[hari_index]
+                    
+                    pendapatan_mingguan.append({
+                        'hari': hari,
+                        'tiket': jumlah,
+                        'pendapatan': jumlah * HARGA_TIKET,
+                        'height': min(max(jumlah * 10, 20), 180)  # Height untuk chart (20-180px)
+                    })
+            
+            # Jika data kurang dari 7, tambahkan data dummy
+            while len(pendapatan_mingguan) < 7:
+                pendapatan_mingguan.append({
+                    'hari': 'N/A',
+                    'tiket': 0,
+                    'pendapatan': 0,
+                    'height': 20  # Minimum height
+                })
+
+            # Penjualan tiket berdasarkan jenis fasilitas (semua data)
+            cursor.execute("""
+                SELECT nama_fasilitas, COUNT(*) as jumlah
+                FROM sizopi.reservasi
+                WHERE status != 'Dibatalkan'
+                GROUP BY nama_fasilitas
+                ORDER BY jumlah DESC
+                LIMIT 5
+            """)
+            penjualan_tiket_raw = cursor.fetchall()
+            
+            # Tambahkan pendapatan untuk setiap jenis tiket
+            penjualan_tiket = []
+            for item in penjualan_tiket_raw:
+                penjualan_tiket.append((
+                    item[0],                 # nama_fasilitas
+                    item[1],                 # jumlah tiket
+                    item[1] * HARGA_TIKET    # pendapatan
+                ))
+
+            # Atraksi terpopuler (semua data)
+            cursor.execute("""
+                SELECT r.nama_fasilitas, COUNT(*) as total_tiket
+                FROM sizopi.reservasi r
+                WHERE r.status != 'Dibatalkan'
+                GROUP BY r.nama_fasilitas
+                ORDER BY total_tiket DESC
+                LIMIT 5
+            """)
+            atraksi_populer = cursor.fetchall()
+
+            # Hitung persentase untuk atraksi populer
+            total_tiket_atraksi = sum([a[1] for a in atraksi_populer])
+            atraksi_dengan_persentase = []
+            for nama, jumlah in atraksi_populer:
+                persentase = (jumlah / total_tiket_atraksi * 100) if total_tiket_atraksi > 0 else 0
+                atraksi_dengan_persentase.append({
+                    'nama': nama,
+                    'jumlah': jumlah,
+                    'persentase': round(persentase, 1)
+                })
+
+            # Format nama lengkap
+            nama_lengkap = user_data[2] or ""
+            if user_data[3]:
+                nama_lengkap += f" {user_data[3]}"
+            if user_data[4]:
+                nama_lengkap += f" {user_data[4]}"
+
+            context = {
+                'username': user_data[0],
+                'email': user_data[1],
+                'nama_lengkap': nama_lengkap,
+                'no_telepon': user_data[5],
+                'tiket_hari_ini': tiket_hari_ini,
+                'pengunjung_hari_ini': pengunjung_total,  # Ganti dengan total
+                'pendapatan_hari_ini': pendapatan_total,  # Ganti dengan total
+                'rata_rata_pendapatan': rata_rata_pendapatan,
+                'pendapatan_mingguan': pendapatan_mingguan,
+                'total_pendapatan_minggu': pendapatan_total,  # Ganti dengan total
+                'total_pengunjung_minggu': pengunjung_total,  # Ganti dengan total
+                'penjualan_tiket': penjualan_tiket,
+                'atraksi_populer': atraksi_dengan_persentase,
+                'harga_tiket': HARGA_TIKET,
+            }
+
+    except Exception as e:
+        messages.error(request, f"Terjadi kesalahan: {str(e)}")
+        return redirect('login')
+    
+    return render(request, 'staff_dashboard.html', context)
+
 
 @role_required('dokter')
 def dokter_hewan_dashboard(request):
