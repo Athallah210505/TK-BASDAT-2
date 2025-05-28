@@ -80,10 +80,27 @@
                             <div class="text-gray-500 mb-1">Jumlah tiket:</div>
                             <div>{{ reservasi.jumlah_tiket }}</div>
                         </div>
+                        <!-- Tambahkan informasi jadwal -->
+                        <div>
+                            <div class="text-gray-500 mb-1">Jam Show:</div>
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                </svg>
+                                {% if reservasi.jadwal %}
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ reservasi.jadwal|date:"H:i" }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-500">Tidak ditentukan</span>
+                                {% endif %}
+                            </div>
+                        </div>
                         <div>
                             <div class="text-gray-500 mb-1">Dipesan oleh:</div>
                             <div>{{ reservasi.username_p|default:username }}</div>
                         </div>
+                        <!-- Bagian ketersediaan dihapus -->
                     </div>
                     {% if reservasi.status == 'Terjadwal' %}
                     <div class="flex justify-end mt-4 space-x-3">
@@ -135,10 +152,27 @@
                             <div class="text-gray-500 mb-1">Jumlah tiket:</div>
                             <div>{{ reservasi.jumlah_tiket }}</div>
                         </div>
+                        <!-- Tambahkan informasi jadwal -->
+                        <div>
+                            <div class="text-gray-500 mb-1">Jam Operasi:</div>
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                </svg>
+                                {% if reservasi.jadwal %}
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ reservasi.jadwal|date:"H:i" }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-500">Sepanjang hari</span>
+                                {% endif %}
+                            </div>
+                        </div>
                         <div>
                             <div class="text-gray-500 mb-1">Dipesan oleh:</div>
                             <div>{{ reservasi.username_p|default:username }}</div>
                         </div>
+                        <!-- Bagian ketersediaan dihapus -->
                     </div>
                     {% if reservasi.status == 'Terjadwal' %}
                     <div class="flex justify-end mt-4 space-x-3">

@@ -207,7 +207,7 @@ def show_user_booking(request):
     
     try:
         with connection.cursor() as cursor:
-            # Query untuk mendapatkan semua reservasi pengguna
+            # Query yang menggunakan kolom jadwal dari tabel FASILITAS
             cursor.execute("""
                 SELECT 
                     r.username_p, 
@@ -221,13 +221,27 @@ def show_user_booking(request):
                         ELSE 'unknown'
                     END as jenis,
                     a.lokasi,
-                    w.peraturan
+                    w.peraturan,
+                    f.kapasitas_max,
+                    f.jadwal,
+                    (
+                        f.kapasitas_max - COALESCE(
+                            (SELECT SUM(r2.jumlah_tiket) 
+                             FROM sizopi.RESERVASI r2 
+                             WHERE r2.nama_fasilitas = r.nama_fasilitas 
+                             AND r2.tanggal_kunjungan = r.tanggal_kunjungan
+                             AND r2.status = 'Terjadwal'
+                            ), 0
+                        )
+                    ) as kapasitas_tersisa
                 FROM 
                     sizopi.RESERVASI r
                 LEFT JOIN 
                     sizopi.ATRAKSI a ON r.nama_fasilitas = a.nama_atraksi
                 LEFT JOIN 
                     sizopi.WAHANA w ON r.nama_fasilitas = w.nama_wahana
+                LEFT JOIN
+                    sizopi.FASILITAS f ON r.nama_fasilitas = f.nama
                 WHERE 
                     r.username_p = %s
                 ORDER BY 
@@ -236,6 +250,12 @@ def show_user_booking(request):
             
             reservasi_all = dictfetchall(cursor)
             print(f"DEBUG - Ditemukan {len(reservasi_all)} reservasi untuk {username}")
+            
+            # Debug untuk melihat data yang diperoleh
+            for r in reservasi_all:
+                print(f"DEBUG - Reservasi: {r['nama_fasilitas']} | "
+                      f"Jadwal: {r.get('jadwal', 'None')} | "
+                      f"Kapasitas: {r.get('kapasitas_tersisa', 'None')}/{r.get('kapasitas_max', 'None')}")
             
             # Pisahkan hasil menjadi atraksi dan wahana
             reservasi_atraksi = []
@@ -277,7 +297,6 @@ def show_user_booking(request):
             'role': 'user',
             'username': username
         })
-
 # @login_required
 
 @role_required('pengunjung')
