@@ -46,15 +46,7 @@ def show_staff_dashboard(request):
             """)
             tiket_total = cursor.fetchone()[0] or 0
 
-            # Total tiket terjual hari ini - tetap tampilkan untuk referensi
-            cursor.execute("""
-                SELECT COUNT(*) as total_tiket
-                FROM sizopi.reservasi
-                WHERE tanggal_kunjungan = %s AND status != 'Dibatalkan'
-            """, [today])
-            tiket_hari_ini = cursor.fetchone()[0] or 0
-
-            # Total pengunjung (semua data)
+            # Total pengunjung (sama dengan tiket terjual)
             pengunjung_total = tiket_total
 
             # Pendapatan total
@@ -69,44 +61,6 @@ def show_staff_dashboard(request):
             """)
             jumlah_hari = cursor.fetchone()[0] or 1  # minimal 1 untuk menghindari pembagian dengan 0
             rata_rata_pendapatan = (pendapatan_total / jumlah_hari)
-
-            # Data pendapatan mingguan (gunakan data terbaru 7 hari)
-            cursor.execute("""
-                SELECT tanggal_kunjungan, COUNT(*) as total_tiket
-                FROM sizopi.reservasi
-                WHERE status != 'Dibatalkan'
-                GROUP BY tanggal_kunjungan
-                ORDER BY tanggal_kunjungan DESC
-                LIMIT 7
-            """)
-            data_terbaru = cursor.fetchall()
-
-            # Pendapatan mingguan
-            pendapatan_mingguan = []
-            
-            # Jika ada data
-            if data_terbaru:
-                for tanggal, jumlah in data_terbaru:
-                    # Format tanggal jadi hari (Sen, Sel, dsb)
-                    hari_index = tanggal.weekday()
-                    hari_names = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
-                    hari = hari_names[hari_index]
-                    
-                    pendapatan_mingguan.append({
-                        'hari': hari,
-                        'tiket': jumlah,
-                        'pendapatan': jumlah * HARGA_TIKET,
-                        'height': min(max(jumlah * 10, 20), 180)  # Height untuk chart (20-180px)
-                    })
-            
-            # Jika data kurang dari 7, tambahkan data dummy
-            while len(pendapatan_mingguan) < 7:
-                pendapatan_mingguan.append({
-                    'hari': 'N/A',
-                    'tiket': 0,
-                    'pendapatan': 0,
-                    'height': 20  # Minimum height
-                })
 
             # Penjualan tiket berdasarkan jenis fasilitas (semua data)
             cursor.execute("""
@@ -162,13 +116,10 @@ def show_staff_dashboard(request):
                 'email': user_data[1],
                 'nama_lengkap': nama_lengkap,
                 'no_telepon': user_data[5],
-                'tiket_hari_ini': tiket_hari_ini,
-                'pengunjung_hari_ini': pengunjung_total,  # Ganti dengan total
-                'pendapatan_hari_ini': pendapatan_total,  # Ganti dengan total
+                'tiket_hari_ini': tiket_total,  # Gunakan total tiket
+                'pengunjung_hari_ini': pengunjung_total,
+                'pendapatan_hari_ini': pendapatan_total,
                 'rata_rata_pendapatan': rata_rata_pendapatan,
-                'pendapatan_mingguan': pendapatan_mingguan,
-                'total_pendapatan_minggu': pendapatan_total,  # Ganti dengan total
-                'total_pengunjung_minggu': pengunjung_total,  # Ganti dengan total
                 'penjualan_tiket': penjualan_tiket,
                 'atraksi_populer': atraksi_dengan_persentase,
                 'harga_tiket': HARGA_TIKET,
@@ -179,6 +130,7 @@ def show_staff_dashboard(request):
         return redirect('login')
     
     return render(request, 'staff_dashboard.html', context)
+
 
 
 @role_required('dokter')
