@@ -69,9 +69,11 @@ def penjaga_hewan_dashboard(request):
                 p.no_telepon,
                 j.id_staf,
                 (
-                    SELECT COUNT(*) 
+                    SELECT COUNT(DISTINCT m.id_hewan) 
                     FROM sizopi.memberi m
+                    JOIN sizopi.pakan p ON m.id_hewan = p.id_hewan
                     WHERE m.username_jh = j.username_jh
+                      AND LOWER(p.status) = 'sudah diberikan'
                 ) AS jumlah_pakan_diberikan
             FROM sizopi.pengguna p
             JOIN sizopi.penjaga_hewan j ON p.username = j.username_jh
