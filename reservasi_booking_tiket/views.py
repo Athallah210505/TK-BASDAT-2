@@ -287,12 +287,12 @@ def show_user_add_booking(request):
     """
     today = datetime.now().date()
     
-    # Ambil username dari session (sesuai dengan cara login Anda)
+    # Ambil username dari session
     username = request.session.get('username', '')
     
     if request.method == 'POST':
         try:
-            # Gunakan username dari session bukan dari request.user
+            # Ambil data dari form
             jenis_reservasi = request.POST.get('jenis_reservasi')
             nama_fasilitas = request.POST.get('nama_fasilitas')
             tanggal_str = request.POST.get('tanggal_kunjungan')
@@ -303,11 +303,21 @@ def show_user_add_booking(request):
             for key, value in request.POST.items():
                 print(f"{key}: {value}")
             
+            # Validasi dasar input
+            if not all([nama_fasilitas, tanggal_str, jumlah_tiket]):
+                messages.error(request, "Semua field harus diisi")
+                return redirect('show_user_add_booking')
+            
+            if jumlah_tiket <= 0:
+                messages.error(request, "Jumlah tiket harus lebih dari 0")
+                return redirect('show_user_add_booking')
+            
             tanggal_kunjungan = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
             
             with connection.cursor() as cursor:
                 try:
-                    # Simpan reservasi ke tabel RESERVASI - trigger akan otomatis memvalidasi kapasitas
+                    # Simpan reservasi ke tabel RESERVASI 
+                    # TIDAK perlu memeriksa kapasitas di sini karena sudah ditangani oleh trigger
                     cursor.execute("""
                         INSERT INTO sizopi.RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
                         VALUES (%s, %s, %s, %s, %s)
@@ -319,15 +329,21 @@ def show_user_add_booking(request):
                 except Exception as db_error:
                     # Tangkap pesan error dari trigger
                     error_message = str(db_error)
-                    print(f"DEBUG - Database error: {error_message}")
+                    print(f"DEBUG - Full Database error: {error_message}")
                     
                     # Periksa apakah error berasal dari trigger kapasitas
                     if "Kapasitas tersisa" in error_message and "tiket yang diminta" in error_message:
-                        # Tampilkan pesan error dari trigger langsung ke user
-                        messages.error(request, error_message)
+                        # Ambil hanya bagian pesan error yang penting (tanpa context SQL)
+                        import re
+                        error_match = re.search(r'ERROR: Kapasitas tersisa "(.*?)" tiket, atraksi tidak mencukupi untuk sejumlah "(.*?)" tiket yang diminta', error_message)
+                        if error_match:
+                            clean_error = f'ERROR: Kapasitas tersisa "{error_match.group(1)}" tiket, atraksi tidak mencukupi untuk sejumlah "{error_match.group(2)}" tiket yang diminta.'
+                            messages.error(request, clean_error)
+                        else:
+                            messages.error(request, "Jumlah tiket melebihi kapasitas yang tersedia.")
                     else:
-                        # Error lainnya
-                        messages.error(request, f"Gagal membuat reservasi: {error_message}")
+                        # Error database lainnya
+                        messages.error(request, f"Gagal membuat reservasi: Terjadi kesalahan pada sistem")
                     
                     return redirect('show_user_add_booking')
             
@@ -348,7 +364,7 @@ def show_user_add_booking(request):
             print(f"DEBUG - Session data: {dict(request.session)}")
             print(f"DEBUG - Username dari session: {username}")
             
-            # Ambil daftar atraksi
+            # Ambil daftar atraksi dengan data lokasi untuk autofill
             cursor.execute("""
                 SELECT a.nama_atraksi, a.lokasi, f.kapasitas_max
                 FROM sizopi.ATRAKSI a
@@ -363,7 +379,7 @@ def show_user_add_booking(request):
             for atraksi in atraksi_list:
                 print(f"Atraksi: {atraksi['nama_atraksi']}, Lokasi: {atraksi['lokasi'] or 'None'}")
             
-            # Ambil daftar wahana
+            # Ambil daftar wahana dengan data peraturan untuk autofill
             cursor.execute("""
                 SELECT w.nama_wahana, w.peraturan, f.kapasitas_max
                 FROM sizopi.WAHANA w
@@ -416,8 +432,7 @@ def show_user_add_booking(request):
             'session_username': username
         })
         
-        
-@role_required('pengunjung')
+
 @role_required('pengunjung')
 def add_reservasi_wahana(request):
     """
@@ -546,16 +561,16 @@ def add_reservasi_wahana(request):
             'session_username': username
         })
         
-        
-@role_required('pengunjung')
+
 @role_required('pengunjung')
 def show_user_edit_booking(request):
     # Ambil username dari session
     username = request.session.get('username', '')
     
-    jenis_reservasi = request.GET.get('jenis')
-    nama_fasilitas = request.GET.get('nama')
-    tanggal_str = request.GET.get('tanggal')
+    # Ambil parameter dari URL dengan format yang fleksibel
+    jenis_reservasi = request.GET.get('jenis_reservasi', request.GET.get('jenis', ''))
+    nama_fasilitas = request.GET.get('nama_fasilitas', request.GET.get('nama', ''))
+    tanggal_str = request.GET.get('tanggal_kunjungan', request.GET.get('tanggal', ''))
     
     # Konteks dasar untuk menampilkan form
     form_context = {
@@ -572,7 +587,7 @@ def show_user_edit_booking(request):
             tanggal_str = request.POST.get('tanggal_kunjungan')
             action = request.POST.get('action')
             # Ambil jenis dari POST jika ada
-            jenis_reservasi = request.GET.get('jenis') or request.POST.get('jenis_reservasi')
+            jenis_reservasi = request.POST.get('jenis_reservasi', jenis_reservasi)
             
             # Perbarui konteks dengan data dari POST
             form_context.update({
@@ -585,10 +600,13 @@ def show_user_edit_booking(request):
             # Validasi data yang diterima
             if not all([username, nama_fasilitas, tanggal_str]):
                 form_context['error_message'] = "Data tidak lengkap. Mohon isi semua field."
-                # Load data untuk form dan tampilkan ulang
                 return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
             
-            tanggal_kunjungan = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
+            try:
+                tanggal_kunjungan = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
+            except ValueError:
+                form_context['error_message'] = "Format tanggal tidak valid."
+                return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
             
             with connection.cursor() as cursor:
                 # Cek keberadaan reservasi
@@ -678,17 +696,23 @@ def show_user_edit_booking(request):
                             return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
                             
                     except Exception as db_error:
-                        # Tangkap pesan error dari trigger
+                        # Tangkap pesan error dari trigger dengan format yang lebih bersih
                         error_message = str(db_error)
                         print(f"DEBUG - Database error: {error_message}")
                         
-                        # Periksa apakah error berasal dari trigger kapasitas
+                        # Filter pesan error agar lebih user-friendly
+                        import re
                         if "Kapasitas tersisa" in error_message and "tiket yang diminta" in error_message:
-                            # Tampilkan pesan error dari trigger langsung ke user
-                            form_context['error_message'] = error_message
+                            # Ekstrak bagian penting dari pesan error
+                            match = re.search(r'Kapasitas tersisa (\d+) tiket, atraksi tidak mencukupi untuk sejumlah (\d+) tiket yang diminta', error_message)
+                            if match:
+                                tersisa = match.group(1)
+                                diminta = match.group(2)
+                                form_context['error_message'] = f"Kapasitas tersisa hanya {tersisa} tiket, tidak mencukupi untuk {diminta} tiket yang diminta."
+                            else:
+                                form_context['error_message'] = "Jumlah tiket melebihi kapasitas yang tersedia."
                         else:
-                            # Error lainnya
-                            form_context['error_message'] = f"Gagal memperbarui reservasi: {error_message}"
+                            form_context['error_message'] = "Gagal memperbarui reservasi. Silakan coba lagi."
                         
                         return load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tanggal_str, form_context)
             
@@ -713,6 +737,16 @@ def load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tangg
         context = {}
     
     try:
+        # Parse tanggal dengan penanganan error
+        try:
+            tanggal_date = None
+            if tanggal_str:
+                tanggal_date = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
+        except ValueError as e:
+            print(f"DEBUG - Error parsing date: {str(e)}")
+            context['error_message'] = "Format tanggal tidak valid."
+            return render(request, 'user_edit_booking.html', context)
+        
         with connection.cursor() as cursor:
             if jenis_reservasi and nama_fasilitas and tanggal_str:
                 # Query untuk mendapatkan detail reservasi berdasarkan jenis
@@ -732,7 +766,7 @@ def load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tangg
                         WHERE r.username_p = %s
                         AND r.nama_fasilitas = %s
                         AND r.tanggal_kunjungan = %s
-                    """, [username, nama_fasilitas, tanggal_str])
+                    """, [username, nama_fasilitas, tanggal_date])
                 else:  # wahana
                     cursor.execute("""
                         SELECT 
@@ -749,7 +783,7 @@ def load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tangg
                         WHERE r.username_p = %s
                         AND r.nama_fasilitas = %s
                         AND r.tanggal_kunjungan = %s
-                    """, [username, nama_fasilitas, tanggal_str])
+                    """, [username, nama_fasilitas, tanggal_date])
                 
                 reservasi = cursor.fetchone()
                 
@@ -763,7 +797,7 @@ def load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tangg
                             AND tanggal_kunjungan = %s
                             AND status = 'Terjadwal'
                             AND NOT (username_p = %s AND tanggal_kunjungan = %s)
-                        """, [nama_fasilitas, tanggal_str, username, tanggal_str])
+                        """, [nama_fasilitas, tanggal_date, username, tanggal_date])
                         
                         tiket_terpakai = cursor.fetchone()[0]
                         kapasitas_max = reservasi[6]
@@ -799,12 +833,10 @@ def load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tangg
     
     except Exception as e:
         import traceback
-        print(f"ERROR: {str(e)}")
+        print(f"ERROR in load_and_show_form: {str(e)}")
         print(traceback.format_exc())
         context['error_message'] = f"Terjadi kesalahan: {str(e)}"
         return render(request, 'user_edit_booking.html', context)
-
-
    
 @role_required('pengunjung')
 def user_cancel_booking(request):
