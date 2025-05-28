@@ -182,8 +182,6 @@ def get_atraksi_data(request, id):
         print(f"ERROR in get_atraksi_data: {error_details}")
         return JsonResponse({'error': str(e), 'details': error_details}, status=500)
     
-    
-    
 @role_required('staff')
 def edit_atraksi(request, id):
     """View for editing an attraction"""
@@ -204,90 +202,108 @@ def edit_atraksi(request, id):
                 """, [id])
                 result = cursor.fetchone()
                 date_str = result[0] if result else datetime.now().strftime('%Y-%m-%d')
-                
-                # Convert time string to timestamp with preserved date
                 jadwal_timestamp = f'{date_str} {jadwal}:00'
                 
-                # Langkah 1: Temukan pelatih yang sudah bertugas >90 hari
+                # STEP 1: Ambil semua pelatih yang sedang ditugaskan SEBELUM rotasi
                 cursor.execute("""
                     SELECT jp.username_lh, 
                            p.nama_depan || ' ' || p.nama_belakang AS nama_pelatih,
-                           EXTRACT(DAY FROM (CURRENT_DATE - MIN(jp.tgl_penugasan))) AS durasi_hari
+                           EXTRACT(DAY FROM (CURRENT_DATE - jp.tgl_penugasan)) AS durasi_hari
                     FROM sizopi.jadwal_penugasan jp
                     JOIN sizopi.pelatih_hewan ph ON jp.username_lh = ph.username_lh
                     JOIN sizopi.pengguna p ON ph.username_lh = p.username
                     WHERE jp.nama_atraksi = %s
-                    GROUP BY jp.username_lh, p.nama_depan, p.nama_belakang, jp.tgl_penugasan
-                    HAVING EXTRACT(DAY FROM (CURRENT_DATE - MIN(jp.tgl_penugasan))) >= 90
                 """, [id])
                 
-                long_serving_trainers = dictfetchall(cursor)
+                all_current_trainers = dictfetchall(cursor)
+                
+                # Identifikasi pelatih yang sudah >90 hari
+                long_serving_trainers = [t for t in all_current_trainers if t.get('durasi_hari', 0) >= 90]
                 rotated_trainer_ids = [t['username_lh'] for t in long_serving_trainers]
                 
-                # Langkah 2: HAPUS pelatih tersebut dari list pelatih yang dipilih
-                pelatih_ids = [pid for pid in pelatih_ids if pid not in rotated_trainer_ids]
+                print(f"Semua pelatih saat ini: {[t['username_lh'] for t in all_current_trainers]}")
+                print(f"Pelatih yang akan dirotasi: {rotated_trainer_ids}")
+                print(f"Pelatih yang dipilih user: {pelatih_ids}")
                 
-                # Langkah 3: Update atraksi untuk memicu trigger
+                # STEP 2: HAPUS pelatih >90 hari dari daftar yang dipilih user
+                original_pelatih_ids = [p_id for p_id in pelatih_ids if p_id not in rotated_trainer_ids]
+                
+                print(f"Pelatih yang dipilih setelah filter rotasi: {original_pelatih_ids}")
+                
+                # STEP 3: Update atraksi untuk memicu trigger
                 cursor.execute("""
                     UPDATE sizopi.atraksi
                     SET lokasi = %s
                     WHERE nama_atraksi = %s
                 """, [lokasi, id])
                 
-                # Langkah 4: Update fasilitas
+                # STEP 4: Update fasilitas
                 cursor.execute("""
                     UPDATE sizopi.fasilitas
                     SET kapasitas_max = %s, jadwal = %s
                     WHERE nama = %s
                 """, [kapasitas, jadwal_timestamp, id])
                 
-                # Langkah 5: Periksa pelatih yang ditambahkan oleh trigger
+                # STEP 5: Berikan waktu untuk trigger diproses
+                from time import sleep
+                sleep(0.3)  # 300ms delay
+                
+                # STEP 6: Ambil data pelatih setelah trigger berjalan
                 cursor.execute("""
-                    SELECT jp.username_lh, p.nama_depan || ' ' || p.nama_belakang AS nama_pelatih
+                    SELECT jp.username_lh, 
+                           p.nama_depan || ' ' || p.nama_belakang AS nama_pelatih,
+                           jp.tgl_penugasan
                     FROM sizopi.jadwal_penugasan jp
                     JOIN sizopi.pelatih_hewan ph ON jp.username_lh = ph.username_lh
                     JOIN sizopi.pengguna p ON ph.username_lh = p.username
                     WHERE jp.nama_atraksi = %s
                 """, [id])
                 
-                current_trainers = dictfetchall(cursor)
-                current_trainer_ids = [t['username_lh'] for t in current_trainers]
+                current_trainers_after_trigger = dictfetchall(cursor)
+                current_trainer_ids_after = [t['username_lh'] for t in current_trainers_after_trigger]
                 
-                # Langkah 6: Temukan pelatih yang ditambahkan oleh trigger (tidak ada di seleksi sebelumnya)
-                new_trainer_ids = []
-                for trainer_id in current_trainer_ids:
-                    if trainer_id not in pelatih_ids and trainer_id not in rotated_trainer_ids:
-                        new_trainer_ids.append(trainer_id)
-                        pelatih_ids.append(trainer_id)  # Tambahkan ke list yang akan dipertahankan
+                print(f"Pelatih setelah trigger: {current_trainer_ids_after}")
                 
-                # Langkah 7: Tampilkan pesan untuk pelatih yang dirotasi
-                for trainer in long_serving_trainers:
+                # STEP 7: Identifikasi pelatih baru yang ditambahkan oleh trigger
+                trigger_added_trainers = []
+                for trainer in current_trainers_after_trigger:
                     username_lh = trainer['username_lh']
-                    nama_pelatih = trainer['nama_pelatih']
-                    messages.success(request, f"Pelatih \"{nama_pelatih}\" telah bertugas lebih dari 3 bulan di atraksi \"{id}\" dan akan diganti.")
-                    
-                # Langkah 8: Tampilkan pesan untuk pelatih pengganti
-                for trainer_id in new_trainer_ids:
-                    # Cari nama pelatih
-                    for trainer in current_trainers:
-                        if trainer['username_lh'] == trainer_id:
-                            messages.info(request, f"Pelatih \"{trainer['nama_pelatih']}\" telah ditugaskan sebagai pengganti.")
-                            break
+                    # Pelatih yang ditambahkan trigger = ada sekarang tapi tidak ada di daftar awal
+                    if (username_lh not in [t['username_lh'] for t in all_current_trainers] and
+                        username_lh not in original_pelatih_ids):
+                        trigger_added_trainers.append(username_lh)
                 
-                # Langkah 9: Hapus pelatih yang tidak dipilih user dan bukan pengganti dari trigger
-                if pelatih_ids:
-                    cursor.execute("""
+                print(f"Pelatih baru dari trigger: {trigger_added_trainers}")
+                
+                # STEP 8: Buat daftar final pelatih yang harus ada
+                final_trainer_ids = list(original_pelatih_ids) + trigger_added_trainers
+                
+                print(f"Daftar final pelatih yang harus ada: {final_trainer_ids}")
+                
+                # STEP 9: HAPUS SEMUA pelatih yang tidak ada di daftar final
+                # Ini adalah perbaikan utama - hapus semua yang tidak diperlukan sekaligus
+                if final_trainer_ids:
+                    # Buat placeholder untuk IN clause
+                    placeholders = ','.join(['%s'] * len(final_trainer_ids))
+                    cursor.execute(f"""
                         DELETE FROM sizopi.jadwal_penugasan
-                        WHERE nama_atraksi = %s AND username_lh NOT IN %s
-                    """, [id, tuple(pelatih_ids) if len(pelatih_ids) > 1 else f"('{pelatih_ids[0]}')"])
+                        WHERE nama_atraksi = %s 
+                        AND username_lh NOT IN ({placeholders})
+                    """, [id] + final_trainer_ids)
+                    
+                    deleted_count = cursor.rowcount
+                    print(f"Jumlah pelatih yang dihapus: {deleted_count}")
                 else:
+                    # Jika tidak ada pelatih yang harus dipertahankan, hapus semua
                     cursor.execute("""
                         DELETE FROM sizopi.jadwal_penugasan
                         WHERE nama_atraksi = %s
                     """, [id])
+                    deleted_count = cursor.rowcount
+                    print(f"Semua pelatih dihapus: {deleted_count}")
                 
-                # Langkah 10: Tambahkan pelatih baru yang dipilih user jika belum ada
-                for username_lh in pelatih_ids:
+                # STEP 10: Tambahkan pelatih yang dipilih user jika belum ada
+                for username_lh in final_trainer_ids:
                     cursor.execute("""
                         SELECT 1 FROM sizopi.jadwal_penugasan
                         WHERE username_lh = %s AND nama_atraksi = %s
@@ -298,8 +314,9 @@ def edit_atraksi(request, id):
                             INSERT INTO sizopi.jadwal_penugasan (username_lh, tgl_penugasan, nama_atraksi)
                             VALUES (%s, %s, %s)
                         """, [username_lh, datetime.now(), id])
+                        print(f"Menambahkan pelatih: {username_lh}")
                 
-                # Langkah 11: Update hewan yang berpartisipasi
+                # STEP 11: Update hewan yang berpartisipasi
                 cursor.execute("""
                     DELETE FROM sizopi.berpartisipasi
                     WHERE nama_fasilitas = %s
@@ -310,17 +327,45 @@ def edit_atraksi(request, id):
                         INSERT INTO sizopi.berpartisipasi (nama_fasilitas, id_hewan)
                         VALUES (%s, %s)
                     """, [id, id_hewan])
+                
+                # STEP 12: Tampilkan pesan untuk pelatih yang dirotasi
+                for trainer in long_serving_trainers:
+                    messages.warning(request, f"Pelatih \"{trainer['nama_pelatih']}\" telah bertugas lebih dari 3 bulan di atraksi \"{id}\" dan akan diganti.")
+                
+                # STEP 13: Tampilkan pesan untuk pelatih pengganti
+                for trainer_id in trigger_added_trainers:
+                    for trainer in current_trainers_after_trigger:
+                        if trainer['username_lh'] == trainer_id:
+                            messages.success(request, f"Pelatih \"{trainer['nama_pelatih']}\" telah ditugaskan sebagai pengganti.")
+                            break
+                
+                # STEP 14: Verifikasi hasil akhir
+                cursor.execute("""
+                    SELECT jp.username_lh, p.nama_depan || ' ' || p.nama_belakang AS nama_pelatih
+                    FROM sizopi.jadwal_penugasan jp
+                    JOIN sizopi.pelatih_hewan ph ON jp.username_lh = ph.username_lh
+                    JOIN sizopi.pengguna p ON ph.username_lh = p.username
+                    WHERE jp.nama_atraksi = %s
+                """, [id])
+                
+                final_trainers = dictfetchall(cursor)
+                print(f"Pelatih final setelah update: {[t['username_lh'] for t in final_trainers]}")
             
-            # Tampilkan pesan sukses jika tidak ada pelatih yang dirotasi
+            # Tampilkan pesan sukses
             if not long_serving_trainers:
                 messages.success(request, "Atraksi berhasil diperbarui!")
+            else:
+                messages.success(request, "Atraksi berhasil diperbarui dengan rotasi pelatih.")
             return redirect('show_atraksi_management')
         
         except Exception as e:
+            import traceback
+            print(traceback.format_exc())
             messages.error(request, f"Gagal memperbarui atraksi: {str(e)}")
             return redirect('show_atraksi_management')
         
         
+
 @role_required('staff')
 def delete_atraksi(request, id):
     """View for deleting an attraction"""

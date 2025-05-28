@@ -7,6 +7,7 @@ urlpatterns = [
     path('add/', views.add_atraksi, name='add_atraksi'),
     path('<str:id>/data/', views.get_atraksi_data, name='get_atraksi_data'),
     path('edit/<str:id>/', views.edit_atraksi, name='edit_atraksi'),
+    path('get_atraksi_data/<str:id>/', views.get_atraksi_data, name='get_atraksi_data'),
     path('delete/<str:id>/', views.delete_atraksi, name='delete_atraksi'),
     
     # Wahana management routes
