@@ -22,97 +22,6 @@ def show_atraksi_management(request):
                 SELECT schema_name FROM information_schema.schemata 
                 WHERE schema_name = 'sizopi'
             """)
-            
-            if cursor.rowcount == 0:
-                # If schema doesn't exist, create it
-                cursor.execute("CREATE SCHEMA IF NOT EXISTS sizopi")
-            
-            # Check if tables exist, and create if needed
-            cursor.execute("""
-                SELECT table_name FROM information_schema.tables 
-                WHERE table_schema = 'sizopi' AND table_name = 'fasilitas'
-            """)
-            
-            if cursor.rowcount == 0:
-                # Create necessary tables if they don't exist
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.fasilitas (
-                        nama VARCHAR(50) PRIMARY KEY,
-                        jadwal TIMESTAMP NOT NULL,
-                        kapasitas_max INT NOT NULL
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.atraksi (
-                        nama_atraksi VARCHAR(50) PRIMARY KEY,
-                        lokasi VARCHAR(100) NOT NULL,
-                        FOREIGN KEY (nama_atraksi) REFERENCES sizopi.fasilitas(nama) ON DELETE CASCADE ON UPDATE CASCADE
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.hewan (
-                        id UUID PRIMARY KEY,
-                        nama VARCHAR(100) NOT NULL,
-                        jenis VARCHAR(50) NOT NULL,
-                        usia INT NOT NULL
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.pelatih_hewan (
-                        username_lh VARCHAR(50) PRIMARY KEY,
-                        spesialisasi VARCHAR(100) NOT NULL
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.pengguna (
-                        username VARCHAR(50) PRIMARY KEY,
-                        nama_depan VARCHAR(50) NOT NULL,
-                        nama_belakang VARCHAR(50) NOT NULL
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.jadwal_penugasan (
-                        username_lh VARCHAR(50),
-                        tgl_penugasan TIMESTAMP,
-                        nama_atraksi VARCHAR(50),
-                        PRIMARY KEY (username_lh, tgl_penugasan),
-                        FOREIGN KEY (username_lh) REFERENCES sizopi.pelatih_hewan(username_lh) ON DELETE CASCADE ON UPDATE CASCADE,
-                        FOREIGN KEY (nama_atraksi) REFERENCES sizopi.atraksi(nama_atraksi) ON DELETE CASCADE ON UPDATE CASCADE
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.berpartisipasi (
-                        nama_fasilitas VARCHAR(50),
-                        id_hewan UUID,
-                        PRIMARY KEY (nama_fasilitas, id_hewan),
-                        FOREIGN KEY (nama_fasilitas) REFERENCES sizopi.fasilitas(nama) ON DELETE CASCADE ON UPDATE CASCADE,
-                        FOREIGN KEY (id_hewan) REFERENCES sizopi.hewan(id) ON DELETE CASCADE ON UPDATE CASCADE
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.wahana (
-                        nama_wahana VARCHAR(50) PRIMARY KEY,
-                        jenis VARCHAR(50) NOT NULL,
-                        FOREIGN KEY (nama_wahana) REFERENCES sizopi.fasilitas(nama) ON DELETE CASCADE ON UPDATE CASCADE
-                    )
-                """)
-                
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sizopi.peraturan_wahana (
-                        id SERIAL PRIMARY KEY,
-                        nama_wahana VARCHAR(50),
-                        peraturan TEXT NOT NULL,
-                        FOREIGN KEY (nama_wahana) REFERENCES sizopi.wahana(nama_wahana) ON DELETE CASCADE ON UPDATE CASCADE
-                    )
-                """)
-            
             # Get all attractions with related information
             cursor.execute("""
                 SELECT a.nama_atraksi as id, a.nama_atraksi as nama, a.lokasi, 
@@ -291,6 +200,36 @@ def edit_atraksi(request, id):
                 # Convert time string to timestamp with preserved date
                 jadwal_timestamp = f'{date_str} {jadwal}:00'
                 
+                # PERBAIKAN: Cek pelatih yang sudah bertugas lebih dari 3 bulan (90 hari)
+                cursor.execute("""
+                    SELECT jp.username_lh, 
+                           p.nama_depan || ' ' || p.nama_belakang AS nama_pelatih,
+                           MIN(jp.tgl_penugasan) AS tanggal_mulai,
+                           EXTRACT(DAY FROM (CURRENT_DATE - MIN(jp.tgl_penugasan))) AS durasi_hari
+                    FROM sizopi.jadwal_penugasan jp
+                    JOIN sizopi.pelatih_hewan ph ON jp.username_lh = ph.username_lh
+                    JOIN sizopi.pengguna p ON ph.username_lh = p.username
+                    WHERE jp.nama_atraksi = %s
+                    GROUP BY jp.username_lh, p.nama_depan, p.nama_belakang
+                    HAVING EXTRACT(DAY FROM (CURRENT_DATE - MIN(jp.tgl_penugasan))) >= 90
+                """, [id])
+                
+                long_serving_trainers = dictfetchall(cursor)
+                rotated_trainers = []
+                
+                # Proses pelatih yang perlu dirotasi
+                for trainer in long_serving_trainers:
+                    username_lh = trainer['username_lh']
+                    nama_pelatih = trainer['nama_pelatih']
+                    rotated_trainers.append(username_lh)
+                    
+                    # Tampilkan pesan rotasi sesuai format yang diminta
+                    messages.success(request, f"SUKSES: Pelatih \"{nama_pelatih}\" telah bertugas lebih dari 3 bulan di atraksi \"{id}\" dan akan diganti.")
+                
+                # Hapus pelatih yang dirotasi dari daftar pelatih yang akan ditugaskan
+                pelatih_ids = [p for p in pelatih_ids if p not in rotated_trainers]
+                # AKHIR PERBAIKAN
+                
                 # Update atraksi table
                 cursor.execute("""
                     UPDATE sizopi.atraksi
@@ -331,7 +270,9 @@ def edit_atraksi(request, id):
                         VALUES (%s, %s)
                     """, [id, id_hewan])
             
-            messages.success(request, "Atraksi berhasil diperbarui!")
+            # Tampilkan pesan sukses umum hanya jika tidak ada pelatih yang dirotasi
+            if not long_serving_trainers:
+                messages.success(request, "Atraksi berhasil diperbarui!")
             return redirect('show_atraksi_management')
         
         except Exception as e:
