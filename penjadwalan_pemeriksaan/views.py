@@ -138,13 +138,15 @@ def tambah_jadwal_pemeriksaan(request):
 
         try:
             with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT MAX(freq_pemeriksaan_rutin)
-                    FROM sizopi.jadwal_pemeriksaan_kesehatan
-                    WHERE id_hewan = %s
-                """, [id_hewan])
-                freq_row = cursor.fetchone()
-                freq_value = freq_row[0] if freq_row and freq_row[0] is not None else 3
+                freq_value = request.session.pop(f"pending_freq_{id_hewan}", None)
+                if not freq_value:
+                    cursor.execute("""
+                        SELECT MAX(freq_pemeriksaan_rutin)
+                        FROM sizopi.jadwal_pemeriksaan_kesehatan
+                        WHERE id_hewan = %s
+                    """, [id_hewan])
+                    freq_row = cursor.fetchone()
+                    freq_value = freq_row[0] if freq_row and freq_row[0] is not None else 3
                 
                 cursor.execute("""
                     SELECT nama FROM sizopi.hewan WHERE id = %s
@@ -195,7 +197,8 @@ def edit_frekuensi_pemeriksaan(request):
                 """, [frekuensi_baru, id_hewan])
 
                 if cursor.rowcount == 0:
-                    messages.warning(request, "Tidak ada jadwal ditemukan untuk hewan ini.")
+                    request.session[f"pending_freq_{id_hewan}"] = frekuensi_baru
+                    messages.success(request, f"Frekuensi disimpan sementara: {frekuensi_baru} bulan. Akan diterapkan saat menambah jadwal.")
                 else:
                     messages.success(request, f"Frekuensi berhasil diperbarui menjadi {frekuensi_baru} bulan.")
 
