@@ -32,7 +32,7 @@
             <h2 class="text-xl font-bold text-white">Form Reservasi Wahana</h2>
         </div>
         
-        <form method="post" action="{% url 'add_reservasi_wahana' %}" class="p-6">
+        <form method="post" action="{% url 'add_reservasi_wahana' %}" class="p-6" id="reservasi-form">
             {% csrf_token %}
             
             <!-- Pilihan Wahana -->
@@ -66,6 +66,7 @@
                 <label for="jumlah_tiket" class="block text-sm font-medium text-gray-700 mb-2">Jumlah Tiket</label>
                 <input type="number" name="jumlah_tiket" id="jumlah_tiket" min="1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required>
                 <p id="ticket-availability" class="text-sm text-gray-500 mt-1"></p>
+                <p id="ticket-error" class="text-sm text-red-500 mt-1 hidden">Jumlah tiket melebihi kapasitas tersedia!</p>
             </div>
 
             <!-- Submit Button -->
@@ -73,7 +74,7 @@
                 <a href="{% url 'show_user_booking' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition">
                     Batal
                 </a>
-                <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                <button type="submit" id="submit-button" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
                     Buat Reservasi Wahana
                 </button>
             </div>
@@ -84,9 +85,11 @@
 <script>
     // Data wahana dari Django
     const wahanaData = {{ wahana_list|safe }};
+    let currentKapasitasTersisa = 0;
 
     function loadWahanaDetails() {
         const wahanaName = document.getElementById('nama_fasilitas').value;
+        const tanggalInput = document.getElementById('tanggal_kunjungan');
         
         if (!wahanaName) {
             document.getElementById('wahana-details').classList.add('hidden');
@@ -109,9 +112,17 @@
                     </div>
                     <div class="col-span-2">
                         <strong>Peraturan:</strong> ${wahana.peraturan || 'Tidak ada peraturan khusus'}
-                    </div>
-                </div>
-            `;
+                    </div>`;
+                    
+            // Tambahkan informasi jadwal jika ada
+            if (wahana.waktu_mulai && wahana.waktu_selesai) {
+                detailHTML += `
+                    <div class="col-span-2">
+                        <strong>Jam Operasional:</strong> ${wahana.waktu_mulai} - ${wahana.waktu_selesai}
+                    </div>`;
+            }
+            
+            detailHTML += `</div>`;
             
             contentDiv.innerHTML = detailHTML;
             detailsDiv.classList.remove('hidden');
@@ -119,33 +130,108 @@
             // Set max untuk input tiket
             document.getElementById('jumlah_tiket').max = wahana.kapasitas_max;
             document.getElementById('ticket-availability').textContent = `Maksimal ${wahana.kapasitas_max} tiket per reservasi`;
+            
+            // Jika tanggal sudah diisi, cek ketersediaan
+            if (tanggalInput.value) {
+                checkAvailability(wahanaName, tanggalInput.value);
+            }
+        }
+    }
+
+    // Fungsi untuk memeriksa ketersediaan
+    function checkAvailability(wahanaName, tanggal) {
+        if (wahanaName && tanggal) {
+            const availabilityText = document.getElementById('ticket-availability');
+            availabilityText.textContent = 'Mengecek ketersediaan...';
+            availabilityText.className = 'text-sm text-gray-500 mt-1';
+            
+            fetch(`{% url 'check_availability' %}?jenis=wahana&nama=${encodeURIComponent(wahanaName)}&tanggal=${encodeURIComponent(tanggal)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response error');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        availabilityText.textContent = 'Error mengecek ketersediaan';
+                        availabilityText.className = 'text-sm text-red-500 mt-1';
+                    } else {
+                        currentKapasitasTersisa = data.kapasitas_tersisa;
+                        
+                        if (data.kapasitas_tersisa <= 5) {
+                            availabilityText.textContent = `Tersedia: ${data.kapasitas_tersisa} tiket (dari ${data.kapasitas_max} total)`;
+                            availabilityText.className = 'text-sm text-red-500 font-medium mt-1';
+                            
+                            if (data.kapasitas_tersisa <= 0) {
+                                availabilityText.textContent = 'Tidak ada tiket tersedia untuk tanggal ini';
+                            }
+                        } else {
+                            availabilityText.textContent = `Tersedia: ${data.kapasitas_tersisa} tiket (dari ${data.kapasitas_max} total)`;
+                            availabilityText.className = 'text-sm text-green-500 font-medium mt-1';
+                        }
+                        
+                        // Update max input
+                        document.getElementById('jumlah_tiket').max = data.kapasitas_tersisa;
+                        validateTicketCount();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    availabilityText.textContent = 'Error mengecek ketersediaan';
+                    availabilityText.className = 'text-sm text-red-500 mt-1';
+                });
+        }
+    }
+
+    // Validasi jumlah tiket tidak melebihi kapasitas
+    function validateTicketCount() {
+        const ticketInput = document.getElementById('jumlah_tiket');
+        const ticketError = document.getElementById('ticket-error');
+        const submitButton = document.getElementById('submit-button');
+        
+        if (parseInt(ticketInput.value) > currentKapasitasTersisa) {
+            ticketError.classList.remove('hidden');
+            submitButton.disabled = true;
+            submitButton.classList.add('bg-gray-400');
+            submitButton.classList.remove('bg-green-500', 'hover:bg-green-600');
+            return false;
+        } else {
+            ticketError.classList.add('hidden');
+            submitButton.disabled = false;
+            submitButton.classList.remove('bg-gray-400');
+            submitButton.classList.add('bg-green-500', 'hover:bg-green-600');
+            return true;
         }
     }
 
     // Validasi tanggal ketika input berubah
     document.getElementById('tanggal_kunjungan').addEventListener('change', function() {
         const wahanaName = document.getElementById('nama_fasilitas').value;
-        const tanggal = this.value;
+        checkAvailability(wahanaName, this.value);
+    });
+
+    // Validasi jumlah tiket ketika input berubah
+    document.getElementById('jumlah_tiket').addEventListener('change', validateTicketCount);
+    document.getElementById('jumlah_tiket').addEventListener('input', validateTicketCount);
+
+    // Form validation sebelum submit
+    document.getElementById('reservasi-form').addEventListener('submit', function(event) {
+        const wahanaName = document.getElementById('nama_fasilitas').value;
+        const tanggal = document.getElementById('tanggal_kunjungan').value;
+        const jumlahTiket = parseInt(document.getElementById('jumlah_tiket').value);
         
-        if (wahanaName && tanggal) {
-            // Bisa tambahkan AJAX call untuk cek ketersediaan real-time jika diperlukan
-            fetch(`{% url 'check_availability' %}?jenis=wahana&nama=${wahanaName}&tanggal=${tanggal}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        document.getElementById('ticket-availability').textContent = 'Error mengecek ketersediaan';
-                    } else {
-                        document.getElementById('ticket-availability').textContent = 
-                            `Tersedia: ${data.kapasitas_tersisa} tiket (dari ${data.kapasitas_max} total)`;
-                        
-                        // Update max input
-                        document.getElementById('jumlah_tiket').max = data.kapasitas_tersisa;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('ticket-availability').textContent = 'Error mengecek ketersediaan';
-                });
+        if (!wahanaName || !tanggal || isNaN(jumlahTiket) || jumlahTiket < 1) {
+            event.preventDefault();
+            alert('Mohon lengkapi semua field dengan benar');
+            return false;
+        }
+        
+        if (jumlahTiket > currentKapasitasTersisa) {
+            event.preventDefault();
+            document.getElementById('ticket-error').classList.remove('hidden');
+            alert(`Jumlah tiket melebihi kapasitas tersedia (${currentKapasitasTersisa} tiket)`);
+            return false;
         }
     });
 
