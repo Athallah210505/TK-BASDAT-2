@@ -4,6 +4,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime
 import re
+from utils.decorators import role_required
 
 def dictfetchall(cursor):
     """Return all rows from a cursor as a dict"""
@@ -12,17 +13,15 @@ def dictfetchall(cursor):
         dict(zip(columns, row))
         for row in cursor.fetchall()
     ]
-
+@role_required('staff')
 def show_atraksi_management(request):
     """View for displaying atraksi management page"""
     try:
         with connection.cursor() as cursor:
-            # First determine if sizopi schema exists
             cursor.execute("""
                 SELECT schema_name FROM information_schema.schemata 
                 WHERE schema_name = 'sizopi'
             """)
-            # Get all attractions with related information
             cursor.execute("""
                 SELECT a.nama_atraksi as id, a.nama_atraksi as nama, a.lokasi, 
                        f.kapasitas_max as kapasitas, TO_CHAR(f.jadwal, 'HH24:MI') as jadwal,
@@ -65,6 +64,7 @@ def show_atraksi_management(request):
         messages.error(request, f"Terjadi kesalahan: {str(e)}")
         return render(request, 'atraksi_management.html', {'error': str(e)})
 
+@role_required('staff')
 def add_atraksi(request):
     """View for adding a new attraction"""
     if request.method == 'POST':
@@ -113,7 +113,7 @@ def add_atraksi(request):
         except Exception as e:
             messages.error(request, f"Gagal menambahkan atraksi: {str(e)}")
             return redirect('show_atraksi_management')
-
+@role_required('staff')
 def get_atraksi_data(request, id):
     """View to get attraction data for editing via AJAX"""
     try:
@@ -126,10 +126,12 @@ def get_atraksi_data(request, id):
                 JOIN sizopi.fasilitas f ON a.nama_atraksi = f.nama
                 WHERE a.nama_atraksi = %s
             """, [id])
-            attraction = dictfetchall(cursor)[0] if cursor.rowcount > 0 else None
             
-            if not attraction:
+            results = dictfetchall(cursor)
+            if not results:
                 return JsonResponse({'error': 'Atraksi tidak ditemukan'}, status=404)
+            
+            attraction = results[0]
             
             # Get selected trainers
             cursor.execute("""
@@ -175,14 +177,20 @@ def get_atraksi_data(request, id):
         return JsonResponse(data)
     
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"ERROR in get_atraksi_data: {error_details}")
+        return JsonResponse({'error': str(e), 'details': error_details}, status=500)
+    
+    
+    
+@role_required('staff')
 def edit_atraksi(request, id):
     """View for editing an attraction"""
     if request.method == 'POST':
         lokasi = request.POST.get('lokasi')
         kapasitas = request.POST.get('kapasitas')
-        jadwal = request.POST.get('jadwal')  # Format: HH:MM
+        jadwal = request.POST.get('jadwal')  
         pelatih_ids = request.POST.getlist('pelatih')
         hewan_ids = request.POST.getlist('hewan')
         
@@ -200,77 +208,110 @@ def edit_atraksi(request, id):
                 # Convert time string to timestamp with preserved date
                 jadwal_timestamp = f'{date_str} {jadwal}:00'
                 
-                # PERBAIKAN: Cek pelatih yang sudah bertugas lebih dari 3 bulan (90 hari)
+                # Langkah 1: Temukan pelatih yang sudah bertugas >90 hari
                 cursor.execute("""
                     SELECT jp.username_lh, 
                            p.nama_depan || ' ' || p.nama_belakang AS nama_pelatih,
-                           MIN(jp.tgl_penugasan) AS tanggal_mulai,
                            EXTRACT(DAY FROM (CURRENT_DATE - MIN(jp.tgl_penugasan))) AS durasi_hari
                     FROM sizopi.jadwal_penugasan jp
                     JOIN sizopi.pelatih_hewan ph ON jp.username_lh = ph.username_lh
                     JOIN sizopi.pengguna p ON ph.username_lh = p.username
                     WHERE jp.nama_atraksi = %s
-                    GROUP BY jp.username_lh, p.nama_depan, p.nama_belakang
+                    GROUP BY jp.username_lh, p.nama_depan, p.nama_belakang, jp.tgl_penugasan
                     HAVING EXTRACT(DAY FROM (CURRENT_DATE - MIN(jp.tgl_penugasan))) >= 90
                 """, [id])
                 
                 long_serving_trainers = dictfetchall(cursor)
-                rotated_trainers = []
+                rotated_trainer_ids = [t['username_lh'] for t in long_serving_trainers]
                 
-                # Proses pelatih yang perlu dirotasi
-                for trainer in long_serving_trainers:
-                    username_lh = trainer['username_lh']
-                    nama_pelatih = trainer['nama_pelatih']
-                    rotated_trainers.append(username_lh)
-                    
-                    # Tampilkan pesan rotasi sesuai format yang diminta
-                    messages.success(request, f"SUKSES: Pelatih \"{nama_pelatih}\" telah bertugas lebih dari 3 bulan di atraksi \"{id}\" dan akan diganti.")
+                # Langkah 2: HAPUS pelatih tersebut dari list pelatih yang dipilih
+                pelatih_ids = [pid for pid in pelatih_ids if pid not in rotated_trainer_ids]
                 
-                # Hapus pelatih yang dirotasi dari daftar pelatih yang akan ditugaskan
-                pelatih_ids = [p for p in pelatih_ids if p not in rotated_trainers]
-                # AKHIR PERBAIKAN
-                
-                # Update atraksi table
+                # Langkah 3: Update atraksi untuk memicu trigger
                 cursor.execute("""
                     UPDATE sizopi.atraksi
                     SET lokasi = %s
                     WHERE nama_atraksi = %s
                 """, [lokasi, id])
                 
-                # Update fasilitas table
+                # Langkah 4: Update fasilitas
                 cursor.execute("""
                     UPDATE sizopi.fasilitas
                     SET kapasitas_max = %s, jadwal = %s
                     WHERE nama = %s
                 """, [kapasitas, jadwal_timestamp, id])
                 
-                # Delete existing jadwal_penugasan entries
+                # Langkah 5: Periksa pelatih yang ditambahkan oleh trigger
                 cursor.execute("""
-                    DELETE FROM sizopi.jadwal_penugasan
-                    WHERE nama_atraksi = %s
+                    SELECT jp.username_lh, p.nama_depan || ' ' || p.nama_belakang AS nama_pelatih
+                    FROM sizopi.jadwal_penugasan jp
+                    JOIN sizopi.pelatih_hewan ph ON jp.username_lh = ph.username_lh
+                    JOIN sizopi.pengguna p ON ph.username_lh = p.username
+                    WHERE jp.nama_atraksi = %s
                 """, [id])
                 
-                # Insert updated jadwal_penugasan entries
+                current_trainers = dictfetchall(cursor)
+                current_trainer_ids = [t['username_lh'] for t in current_trainers]
+                
+                # Langkah 6: Temukan pelatih yang ditambahkan oleh trigger (tidak ada di seleksi sebelumnya)
+                new_trainer_ids = []
+                for trainer_id in current_trainer_ids:
+                    if trainer_id not in pelatih_ids and trainer_id not in rotated_trainer_ids:
+                        new_trainer_ids.append(trainer_id)
+                        pelatih_ids.append(trainer_id)  # Tambahkan ke list yang akan dipertahankan
+                
+                # Langkah 7: Tampilkan pesan untuk pelatih yang dirotasi
+                for trainer in long_serving_trainers:
+                    username_lh = trainer['username_lh']
+                    nama_pelatih = trainer['nama_pelatih']
+                    messages.success(request, f"Pelatih \"{nama_pelatih}\" telah bertugas lebih dari 3 bulan di atraksi \"{id}\" dan akan diganti.")
+                    
+                # Langkah 8: Tampilkan pesan untuk pelatih pengganti
+                for trainer_id in new_trainer_ids:
+                    # Cari nama pelatih
+                    for trainer in current_trainers:
+                        if trainer['username_lh'] == trainer_id:
+                            messages.info(request, f"Pelatih \"{trainer['nama_pelatih']}\" telah ditugaskan sebagai pengganti.")
+                            break
+                
+                # Langkah 9: Hapus pelatih yang tidak dipilih user dan bukan pengganti dari trigger
+                if pelatih_ids:
+                    cursor.execute("""
+                        DELETE FROM sizopi.jadwal_penugasan
+                        WHERE nama_atraksi = %s AND username_lh NOT IN %s
+                    """, [id, tuple(pelatih_ids) if len(pelatih_ids) > 1 else f"('{pelatih_ids[0]}')"])
+                else:
+                    cursor.execute("""
+                        DELETE FROM sizopi.jadwal_penugasan
+                        WHERE nama_atraksi = %s
+                    """, [id])
+                
+                # Langkah 10: Tambahkan pelatih baru yang dipilih user jika belum ada
                 for username_lh in pelatih_ids:
                     cursor.execute("""
-                        INSERT INTO sizopi.jadwal_penugasan (username_lh, tgl_penugasan, nama_atraksi)
-                        VALUES (%s, %s, %s)
-                    """, [username_lh, jadwal_timestamp, id])
+                        SELECT 1 FROM sizopi.jadwal_penugasan
+                        WHERE username_lh = %s AND nama_atraksi = %s
+                    """, [username_lh, id])
+                    
+                    if cursor.fetchone() is None:
+                        cursor.execute("""
+                            INSERT INTO sizopi.jadwal_penugasan (username_lh, tgl_penugasan, nama_atraksi)
+                            VALUES (%s, %s, %s)
+                        """, [username_lh, datetime.now(), id])
                 
-                # Delete existing berpartisipasi entries
+                # Langkah 11: Update hewan yang berpartisipasi
                 cursor.execute("""
                     DELETE FROM sizopi.berpartisipasi
                     WHERE nama_fasilitas = %s
                 """, [id])
                 
-                # Insert updated berpartisipasi entries
                 for id_hewan in hewan_ids:
                     cursor.execute("""
                         INSERT INTO sizopi.berpartisipasi (nama_fasilitas, id_hewan)
                         VALUES (%s, %s)
                     """, [id, id_hewan])
             
-            # Tampilkan pesan sukses umum hanya jika tidak ada pelatih yang dirotasi
+            # Tampilkan pesan sukses jika tidak ada pelatih yang dirotasi
             if not long_serving_trainers:
                 messages.success(request, "Atraksi berhasil diperbarui!")
             return redirect('show_atraksi_management')
@@ -278,13 +319,15 @@ def edit_atraksi(request, id):
         except Exception as e:
             messages.error(request, f"Gagal memperbarui atraksi: {str(e)}")
             return redirect('show_atraksi_management')
-
+        
+        
+@role_required('staff')
 def delete_atraksi(request, id):
     """View for deleting an attraction"""
     if request.method == 'POST':
         try:
             with connection.cursor() as cursor:
-                # Due to ON DELETE CASCADE, we only need to delete from fasilitas
+              
                 cursor.execute("""
                     DELETE FROM sizopi.fasilitas
                     WHERE nama = %s
@@ -296,12 +339,13 @@ def delete_atraksi(request, id):
     
     return redirect('show_atraksi_management')
 
-# Wahana Management Views
+
+@role_required('staff')
 def show_wahana_management(request):
     """Show the wahana management page with list of wahanas"""
     try:
         with connection.cursor() as cursor:
-            # Get wahana data with capacity and schedule from fasilitas
+            
             cursor.execute("""
                 SELECT w.nama_wahana, w.peraturan, f.kapasitas_max as kapasitas, 
                        TO_CHAR(f.jadwal, 'HH24:MI') as jadwal
@@ -310,15 +354,15 @@ def show_wahana_management(request):
             """)
             wahana_list = dictfetchall(cursor)
             
-            # Format peraturan for display
+           
             for wahana in wahana_list:
                 if wahana.get('peraturan'):
-                    # Parse peraturan into list items
+                   
                     if '\n' in wahana['peraturan']:
-                        # Split by newlines
+                        
                         wahana['peraturan_list'] = [rule.strip() for rule in wahana['peraturan'].split('\n') if rule.strip()]
                     else:
-                        # Single rule
+                       
                         wahana['peraturan_list'] = [wahana['peraturan']]
             
         context = {
@@ -333,6 +377,8 @@ def show_wahana_management(request):
         }
         return render(request, 'wahana_management.html', context)
 
+
+@role_required('staff')
 def add_wahana(request):
     """Add a new wahana to the database"""
     if request.method == 'POST':
@@ -341,19 +387,15 @@ def add_wahana(request):
             kapasitas = request.POST.get('kapasitas', 20)
             jadwal = request.POST.get('jadwal', '10:00')
             
-            # Collect all peraturan entries
             peraturan_list = []
             for key in sorted([k for k in request.POST.keys() if k.startswith('peraturan_')]):
                 peraturan_value = request.POST.get(key).strip()
-                if peraturan_value:  # Only add non-empty values
+                if peraturan_value:  
                     peraturan_list.append(peraturan_value)
             
-            # Join peraturan with newlines (without numbering)
             peraturan_text = '\n'.join(peraturan_list)
             
-            # Start a transaction
             with connection.cursor() as cursor:
-                # First insert into fasilitas
                 current_date = datetime.now().strftime('%Y-%m-%d')
                 jadwal_timestamp = f'{current_date} {jadwal}:00'
                 
@@ -362,7 +404,6 @@ def add_wahana(request):
                     VALUES (%s, %s, %s)
                 """, [nama_wahana, jadwal_timestamp, kapasitas])
                 
-                # Then insert into wahana
                 cursor.execute("""
                     INSERT INTO sizopi.wahana (nama_wahana, peraturan)
                     VALUES (%s, %s)
@@ -374,11 +415,12 @@ def add_wahana(request):
             
     return redirect('show_wahana_management')
 
+
+@role_required('staff')
 def get_wahana_data(request, nama_wahana):
     """Get data for a specific wahana for AJAX requests"""
     try:
         with connection.cursor() as cursor:
-            # Get wahana details with capacity and schedule
             cursor.execute("""
                 SELECT w.nama_wahana, w.peraturan, f.kapasitas_max as kapasitas, 
                        TO_CHAR(f.jadwal, 'HH24:MI') as jadwal
@@ -393,13 +435,10 @@ def get_wahana_data(request, nama_wahana):
             
             wahana = results[0]
             
-            # Process peraturan into a list
             peraturan_list = []
             if wahana.get('peraturan'):
-                # Remove any existing numbering patterns like "1. " at the beginning of lines
                 clean_peraturan = re.sub(r'^\d+\.\s*', '', wahana['peraturan'], flags=re.MULTILINE)
                 
-                # Split by newlines
                 peraturan_list = [line.strip() for line in clean_peraturan.split('\n') if line.strip()]
                 
             wahana['peraturan_list'] = peraturan_list
@@ -408,6 +447,7 @@ def get_wahana_data(request, nama_wahana):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@role_required('staff')
 def edit_wahana(request, nama_wahana):
     """Edit an existing wahana"""
     if request.method == 'POST':
@@ -419,14 +459,12 @@ def edit_wahana(request, nama_wahana):
             peraturan_list = []
             for key in sorted([k for k in request.POST.keys() if k.startswith('edit_peraturan_')]):
                 peraturan_value = request.POST.get(key).strip()
-                if peraturan_value:  # Only add non-empty values
+                if peraturan_value:  
                     peraturan_list.append(peraturan_value)
             
-            # Join peraturan with newlines (without numbering)
             peraturan_text = '\n'.join(peraturan_list)
             
             with connection.cursor() as cursor:
-                # Get current date from existing record
                 cursor.execute("""
                     SELECT TO_CHAR(jadwal, 'YYYY-MM-DD') as date
                     FROM sizopi.fasilitas
@@ -435,17 +473,14 @@ def edit_wahana(request, nama_wahana):
                 result = cursor.fetchone()
                 date_str = result[0] if result else datetime.now().strftime('%Y-%m-%d')
                 
-                # Convert time string to timestamp with preserved date
                 jadwal_timestamp = f'{date_str} {jadwal}:00'
                 
-                # Update fasilitas table with new capacity and schedule
                 cursor.execute("""
                     UPDATE sizopi.fasilitas
                     SET kapasitas_max = %s, jadwal = %s
                     WHERE nama = %s
                 """, [kapasitas, jadwal_timestamp, nama_wahana])
                 
-                # Update wahana table with new peraturan
                 cursor.execute("""
                     UPDATE sizopi.wahana
                     SET peraturan = %s
@@ -457,18 +492,18 @@ def edit_wahana(request, nama_wahana):
             messages.error(request, f"Gagal memperbarui wahana: {str(e)}")
             
     return redirect('show_wahana_management')
+
+@role_required('staff')
 def delete_wahana(request, nama_wahana):
     """Delete a wahana"""
     if request.method == 'POST':
         try:
             with connection.cursor() as cursor:
-                # Delete from wahana first (make sure constraints are handled properly)
                 cursor.execute("""
                     DELETE FROM sizopi.wahana
                     WHERE nama_wahana = %s
                 """, [nama_wahana])
                 
-                # Then delete from fasilitas
                 cursor.execute("""
                     DELETE FROM sizopi.fasilitas
                     WHERE nama = %s

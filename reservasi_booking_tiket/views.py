@@ -335,13 +335,16 @@ def show_user_add_booking(request):
             
             with connection.cursor() as cursor:
                 try:
-                    # Simpan reservasi ke tabel RESERVASI 
-                    # TIDAK perlu memeriksa kapasitas di sini karena sudah ditangani oleh trigger
                     cursor.execute("""
                         INSERT INTO sizopi.RESERVASI (username_p, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, status)
                         VALUES (%s, %s, %s, %s, %s)
                     """, [username, nama_fasilitas, tanggal_kunjungan, jumlah_tiket, 'Terjadwal'])
-                    
+                    print("DEBUG - Inserted reservasi for", username, nama_fasilitas, tanggal_kunjungan)
+                    # Cek apakah benar-benar masuk
+                    cursor.execute("""
+                        SELECT * FROM sizopi.RESERVASI WHERE username_p=%s AND nama_fasilitas=%s AND tanggal_kunjungan=%s
+                    """, [username, nama_fasilitas, tanggal_kunjungan])
+                    print("DEBUG - Data after insert:", cursor.fetchall())
                     messages.success(request, f"Reservasi {jenis_reservasi} berhasil dibuat!")
                     return redirect('show_user_booking')
                     

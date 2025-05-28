@@ -16,16 +16,16 @@
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-8">
         <!-- Common links for all roles -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="{% url 'pengunjung_dashboard' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Dashboard
         </a>
         
         <!-- Visitor-specific links -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href='#' class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Informasi Kebun Binatang
         </a>
 
-        <a href="{% url 'show_user_booking' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        <a href="{% url 'show_user_booking' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Reservasi tiket
         </a>
         
