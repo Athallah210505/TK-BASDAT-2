@@ -6,19 +6,18 @@
 
     <!-- Header Section -->
     <div class="mb-10 mt-20">
-        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Jadwal Pemeriksaan Hewan</h1>
-        <p class="text-center text-gray-500 max-w-2xl mx-auto">Informasi jadwal pemeriksaan rutin dan tindak lanjut untuk hewan peliharaan</p>
+        <h1 class="text-4xl font-bold text-center text-green-500 mb-2 animate-float">Daftar Hewan</h1>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Pilih hewan untuk melihat dan mengatur jadwal pemeriksaan kesehatannya.</p>
     </div>
 
-    <!-- Schedule Table -->
+    <!-- Table: Hewan -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hewan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Pemeriksaan Selanjutnya</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frekuensi Pemeriksaan Rutin</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frekuensi Pemeriksaan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -36,19 +35,16 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ item.tgl_selanjutnya|date:"d M Y" }}</div>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ item.frekuensi }} Bulan Sekali
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ item.frekuensi }} Bulan Sekali</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'show_jadwal_satu_hewan' %}?id={{ item.id }}" class="text-green-500 hover:text-red-700 font-medium">Lihat</a>
+                            <a href="{% url 'show_jadwal_satu_hewan' %}?id={{ item.id }}" class="text-green-600 hover:text-green-800 font-medium">Lihat Jadwal</a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center px-6 py-4 text-gray-500">Belum ada jadwal pemeriksaan yang tersedia.</td>
+                        <td colspan="3" class="text-center px-6 py-4 text-gray-500">Belum ada data hewan tersedia.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
