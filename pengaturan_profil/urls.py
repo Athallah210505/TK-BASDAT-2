@@ -13,4 +13,7 @@ urlpatterns = [
     path('profile/staff/update/', views.update_staff_profile, name='update_staff_profile'),
     
     path('profile/password/', views.password_change, name='password_change'),
+    path('pengaturan-profil_dh/', views.pengaturan_profil_dh, name='pengaturan_profil_dh'),
+    path('ubah-password/', views.ubah_password, name='ubah_password'),
+
 ]
