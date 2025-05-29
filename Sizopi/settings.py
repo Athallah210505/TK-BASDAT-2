@@ -68,6 +68,10 @@ MIDDLEWARE = [
     'utils.fake_auth_middleware.FakeAuthenticationMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://tk-basdat-2-production.up.railway.app",
+]
+
 ROOT_URLCONF = 'Sizopi.urls'
 
 import os
