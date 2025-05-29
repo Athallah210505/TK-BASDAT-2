@@ -16,15 +16,18 @@
 
       <!-- Navigation Links - Desktop -->
       <div class="hidden md:flex items-center space-x-6">
-        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
+        <a href="{% url 'penjaga_hewan_dashboard' %}" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
           Dashboard
         </a>
-        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
+        <a href="{% url 'show_pemberian_pakan' %}" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
           Catatan Perawatan Hewan
         </a>
-        <a href="#" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
-          Profile
+        <a href="{% url 'show_pemberian_pakan' %}" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
+          Beri pakan
         </a>
+         <a href="{% url 'staff_profile' %}" class="nav-link text-gray-700 hover:text-green-600 px-2 py-1 rounded-md text-sm font-medium transition-colors duration-200">
+          Profile
+        </a> 
         <a href="{% url 'logout' %}" class="bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm transition-all duration-200 shadow-sm">
           Logout
         </a>
@@ -45,15 +48,18 @@
   <!-- Mobile menu, hidden by default -->
   <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100 shadow-sm">
     <div class="py-2 space-y-1">
-      <a href="#" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
+      <a href="{% url 'penjaga_hewan_dashboard' %}" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
         Dashboard
       </a>
-      <a href="#" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
+      <a href="{% url 'show_pemberian_pakan' %}" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
         Catatan Perawatan Hewan
       </a>
-      <a href="#" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
-        Profile
+      <a href="{% url 'show_pemberian_pakan' %}" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
+        Beri pakan
       </a>
+       <a href="{% url 'staff_profile' %}" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-150">
+        Profile
+      </a> 
       <div class="px-4 py-2">
         <a href="{% url 'logout' %}" class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm text-center transition duration-200 shadow-sm">
           Logout

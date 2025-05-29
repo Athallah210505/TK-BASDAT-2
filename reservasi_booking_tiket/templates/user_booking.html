@@ -4,11 +4,35 @@
 {% include 'navbar_pengunjung.html' %}
 
 <div class="container mx-auto px-4 py-8 max-w-5xl mt-20">
-    <!-- Header -->
-    <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket Atraksi</h1>
+    <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket</h1>
     <p class="text-gray-600 mb-6">Lihat dan kelola reservasi tiket Anda di Taman Safari</p>
 
-    <!-- Daftar Reservasi Section -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %} p-4 rounded-md mb-2">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        <div class="bg-gray-800 p-4 flex items-center">
+            <span class="text-green-400 mr-2"><i class="fas fa-user"></i></span>
+            <h2 class="text-xl font-bold text-white">Informasi Pengunjung</h2>
+        </div>
+        <div class="p-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+            <div>
+                <p class="text-sm text-gray-500">Username</p>
+                <p class="font-bold text-lg">{{ username|default:"Pengunjung" }}</p>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
         <div class="bg-gray-800 p-4 flex items-center">
             <span class="text-green-400 mr-2"><i class="fas fa-list"></i></span>
@@ -18,101 +42,184 @@
             <p class="text-gray-600">Lihat dan kelola reservasi tiket Anda</p>
         </div>
 
-        <div class="p-6">
-            <!-- Example of reservation card - first item -->
-            <div class="mb-6 pb-6 border-b border-gray-200">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-xl font-semibold">Pertunjukan lumba-lumba</h3>
-                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Terjadwal</span>
-                </div>
-                <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <div class="text-gray-500 mb-1">Lokasi:</div>
-                        <div>Area Akuatik</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-500 mb-1">Jam:</div>
-                        <div>10:00</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-500 mb-1">Tanggal:</div>
-                        <div>12 Mei 2025</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-500 mb-1">Jumlah tiket:</div>
-                        <div>10</div>
-                    </div>
-                </div>
-                <div class="flex justify-end mt-4 space-x-3">
-                    <a href="{% url 'show_user_edit_booking' %}?id=1" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
-                        Edit
-                    </a>
-                    <button type="button" onclick="showDeleteModal(1, 'Pertunjukan lumba-lumba')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                        Batalkan Reservasi
-                    </button>
-                </div>
-            </div>
-
-            <!-- Example of reservation card - second item -->
-            <div class="mb-6 pb-6 border-b border-gray-200 border-b-0">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-xl font-semibold">Pertunjukan Gajah</h3>
-                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Terjadwal</span>
-                </div>
-                <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <div class="text-gray-500 mb-1">Lokasi:</div>
-                        <div>Arena gajah</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-500 mb-1">Jam:</div>
-                        <div>13:00</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-500 mb-1">Tanggal:</div>
-                        <div>15 Mei 2025</div>
-                    </div>
-                    <div>
-                        <div class="text-gray-500 mb-1">Jumlah tiket:</div>
-                        <div>5</div>
-                    </div>
-                </div>
-                <div class="flex justify-end mt-4 space-x-3">
-                    <a href="{% url 'show_user_edit_booking' %}?id=2" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
-                        Edit
-                    </a>
-                    <button type="button" onclick="showDeleteModal(2, 'Pertunjukan Gajah')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                        Batalkan Reservasi
-                    </button>
-                </div>
-            </div>
+        <div class="border-b border-gray-200">
+            <nav class="flex" aria-label="Tabs">
+                <button id="btn-tab-atraksi" class="tab-btn border-green-500 text-green-600 whitespace-nowrap py-4 px-8 border-b-2 font-medium">
+                    Atraksi
+                </button>
+                <button id="btn-tab-wahana" class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-8 border-b-2 font-medium">
+                    Wahana
+                </button>
+            </nav>
         </div>
 
-        <!-- Add New Reservation Button -->
+        <div id="tab-content-atraksi" class="tab-content p-6">
+            {% if reservasi_atraksi %}
+                {% for reservasi in reservasi_atraksi %}
+                <div class="mb-6 pb-6 border-b border-gray-200 {% if forloop.last %}border-b-0{% endif %}">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold">{{ reservasi.nama_atraksi }}</h3>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if reservasi.status == 'Terjadwal' %} bg-green-100 text-green-800 
+                            {% elif reservasi.status == 'Dibatalkan' %} bg-red-100 text-red-800 
+                            {% else %} bg-yellow-100 text-yellow-800 {% endif %}">
+                            {{ reservasi.status }}
+                        </span>
+                    </div>
+                    <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-gray-500 mb-1">Lokasi:</div>
+                            <div>{{ reservasi.lokasi|default:'-' }}</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 mb-1">Tanggal:</div>
+                            <div>{{ reservasi.tanggal_kunjungan|date:"d F Y" }}</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 mb-1">Jumlah tiket:</div>
+                            <div>{{ reservasi.jumlah_tiket }}</div>
+                        </div>
+                        <!-- Tambahkan informasi jadwal -->
+                        <div>
+                            <div class="text-gray-500 mb-1">Jam Show:</div>
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                </svg>
+                                {% if reservasi.jadwal %}
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ reservasi.jadwal|date:"H:i" }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-500">Tidak ditentukan</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 mb-1">Dipesan oleh:</div>
+                            <div>{{ reservasi.username_p|default:username }}</div>
+                        </div>
+                        <!-- Bagian ketersediaan dihapus -->
+                    </div>
+                    {% if reservasi.status == 'Terjadwal' %}
+                    <div class="flex justify-end mt-4 space-x-3">
+                        <a href="{% url 'show_user_edit_booking' %}?jenis=atraksi&nama={{ reservasi.nama_atraksi|urlencode }}&tanggal={{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                            Edit
+                        </a>
+                        <button type="button" onclick="showCancelModal('atraksi', '{{ reservasi.nama_atraksi|escapejs }}', '{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                            Batalkan Reservasi
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-10">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada reservasi atraksi</h3>
+                    <p class="mt-1 text-sm text-gray-500">Anda belum memiliki reservasi atraksi yang aktif.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div id="tab-content-wahana" class="tab-content p-6 hidden">
+            {% if reservasi_wahana %}
+                {% for reservasi in reservasi_wahana %}
+                <div class="mb-6 pb-6 border-b border-gray-200 {% if forloop.last %}border-b-0{% endif %}">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-semibold">{{ reservasi.nama_wahana }}</h3>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if reservasi.status == 'Terjadwal' %} bg-green-100 text-green-800 
+                            {% elif reservasi.status == 'Dibatalkan' %} bg-red-100 text-red-800 
+                            {% else %} bg-yellow-100 text-yellow-800 {% endif %}">
+                            {{ reservasi.status }}
+                        </span>
+                    </div>
+                    <div class="text-gray-500 uppercase text-xs mb-4">DETAIL RESERVASI</div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-gray-500 mb-1">Peraturan:</div>
+                            <div>{{ reservasi.peraturan|default:'-' }}</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 mb-1">Tanggal:</div>
+                            <div>{{ reservasi.tanggal_kunjungan|date:"d F Y" }}</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 mb-1">Jumlah tiket:</div>
+                            <div>{{ reservasi.jumlah_tiket }}</div>
+                        </div>
+                        <!-- Tambahkan informasi jadwal -->
+                        <div>
+                            <div class="text-gray-500 mb-1">Jam Operasi:</div>
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                </svg>
+                                {% if reservasi.jadwal %}
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ reservasi.jadwal|date:"H:i" }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-500">Sepanjang hari</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 mb-1">Dipesan oleh:</div>
+                            <div>{{ reservasi.username_p|default:username }}</div>
+                        </div>
+                        <!-- Bagian ketersediaan dihapus -->
+                    </div>
+                    {% if reservasi.status == 'Terjadwal' %}
+                    <div class="flex justify-end mt-4 space-x-3">
+                        <a href="{% url 'show_user_edit_booking' %}?jenis=wahana&nama={{ reservasi.nama_wahana|urlencode }}&tanggal={{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}" class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition">
+                            Edit
+                        </a>
+                        <button type="button" onclick="showCancelModal('wahana', '{{ reservasi.nama_wahana|escapejs }}', '{{ reservasi.tanggal_kunjungan|date:'Y-m-d' }}')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                            Batalkan Reservasi
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-10">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada reservasi wahana</h3>
+                    <p class="mt-1 text-sm text-gray-500">Anda belum memiliki reservasi wahana yang aktif.</p>
+                </div>
+            {% endif %}
+        </div>
+
         <div class="p-6 bg-gray-50 border-t border-gray-200">
-            <a href="{% url 'show_user_add_booking' %}" class="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+            <a id="add-new-button" href="{% url 'show_user_add_booking' %}" class="inline-flex items-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
                 <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                Tambah Reservasi Baru
+                <span id="add-new-button-text">Tambah Atraksi Baru</span>
             </a>
         </div>
     </div>
     
-    <!-- Cancel Confirmation Modal -->
     <div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 mx-4">
             <h3 class="text-2xl font-bold mb-2 text-center">BATALKAN <span class="text-green-600">RESERVASI</span></h3>
             <p class="text-gray-600 mb-8 text-center text-lg">Apakah anda yakin ingin membatalkan <span id="reservationName" class="bg-green-100 px-2 py-1 rounded">reservasi</span> ini?</p>
             <div class="flex justify-center gap-4">
-                <button id="cancelButton" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
+                <button id="closeModalButton" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
                     [TIDAK]
                 </button>
-                <form id="deleteForm" method="post" action="{% url 'show_user_booking' %}">
+                <form id="cancelForm" method="post" action="{% url 'show_user_edit_booking' %}">
                     {% csrf_token %}
-                    <input type="hidden" id="deleteId" name="cancel_id" value="">
+                    <input type="hidden" id="cancelName" name="nama_fasilitas" value="">
+                    <input type="hidden" id="cancelTanggal" name="tanggal_kunjungan" value="">
+                    <input type="hidden" name="action" value="cancel">
                     <button type="submit" class="px-6 py-2 text-red-600 font-bold rounded-lg hover:bg-red-50 transition">
                         [YA]
                     </button>
@@ -123,24 +230,83 @@
 </div>
 
 <script>
-    function showDeleteModal(id, name) {
-        // Set the reservation ID to delete
-        document.getElementById('deleteId').value = id;
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Document loaded");
+        
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        // PENAMBAHAN: Ambil elemen tombol tambah baru
+        const addNewButton = document.getElementById('add-new-button');
+        const addNewButtonText = document.getElementById('add-new-button-text');
+        
+        console.log("Tab buttons found:", tabButtons.length);
+        console.log("Tab contents found:", tabContents.length);
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                console.log("Tab clicked:", this.id);
+                
+                // Remove active class from all tab buttons
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-green-500', 'text-green-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                
+                // Add active class to clicked tab button
+                this.classList.remove('border-transparent', 'text-gray-500');
+                this.classList.add('border-green-500', 'text-green-600');
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Show the corresponding tab content
+                const tabId = this.id.replace('btn-tab-', 'tab-content-');
+                console.log("Showing tab content:", tabId);
+                document.getElementById(tabId).classList.remove('hidden');
+
+                // --- PENAMBAHAN: LOGIKA UNTUK MENGUBAH TOMBOL ---
+                // Cek ID tombol tab yang diklik untuk menentukan teks dan link
+                if (this.id === 'btn-tab-atraksi') {
+                    addNewButtonText.textContent = 'Tambah Atraksi Baru';
+                    addNewButton.href = "{% url 'show_user_add_booking' %}";
+                } else if (this.id === 'btn-tab-wahana') {
+                    addNewButtonText.textContent = 'Tambah Wahana Baru';
+                    addNewButton.href = "{% url 'add_reservasi_wahana' %}";
+                }
+                // --- AKHIR PENAMBAHAN ---
+            });
+        });
+    });
+
+    // Modal functionality
+    const modal = document.getElementById('cancelModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+
+    function showCancelModal(type, name, tanggal) {
+        console.log("Showing cancel modal for:", type, name, tanggal);
+        
+        // Set the form values
+        document.getElementById('cancelName').value = name;
+        document.getElementById('cancelTanggal').value = tanggal;
         
         // Set the reservation name in the modal
         document.getElementById('reservationName').textContent = name;
         
         // Show the modal
-        document.getElementById('cancelModal').classList.remove('hidden');
+        modal.classList.remove('hidden');
     }
     
-    // Add event listener to the cancel button
-    document.getElementById('cancelButton').addEventListener('click', function() {
-        document.getElementById('cancelModal').classList.add('hidden');
+    // Add event listener to the "TIDAK" button
+    closeModalButton.addEventListener('click', function() {
+        modal.classList.add('hidden');
     });
     
     // Close modal when clicking outside
-    document.getElementById('cancelModal').addEventListener('click', function(e) {
+    modal.addEventListener('click', function(e) {
+        // Cek jika yang diklik adalah area latar belakang modal
         if (e.target === this) {
             this.classList.add('hidden');
         }

@@ -97,7 +97,6 @@ def add_feeding_schedule(request, id_hewan):
     return redirect('show_pemberian_pakan', id_hewan=id_hewan)
 
 @role_required('penjaga_hewan')
-@role_required('penjaga_hewan')
 def update_feeding_schedule(request, id_hewan, jadwal):
     """Update pakan dari form modal"""
     if request.method == 'POST':

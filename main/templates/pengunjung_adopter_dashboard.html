@@ -1,7 +1,7 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
 
 {% block content %}
-{% include 'navbar_pengunjung_adopter.html'%}
+{% include 'navbar_pengunjung_adopter.html' %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,19 +30,17 @@
                 <p class="text-sm text-gray-600">Welcome to the SIZOPI management system for Taman Safari.</p>
             </div>
             <div class="flex items-center">
-                <span class="text-sm mr-2"></span>
-                <div class="relative inline-block text-left">
-                </div>
+                <span class="text-sm mr-2">Halo, {{ nama_lengkap }}</span>
+                <div class="relative inline-block text-left"></div>
             </div>
         </header>
 
         <!-- User Profile Card -->
         <div class="bg-white rounded-lg p-6 shadow-sm mb-6">
             <div class="mb-4">
-                <h2 class="text-lg font-medium">Eun Lee</h2>
+                <h2 class="text-lg font-medium">{{ username }}</h2>
                 <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Pengunjung</span>
             </div>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex items-center">
                     <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
@@ -50,30 +48,27 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Username</p>
-                        <p>eunlee1</p>
+                        <p>{{ username }}</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center">
                     <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
                         <i class="fas fa-phone"></i>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Nomor Telepon</p>
-                        <p>08127219462</p>
+                        <p>{{ no_telepon }}</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center">
                     <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
                         <i class="fas fa-envelope"></i>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Email</p>
-                        <p>parkjisoo@example.com</p>
+                        <p>{{ email }}</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center">
                     <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
                         <i class="fas fa-id-badge"></i>
@@ -81,6 +76,24 @@
                     <div>
                         <p class="text-xs text-gray-500">Peran</p>
                         <p>Pengunjung</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Alamat Lengkap</p>
+                        <p>{{ alamat|default:"Belum diisi" }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Tanggal Lahir</p>
+                        <p>{{ tgl_lahir|date:"d F Y"|default:"Belum diisi" }}</p>
                     </div>
                 </div>
             </div>
@@ -103,20 +116,18 @@
                     <span class="text-sm text-gray-600">Riwayat Kunjungan</span>
                     <i class="fas fa-history text-green-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-1">3</h3>
+                <h3 class="text-2xl font-bold mb-1">{{ total_reservasi }}</h3>
                 <p class="text-xs text-gray-500">Total kunjungan ke Taman Safari</p>
             </div>
-
             <!-- Upcoming Tickets Card -->
             <div class="bg-white p-4 rounded-lg shadow-sm">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm text-gray-600">Tiket Mendatang</span>
                     <i class="fas fa-ticket-alt text-green-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-1">1</h3>
+                <h3 class="text-2xl font-bold mb-1">{{ total_tiket_mendatang }}</h3>
                 <p class="text-xs text-gray-500">Tiket yang telah dipesan</p>
             </div>
-
             <!-- Reward Points Card -->
             <div class="bg-white p-4 rounded-lg shadow-sm">
                 <div class="flex justify-between items-center mb-2">
@@ -126,7 +137,6 @@
                 <h3 class="text-2xl font-bold mb-1">250</h3>
                 <p class="text-xs text-gray-500">Poin reward yang telah dikumpulkan</p>
             </div>
-
             <!-- Favorite Attractions Card -->
             <div class="bg-white p-4 rounded-lg shadow-sm">
                 <div class="flex justify-between items-center mb-2">
@@ -140,69 +150,73 @@
 
         <!-- Two Column Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Visit History Section -->
             <div class="bg-white p-5 rounded-lg shadow-sm">
                 <div class="flex items-center mb-4">
                     <i class="fas fa-history text-green-500 mr-2"></i>
                     <h3 class="text-lg font-medium">Riwayat Kunjungan</h3>
                 </div>
                 <p class="text-xs text-gray-500 mb-4">Riwayat kunjungan ke Taman Safari</p>
-                
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead>
                             <tr class="text-left text-sm text-gray-600">
                                 <th class="pb-3 pl-1">Tanggal</th>
                                 <th class="pb-3">Jenis Tiket</th>
-                                <th class="pb-3 text-right">Harga</th>
+                                <th class="pb-3 text-right">Jumlah</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="border-t border-gray-100">
-                                <td class="py-3 pl-1">2024-04-15</td>
-                                <td class="py-3">Tiket Reguler</td>
-                                <td class="py-3 text-right">Rp 100.000</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="py-3 pl-1">2024-03-20</td>
-                                <td class="py-3">Tiket Premium</td>
-                                <td class="py-3 text-right">Rp 150.000</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="py-3 pl-1">2024-02-10</td>
-                                <td class="py-3">Tiket Keluarga</td>
-                                <td class="py-3 text-right">Rp 300.000</td>
-                            </tr>
+                            {% if riwayat_kunjungan %}
+                                {% for reservasi in riwayat_kunjungan %}
+                                <tr class="border-t border-gray-100">
+                                    <td class="py-3 pl-1">{{ reservasi.1|date:"Y-m-d" }}</td>
+                                    <td class="py-3">{{ reservasi.0 }}</td>
+                                    <td class="py-3 text-right">{{ reservasi.2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr class="border-t border-gray-100">
+                                    <td colspan="3" class="py-3 text-center text-gray-500">Belum ada riwayat kunjungan</td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            <!-- Upcoming Tickets Section -->
+            
+            <!-- Tiket Mendatang -->
             <div class="bg-white p-5 rounded-lg shadow-sm">
                 <div class="flex items-center mb-4">
                     <i class="fas fa-ticket-alt text-green-500 mr-2"></i>
                     <h3 class="text-lg font-medium">Tiket Mendatang</h3>
                 </div>
                 <p class="text-xs text-gray-500 mb-4">Tiket yang telah dipesan untuk kunjungan mendatang</p>
-                
-                <div class="bg-gray-50 p-4 rounded-lg flex items-start">
-                    <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-green-500 mr-4">
-                        <i class="fas fa-ticket-alt text-xl"></i>
-                    </div>
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-medium">Tiket Premium</p>
-                                <p class="text-xs text-gray-500">Tanggal: 2024-05-10</p>
-                                <p class="text-sm mt-1">Rp 150.000</p>
+                <div class="max-h-[400px] overflow-y-auto pr-2"> 
+                {% if tiket_mendatang %}
+                    {% for tiket in tiket_mendatang %}
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-start {% if not forloop.last %}mb-3{% endif %}">
+                        <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-green-500 mr-4">
+                            <i class="fas fa-ticket-alt text-xl"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-medium">{{ tiket.0 }}</p>
+                                    <p class="text-xs text-gray-500">Tanggal: {{ tiket.1|date:"Y-m-d" }}</p>
+                                    <p class="text-sm mt-1">Jumlah: {{ tiket.2 }}</p>
+                                </div>
+                                <span class="confirmed-badge">{{ tiket.3 }}</span>
                             </div>
-                            <span class="confirmed-badge">Terkonfirmasi</span>
                         </div>
                     </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-center text-gray-500">Belum ada tiket mendatang</p>
+                    </div>
+                {% endif %}
                 </div>
             </div>
-        </div>
 
         <!-- Favorite Attractions -->
         <div class="bg-white p-5 rounded-lg shadow-sm mb-6">
@@ -211,7 +225,6 @@
                 <h3 class="text-lg font-medium">Atraksi Favorit</h3>
             </div>
             <p class="text-xs text-gray-500 mb-6">Atraksi yang paling sering dikunjungi</p>
-            
             <div class="space-y-4">
                 <div class="flex items-center">
                     <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-500 mr-4">
@@ -219,14 +232,12 @@
                     </div>
                     <p class="font-medium">Pertunjukan Singa Laut</p>
                 </div>
-                
                 <div class="flex items-center">
                     <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-500 mr-4">
                         <i class="fas fa-star"></i>
                     </div>
                     <p class="font-medium">Feeding Show</p>
                 </div>
-                
                 <div class="flex items-center">
                     <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-500 mr-4">
                         <i class="fas fa-star"></i>
@@ -234,7 +245,6 @@
                     <p class="font-medium">Pertunjukan Gajah</p>
                 </div>
             </div>
-            
             <div class="text-center mt-6">
                 <button class="text-sm text-green-600 hover:text-green-700">
                     Lihat Semua Atraksi
@@ -242,7 +252,6 @@
             </div>
         </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Add functionality for tabs
@@ -254,7 +263,6 @@
                         t.classList.remove('bg-green-500', 'text-white');
                         t.classList.add('text-gray-600');
                     });
-                    
                     // Add active class to clicked tab
                     this.classList.remove('text-gray-600');
                     this.classList.add('bg-green-500', 'text-white');
@@ -263,6 +271,4 @@
         });
     </script>
 </body>
-</html>
-
 {% endblock %}
