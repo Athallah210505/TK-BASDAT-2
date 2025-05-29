@@ -146,8 +146,8 @@ def get_user_data(cursor, username, role):
     
     elif role == 'staff':
         cursor.execute("""
-            SELECT username_sa, email_sa, no_telp, nama_depan, nama_tengah, nama_belakang
-            FROM sizopi.staf_admin 
+            SELECT username_sa, p.email_sa, no_telp, nama_depan, nama_tengah, nama_belakang
+            FROM sizopi.staf_admin, sizopi.pengguna p
             WHERE username_sa = %s
         """, [username])
         result = cursor.fetchone()

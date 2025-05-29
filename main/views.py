@@ -176,7 +176,7 @@ def dokter_hewan_dashboard(request):
     return render(request, 'dokter_hewan_dashboard.html', {'dokter': dokter})
 
 
-@role_required('pengunjung')
+@role_required(('pengunjung', 'pengunjung_adopter'))
 def pengunjung_dashboard(request):
     if 'username' not in request.session:
         messages.error(request, "Silakan login terlebih dahulu.")

@@ -16,32 +16,32 @@
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-8">
         <!-- Common links for all roles -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-          Dashboard
+       <a href="{% url 'pengunjung_dashboard' %}"c class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-50 hover:text-green-600 hover:bg-green-50">
+        Dashboard
+      </a>
+      
+      <!-- Adopter-specific mobile links -->
+      <a href="{% url 'pengunjung_dashboard' %}"cclass="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        Informasi Kebun Binatang
+      </a>
+      
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        Hewan Adopsi
+      </a>
+      
+      <a href="{% url 'show_user_booking' %}"class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        Reservasi tiket
+      </a>
+      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+        Profile
+      </a>
+      
+      <!-- Logout button in mobile menu -->
+      <div class="px-4 py-2">
+        <a href="{% url 'logout' %}" class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm text-center transition duration-200 shadow-sm">
+          Logout
         </a>
-        
-        <!-- Adopter-specific links -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-          Informasi Kebun Binatang
-        </a>
-        
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-          Hewan Adopsi
-        </a>
-
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-          Reservasi tiket
-        </a>
-        
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-          Profile
-        </a>
-        
-        <div class="px-4 py-2">
-          <a href="{% url 'logout' %}" class="w-full block bg-green-500 hover:bg-green-600 text-white font-medium rounded-md px-3 py-2 text-sm text-center transition duration-200 shadow-sm">
-            Logout
-          </a>
-        </div>
+      </div>
       </div>
 
       <!-- Mobile menu button -->

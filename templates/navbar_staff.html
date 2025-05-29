@@ -16,10 +16,6 @@
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-8">
         <!-- Common links for all roles - PERBAIKAN: Tambahkan URL yang benar -->
-        <a href="{% url 'show_staff_dashboard' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-          Dashboard
-        </a>
-        
         <!-- Admin-specific links - PERBAIKAN: Tambahkan URL yang benar -->
         <a href="{% url 'show_admin_booking' %}"  class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Kelola Pengunjung
@@ -32,14 +28,20 @@
         <a href="{% url 'adopter_info_general' %}"class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Kelola Adopter
         </a>
-        
+        <a href="{% url 'animals:animal_list' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Animals
+        </a>
+        <a href="{% url 'habitat:habitat_list' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Habitat
+        </a>
+
+        <a href={% url 'show_atraksi_management' %} class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Manajemen Atraksi dan Wahana
+        </a> 
+
           <a href={% url 'staff_profile' %} class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Profile
         </a>  
-
-       <a href={% url 'show_atraksi_management' %} class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
-          Manajemen Atraksi dan Wahana
-        </a> 
         
         <!-- Logout button -->
         <div class="px-4 py-2">

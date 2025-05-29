@@ -196,7 +196,7 @@ def admin_cancel_booking(request):
     # Redirect jika bukan POST request
     return redirect('show_admin_booking')
 
-@role_required('pengunjung')
+@role_required(('pengunjung', 'pengunjung_adopter'))
 def show_user_booking(request):
     """
     Menampilkan booking untuk pengguna yang sedang login
@@ -299,7 +299,7 @@ def show_user_booking(request):
         })
 # @login_required
 
-@role_required('pengunjung')
+@role_required(('pengunjung', 'pengunjung_adopter'))
 def show_user_add_booking(request):
     """
     Menampilkan form untuk menambahkan booking baru
@@ -455,7 +455,7 @@ def show_user_add_booking(request):
         })
         
 
-@role_required('pengunjung')
+@role_required(('pengunjung', 'pengunjung_adopter'))
 def add_reservasi_wahana(request):
     """
     Menampilkan form untuk menambahkan reservasi wahana saja
@@ -584,7 +584,7 @@ def add_reservasi_wahana(request):
         })
         
 
-@role_required('pengunjung')
+@role_required(('pengunjung', 'pengunjung_adopter'))
 def show_user_edit_booking(request):
     # Ambil username dari session
     username = request.session.get('username', '')
@@ -860,7 +860,7 @@ def load_and_show_form(request, username, jenis_reservasi, nama_fasilitas, tangg
         context['error_message'] = f"Terjadi kesalahan: {str(e)}"
         return render(request, 'user_edit_booking.html', context)
    
-@role_required('pengunjung')
+@role_required(('pengunjung', 'pengunjung_adopter'))
 def user_cancel_booking(request):
     """
     Menghapus (bukan hanya membatalkan) reservasi tiket user
