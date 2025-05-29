@@ -160,7 +160,7 @@ def edit_rekam_medis(request):
 
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    UPDATE CATATAN_MEDIS
+                    UPDATE SIZOPI.CATATAN_MEDIS
                     SET diagnosis = %s,
                         pengobatan = %s,
                         catatan_tindak_lanjut = %s
