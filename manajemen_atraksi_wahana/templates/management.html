@@ -389,31 +389,29 @@
                 }, 300);
             }
     
-            // Setup event listeners
-            // Tambah modal
+        
             document.getElementById('tambahBtn')?.addEventListener('click', () => showModal('tambahModal', 'tambahModalContent'));
             document.getElementById('closeTambahModal')?.addEventListener('click', () => hideModal('tambahModal', 'tambahModalContent'));
             document.getElementById('batalTambah')?.addEventListener('click', () => hideModal('tambahModal', 'tambahModalContent'));
     
-            // Edit modal
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const atraksiId = e.target.dataset.id;
                     
-                    // Set form action URL
+        
                     document.getElementById('editForm').action = `/manajemen_atraksi_wahana/atraksi/edit/${atraksiId}/`;
                     
-                    // Fetch attraction details via AJAX
+                  
                     fetch(`/manajemen_atraksi_wahana/atraksi/${atraksiId}/data/`)
                         .then(response => response.json())
                         .then(data => {
-                            // Populate form fields
+                         
                             document.getElementById('edit_nama').value = data.nama;
                             document.getElementById('edit_lokasi').value = data.lokasi;
                             document.getElementById('edit_kapasitas').value = data.kapasitas;
                             document.getElementById('edit_jadwal').value = data.jadwal;
                             
-                            // Populate trainers
+                     
                             const pelatihContainer = document.getElementById('edit_pelatih_container');
                             pelatihContainer.innerHTML = '';
                             data.trainers.forEach(trainer => {
@@ -426,7 +424,7 @@
                                 `;
                             });
                             
-                            // Populate animals
+                      
                             const hewanContainer = document.getElementById('edit_hewan_container');
                             hewanContainer.innerHTML = '';
                             data.animals.forEach(animal => {
@@ -441,7 +439,7 @@
                                 `;
                             });
                             
-                            // Show modal
+                    
                             showModal('editModal', 'editModalContent');
                         })
                         .catch(error => {
@@ -453,19 +451,19 @@
             document.getElementById('closeEditModal')?.addEventListener('click', () => hideModal('editModal', 'editModalContent'));
             document.getElementById('batalEdit')?.addEventListener('click', () => hideModal('editModal', 'editModalContent'));
     
-            // Delete modal
+
             document.querySelectorAll('.hapus-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const atraksiId = e.target.dataset.id;
                     const atraksiName = e.target.dataset.name;
                     
-                    // Set form action URL
+            
                     document.getElementById('deleteForm').action = `/manajemen_atraksi_wahana/atraksi/delete/${atraksiId}/`;
                     
-                    // Set confirmation message
+       
                     document.getElementById('deleteMessage').textContent = `Apakah anda yakin ingin menghapus atraksi "${atraksiName}"?`;
                     
-                    // Show modal
+          
                     showModal('deleteModal', 'deleteModalContent');
                 });
             });

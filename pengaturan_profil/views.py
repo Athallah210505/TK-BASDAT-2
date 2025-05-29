@@ -3,7 +3,124 @@ from django.contrib import messages
 from django.db import connection
 from django.views.decorators.http import require_http_methods
 import hashlib
+from django.urls import reverse
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.hashers import check_password, make_password
+from utils.decorators import role_required
 
+@role_required('dokter')
+def pengaturan_profil_dh(request):
+    username = request.user.username
+    spesialisasi_list = ["Mamalia Besar", "Reptil", "Burung Eksotis", "Primata", "Lainnya"]
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        nama_depan = request.POST.get('nama_depan')
+        nama_tengah = request.POST.get('nama_tengah')
+        nama_belakang = request.POST.get('nama_belakang')
+        no_telepon = request.POST.get('no_telepon')
+        spesialisasi_terpilih = request.POST.getlist('spesialisasi')
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE sizopi.pengguna
+                    SET email = %s,
+                        nama_depan = %s,
+                        nama_tengah = %s,
+                        nama_belakang = %s,
+                        no_telepon = %s
+                    WHERE username = %s
+                """, [email, nama_depan, nama_tengah, nama_belakang, no_telepon, username])
+
+                cursor.execute("""
+                    DELETE FROM sizopi.spesialisasi WHERE username_sh = %s
+                """, [username])
+
+                for sp in spesialisasi_terpilih:
+                    cursor.execute("""
+                        INSERT INTO sizopi.spesialisasi (username_sh, nama_spesialisasi)
+                        VALUES (%s, %s)
+                    """, [username, sp])
+
+            messages.success(request, "Profil berhasil diperbarui.")
+        except Exception as e:
+            messages.error(request, f"Gagal memperbarui profil: {str(e)}")
+
+        return redirect(reverse('pengaturan_profil_dh'))
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT COUNT(*) FROM sizopi.dokter_hewan WHERE username_dh = %s", [username])
+        row = cursor.fetchone()
+        is_dokter = row and row[0] > 0
+
+        cursor.execute("""
+            SELECT p.username, p.email, p.nama_depan, p.nama_tengah,
+                   p.nama_belakang, p.no_telepon, d.no_str
+            FROM sizopi.pengguna p
+            JOIN sizopi.dokter_hewan d ON p.username = d.username_dh
+            WHERE p.username = %s
+        """, [username])
+        profil_row = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT nama_spesialisasi 
+            FROM sizopi.spesialisasi 
+            WHERE username_sh = %s
+        """, [username])
+        spesialisasi = [row[0] for row in cursor.fetchall()]
+
+    user_data = {
+        'username': profil_row[0],
+        'email': profil_row[1],
+        'nama_depan': profil_row[2],
+        'nama_tengah': profil_row[3],
+        'nama_belakang': profil_row[4],
+        'no_telepon': profil_row[5],
+        'no_str': profil_row[6],
+        'spesialisasi': spesialisasi
+    }
+
+    return render(request, 'pengaturan_profil_dh.html', {
+        'user_data': user_data,
+        'is_dokter': is_dokter,
+        'spesialisasi_list': spesialisasi_list,
+    })
+
+
+@role_required('dokter')
+def ubah_password(request):
+    if request.method == 'POST':
+        username = request.user.username
+        password_lama = request.POST.get('password_lama')
+        password_baru = request.POST.get('password_baru')
+        konfirmasi = request.POST.get('konfirmasi_password_baru')
+
+        if password_baru != konfirmasi:
+            messages.error(request, "Konfirmasi password tidak cocok.")
+            return redirect(reverse('pengaturan_profil_dh'))
+
+        try:
+            with connection.cursor() as cursor:
+                # Ambil password lama dari tabel PENGGUNA
+                cursor.execute("SELECT password FROM sizopi.pengguna WHERE username = %s", [username])
+                row = cursor.fetchone()
+
+                if not row or password_lama != row[0]:
+                    messages.error(request, "Password lama salah.")
+                    return redirect(reverse('pengaturan_profil_dh'))
+
+                # Update password baru (tanpa hash, sesuai dengan struktur kamu sekarang)
+                cursor.execute("""
+                    UPDATE sizopi.pengguna SET password = %s WHERE username = %s
+                """, [password_baru, username])
+
+            messages.success(request, "Password berhasil diubah.")
+        except Exception as e:
+            messages.error(request, f"Gagal mengubah password: {str(e)}")
+
+        return redirect(reverse('pengaturan_profil_dh'))
+    
 # Common profile functions
 def get_common_context(request):
     """Get common context for all profile views"""
@@ -466,3 +583,4 @@ def change_password(request):
         messages.error(request, f'Terjadi kesalahan saat mengubah password: {str(e)}')
     
     return redirect('password_change')
+

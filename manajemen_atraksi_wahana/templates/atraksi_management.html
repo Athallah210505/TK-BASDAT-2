@@ -110,9 +110,9 @@
 </head>
 <body>
     <div class="min-h-screen">
-        <!-- Main Content -->
+  
         <div class="max-w-7xl mx-auto px-6 py-8">
-            <!-- Header -->
+   
             <div class="flex justify-between items-center mb-6 mt-20">
                 <div>
                     <h1 class="text-3xl font-bold text-green-500">Manajemen Atraksi</h1>
@@ -123,7 +123,6 @@
                 </div>
             </div>
 
-            <!-- Message display for Django messages -->
             {% if messages %}
             <div class="mb-6">
                 {% for message in messages %}
@@ -134,7 +133,7 @@
             </div>
             {% endif %}
 
-            <!-- Navigation tabs -->
+          
             <div class="mb-6">
                 <div class="border-b border-gray-200">
                     <nav class="-mb-px flex">
@@ -148,7 +147,7 @@
                 </div>
             </div>
 
-            <!-- Search and Add Button -->
+   
             <div class="flex justify-between mb-6">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -162,7 +161,7 @@
                 </button>
             </div>
 
-            <!-- Data Table -->
+
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="p-4 border-b border-gray-200 bg-green-50">
                     <div class="flex items-center text-green-600">
@@ -199,7 +198,7 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <!-- Dynamic Data Rows from Database -->
+                        
                             {% for attraction in attractions %}
                             <tr class="data-row">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ attraction.nama }}</td>
@@ -227,7 +226,6 @@
         </div>
     </div>
 
-    <!-- Tambah Atraksi Modal -->
     <div id="tambahModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden overflow-y-auto">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] transform transition-all duration-300 scale-95 opacity-0 my-6" id="tambahModalContent">
             <div class="flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10">
@@ -318,7 +316,7 @@
         </div>
     </div>
     
-    <!-- Edit Atraksi Modal -->
+
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden overflow-y-auto">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] transform transition-all duration-300 scale-95 opacity-0 my-6" id="editModalContent">
             <div class="flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10">
@@ -351,7 +349,7 @@
                         <label class="block text-gray-700 text-sm font-medium mb-2">Pelatih Pertunjukan:</label>
                         <div class="checkbox-container">
                             <div class="grid grid-cols-1 gap-2" id="edit_pelatih_container">
-                                <!-- Will be populated by JavaScript -->
+                              
                             </div>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Pilih satu atau lebih pelatih untuk atraksi ini</p>
@@ -380,7 +378,7 @@
                         <label class="block text-gray-700 text-sm font-medium mb-2">Hewan yang Terlibat:</label>
                         <div class="checkbox-container">
                             <div class="grid grid-cols-2 gap-2" id="edit_hewan_container">
-                                <!-- Will be populated by JavaScript -->
+                                
                             </div>
                         </div>
                     </div>
@@ -393,7 +391,7 @@
         </div>
     </div>
     
-    <!-- Delete Atraksi Modal -->
+
     <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md transform transition-all duration-300 scale-95 opacity-0" id="deleteModalContent">
             <div class="p-6 text-center">
@@ -411,9 +409,9 @@
     </div>
     
     <script>
-        // Modal control functionality
+ 
         document.addEventListener('DOMContentLoaded', function() {
-            // Modal show/hide functions
+         
             function showModal(modalId, contentId) {
                 document.getElementById(modalId).classList.remove('hidden');
                 setTimeout(() => {
@@ -431,25 +429,24 @@
                 }, 300);
             }
     
-            // Make these functions available globally
+     
             window.showModal = showModal;
             window.hideModal = hideModal;
     
-            // Setup event listeners
-            // Tambah modal
+       
             document.getElementById('tambahBtn')?.addEventListener('click', () => showModal('tambahModal', 'tambahModalContent'));
             document.getElementById('closeTambahModal')?.addEventListener('click', () => hideModal('tambahModal', 'tambahModalContent'));
             document.getElementById('batalTambah')?.addEventListener('click', () => hideModal('tambahModal', 'tambahModalContent'));
     
-            // Edit modal
+   
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const atraksiId = e.target.dataset.id;
                     
-                    // Set form action URL with encoding for spaces and special characters
+               
                     document.getElementById('editForm').action = `/manajemen_atraksi_wahana/edit/${encodeURIComponent(atraksiId)}/`;
                     
-                    // Fetch attraction details via AJAX with encoding
+              
                     fetch(`/manajemen_atraksi_wahana/${encodeURIComponent(atraksiId)}/data/`)
                         .then(response => {
                             if (!response.ok) {
@@ -458,20 +455,20 @@
                             return response.json();
                         })
                         .then(data => {
-                            console.log("Retrieved data:", data); // Debug data
+                            console.log("Retrieved data:", data); 
                             
-                            // Populate form fields
+                         
                             document.getElementById('edit_nama').value = data.nama;
                             document.getElementById('edit_lokasi').value = data.lokasi;
                             document.getElementById('edit_kapasitas').value = data.kapasitas;
                             document.getElementById('edit_jadwal').value = data.jadwal;
                             
-                            // Populate trainers
+                   
                             const pelatihContainer = document.getElementById('edit_pelatih_container');
                             pelatihContainer.innerHTML = '';
                             
                             data.trainers.forEach(trainer => {
-                                // Convert to string for safer comparison
+                                
                                 const isSelected = data.selected_trainers.some(
                                     id => String(id) === String(trainer.id)
                                 );
@@ -485,12 +482,12 @@
                                 `;
                             });
                             
-                            // Populate animals
+                          
                             const hewanContainer = document.getElementById('edit_hewan_container');
                             hewanContainer.innerHTML = '';
                             
                             data.animals.forEach(animal => {
-                                // Convert to string for safer comparison
+                              
                                 const isSelected = data.selected_animals.some(
                                     id => String(id) === String(animal.id)
                                 );
@@ -506,7 +503,7 @@
                                 `;
                             });
                             
-                            // Show modal
+                        
                             showModal('editModal', 'editModalContent');
                         })
                         .catch(error => {
@@ -536,7 +533,7 @@
             });
             document.getElementById('closeDeleteBtn')?.addEventListener('click', () => hideModal('deleteModal', 'deleteModalContent'));
             
-            // Search functionality
+            
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('keyup', function() {

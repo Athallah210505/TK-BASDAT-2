@@ -27,13 +27,13 @@
         
         <div class="bg-gray-50 border-b border-gray-200">
             <div class="flex overflow-x-auto">
-                <a href="{% url 'staff_profile' %}" class="tab-btn active-tab px-6 py-3 font-medium text-green-600 border-b-2 border-green-500">Profil</a>
-                <a href="{% url 'password_change' %}" class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-green-600">Kata Sandi</a>
+                <a href="{% url 'pengaturan_profil_staff' %}" class="tab-btn active-tab px-6 py-3 font-medium text-green-600 border-b-2 border-green-500">Profil</a>
+                <a href="{% url 'ubah_password' %}" class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-green-600">Kata Sandi</a>
             </div>
         </div>
         
         <div class="p-6">
-            <form method="POST" action="{% url 'update_staff_profile' %}">
+            <form method="POST" action="{% url 'pengaturan_profil_staff' %}">
                 {% csrf_token %}
                 
                 <div class="flex flex-col md:flex-row">
@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <h3 class="text-lg font-semibold text-center">{{ user_data.username }}</h3>
-                            <p class="text-sm text-gray-500 text-center">{{ role|title }}</p>
+                            <p class="text-sm text-gray-500 text-center">Staff</p>
                         </div>
                         
                         <div class="mb-6">
@@ -60,8 +60,8 @@
                         </div>
                         
                         <div class="mb-6">
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon:</label>
-                            <input type="tel" id="phone" name="phone" value="{{ user_data.phone|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon:</label>
+                            <input type="tel" id="no_telepon" name="no_telepon" value="{{ user_data.no_telepon|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
                         </div>
                     </div>
                     
@@ -70,18 +70,18 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Depan:</label>
-                                <input type="text" id="first_name" name="first_name" value="{{ user_data.first_name|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                <label for="nama_depan" class="block text-sm font-medium text-gray-700 mb-1">Nama Depan:</label>
+                                <input type="text" id="nama_depan" name="nama_depan" value="{{ user_data.nama_depan|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
                             </div>
                             
                             <div>
-                                <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Tengah (Opsional):</label>
-                                <input type="text" id="middle_name" name="middle_name" value="{{ user_data.middle_name|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                <label for="nama_tengah" class="block text-sm font-medium text-gray-700 mb-1">Nama Tengah (Opsional):</label>
+                                <input type="text" id="nama_tengah" name="nama_tengah" value="{{ user_data.nama_tengah|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
                             </div>
                             
                             <div>
-                                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Belakang:</label>
-                                <input type="text" id="last_name" name="last_name" value="{{ user_data.last_name|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                <label for="nama_belakang" class="block text-sm font-medium text-gray-700 mb-1">Nama Belakang:</label>
+                                <input type="text" id="nama_belakang" name="nama_belakang" value="{{ user_data.nama_belakang|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
                             </div>
                         </div>
                         
@@ -89,8 +89,8 @@
                             <h3 class="text-xl font-semibold text-gray-800 mb-4">Informasi Staff</h3>
                             <div class="grid grid-cols-1 gap-6">
                                 <div>
-                                    <label for="staff_id" class="block text-sm font-medium text-gray-700 mb-1">ID Staff:</label>
-                                    <input type="text" id="staff_id" name="staff_id" value="{{ user_data.staff_id|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700" readonly>
+                                    <label for="id_staf" class="block text-sm font-medium text-gray-700 mb-1">ID Staff:</label>
+                                    <input type="text" id="id_staf" name="id_staf" value="{{ user_data.id_staf|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700" readonly>
                                     <p class="text-xs text-gray-500 mt-1">(tidak dapat diubah)</p>
                                 </div>
                             </div>
@@ -107,5 +107,52 @@
         </div>
     </div>
 </div>
+
+<style>
+    .btn-shine {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-shine::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+        transform: rotate(45deg);
+        transition: all 0.5s;
+        opacity: 0;
+    }
+    
+    .btn-shine:hover::after {
+        opacity: 1;
+        left: 100%;
+        top: 100%;
+    }
+    
+    .tab-btn {
+        position: relative;
+        transition: all 0.3s;
+    }
+    
+    .tab-btn:not(.active-tab)::after {
+        content: '';
+        position: absolute;
+        width: 0%;
+        height: 2px;
+        bottom: 0;
+        left: 50%;
+        background-color: #10B981;
+        transform: translateX(-50%);
+        transition: width 0.3s;
+    }
+    
+    .tab-btn:not(.active-tab):hover::after {
+        width: 80%;
+    }
+</style>
 
 {% endblock %}

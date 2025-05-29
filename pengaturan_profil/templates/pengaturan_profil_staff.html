@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'navbar_staff.html' %}
+
+<div class="min-h-screen bg-gray-100 pt-16 pb-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+            <div class="border-b border-gray-200 pb-5">
+                <h2 class="text-2xl font-bold text-gray-800">Profil Staff</h2>
+                <p class="text-sm text-gray-500 mt-1">Kelola informasi profil Anda</p>
+            </div>
+            
+            {% if messages %}
+            <div class="mt-4">
+                {% for message in messages %}
+                <div class="p-4 mb-4 rounded-md {% if message.tags == 'success' %}bg-green-50 text-green-800{% else %}bg-red-50 text-red-800{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="mt-6">
+                <form method="post" action="{% url 'pengaturan_profil_staff' %}">
+                    {% csrf_token %}
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                                    <input type="text" name="username" id="username" value="{{ user_data.username }}" class="mt-1 bg-gray-100 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" readonly>
+                                    <p class="mt-1 text-xs text-gray-500">Username tidak dapat diubah</p>
+                                </div>
+                                
+                                <div>
+                                    <label for="id_staf" class="block text-sm font-medium text-gray-700">ID Staff</label>
+                                    <input type="text" name="id_staf" id="id_staf" value="{{ user_data.id_staf }}" class="mt-1 bg-gray-100 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" readonly>
+                                    <p class="mt-1 text-xs text-gray-500">ID Staff tidak dapat diubah</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-5">
+                            <h3 class="text-lg font-medium text-gray-800">Informasi Pribadi</h3>
+                            
+                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div>
+                                    <label for="nama_depan" class="block text-sm font-medium text-gray-700">Nama Depan</label>
+                                    <input type="text" name="nama_depan" id="nama_depan" value="{{ user_data.nama_depan }}" class="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                
+                                <div>
+                                    <label for="nama_tengah" class="block text-sm font-medium text-gray-700">Nama Tengah (Opsional)</label>
+                                    <input type="text" name="nama_tengah" id="nama_tengah" value="{{ user_data.nama_tengah }}" class="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                
+                                <div>
+                                    <label for="nama_belakang" class="block text-sm font-medium text-gray-700">Nama Belakang</label>
+                                    <input type="text" name="nama_belakang" id="nama_belakang" value="{{ user_data.nama_belakang }}" class="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-5">
+                            <h3 class="text-lg font-medium text-gray-800">Informasi Kontak</h3>
+                            
+                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" name="email" id="email" value="{{ user_data.email }}" class="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                
+                                <div>
+                                    <label for="no_telepon" class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
+                                    <input type="text" name="no_telepon" id="no_telepon" value="{{ user_data.no_telepon }}" class="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between pt-5 border-t border-gray-200">
+                            <a href="{% url 'ubah_password' %}" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Ubah Password
+                            </a>
+                            
+                            <button type="submit" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
