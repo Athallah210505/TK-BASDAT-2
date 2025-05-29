@@ -16,7 +16,7 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
-
+@role_required('staff')
 def show_admin_booking(request):
     """
     Menampilkan semua booking untuk admin
@@ -99,7 +99,7 @@ def show_admin_booking(request):
             'role': 'admin'
         })
 
-
+@role_required('staff')
 def admin_edit_booking(request):
     """
     Mengedit booking dari admin
@@ -159,7 +159,7 @@ def admin_edit_booking(request):
     
     # Redirect jika bukan POST request
     return redirect('show_admin_booking')
-
+@role_required('staff')
 def admin_cancel_booking(request):
     """
     Membatalkan booking dari admin

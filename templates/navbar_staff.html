@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between">
       <!-- Logo -->
       <div class="flex items-center">
-        <a href="#" class="flex items-center group">
+        <a href="{% url 'show_staff_dashboard' %}" class="flex items-center group">
           <div class="claw-container overflow-hidden">
             <img src="{% static 'image/claw.svg' %}" class="h-10 w-10 claw-icon" alt="Claw Icon">
           </div>
@@ -15,25 +15,25 @@
 
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-8">
-        <!-- Common links for all roles -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <!-- Common links for all roles - PERBAIKAN: Tambahkan URL yang benar -->
+        <a href="{% url 'show_staff_dashboard' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Dashboard
         </a>
         
-        <!-- Admin-specific links -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <!-- Admin-specific links - PERBAIKAN: Tambahkan URL yang benar -->
+        <a href="{% url 'show_admin_booking' %}"  class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Kelola Pengunjung
         </a>
         
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="/dokter/atraksi/" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Kelola Adopsi
         </a>
         
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="/dokter/kandang/" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Kelola Adopter
         </a>
         
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="/profile/" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Profile
         </a>
         
@@ -59,24 +59,23 @@
   <!-- Mobile menu, hidden by default -->
   <div id="mobile-menu" class="md:hidden hidden">
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-      <a href="{% url 'pengunjung_dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-50 hover:text-green-600 hover:bg-green-50">
+      <a href="{% url 'show_staff_dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-50 hover:text-green-600 hover:bg-green-50">
         Dashboard
       </a>
       
-      <!-- Admin-specific mobile links -->
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="{% url 'show_admin_booking' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
         Kelola Pengunjung
       </a>
       
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="/dokter/atraksi/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
         Kelola Adopsi
       </a>
       
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="/dokter/kandang/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
         Kelola Adopter
       </a>
       
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="/profile/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
         Profile
       </a>
       
