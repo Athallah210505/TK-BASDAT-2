@@ -13,4 +13,7 @@ urlpatterns = [
     
     path('pelatih/profile/', views.pengaturan_profil_pelatih, name='pengaturan_profil_pelatih'),
     path('pelatih/password/', views.ubah_password_pelatih, name='ubah_password_pelatih'),
+
+    path('pengunjung/', views.pengaturan_profil_pengunjung, name='pengaturan_profil_pengunjung'),
+    path('pengunjung/ubah-password/', views.ubah_password_pengunjung, name='ubah_password_pengunjung'),
 ]
