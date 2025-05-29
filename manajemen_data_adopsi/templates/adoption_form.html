@@ -141,7 +141,6 @@
 </div>
 
 <script>
-  // Set tanggal minimum menjadi hari ini
   document.addEventListener('DOMContentLoaded', function() {
     const startDateInput = document.querySelector('input[name="start_date"]');
     const today = new Date().toISOString().split('T')[0];
@@ -149,7 +148,6 @@
     startDateInput.value = today;
   });
 
-  // Toggle between individual and organization form
   document.querySelectorAll('input[name="adopter_type"]').forEach(function(radio) {
     radio.addEventListener('change', function() {
       const individualForm = document.getElementById('individual-form');
@@ -159,11 +157,9 @@
         individualForm.style.display = 'block';
         organizationForm.style.display = 'none';
         
-        // Make individual fields required
         document.querySelectorAll('#individual-form input').forEach(field => {
           field.required = true;
         });
-        // Make organization fields not required
         document.querySelectorAll('#organization-form input').forEach(field => {
           field.required = false;
         });
@@ -171,7 +167,6 @@
         individualForm.style.display = 'none';
         organizationForm.style.display = 'block';
         
-        // Make organization fields required
         document.querySelectorAll('#organization-form input').forEach(field => {
           field.required = true;
         });
@@ -183,7 +178,6 @@
     });
   });
   
-  // Initial trigger for individual form (since it's checked by default)
   document.getElementById('individual').dispatchEvent(new Event('change'));
 </script>
 {% endblock %}

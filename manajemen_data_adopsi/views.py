@@ -32,9 +32,8 @@ def adoption_list(request):
     return render(request, 'adoption_list.html', {'animals': animal_list})
     
 def _parse_adoption_id(adoption_id_str):
-    """Helper function to parse combined adoption ID."""
     parts = adoption_id_str.split('-')
-    if len(parts) != 10:  # UUID format: 8-4-4-4-12 (5 parts). Two UUIDs = 10 parts.
+    if len(parts) != 10:  
         raise ValueError(f"Invalid adoption ID format: {adoption_id_str}")
     
     try:
@@ -45,7 +44,7 @@ def _parse_adoption_id(adoption_id_str):
         raise ValueError(f"Invalid UUID in adoption ID: {adoption_id_str} - {e}")
 
 @role_required(('staff', 'pengunjung_adopter'))
-def adoption_detail(request, adoption_id): # adoption_id adalah string gabungan
+def adoption_detail(request, adoption_id): 
     try:
         adopter_uuid, animal_uuid = _parse_adoption_id(adoption_id)
 
@@ -100,12 +99,12 @@ def adoption_detail(request, adoption_id): # adoption_id adalah string gabungan
             }
         return render(request, 'adoption_detail.html', context)
 
-    except ValueError as ve: # Tangkap error dari _parse_adoption_id
+    except ValueError as ve: 
         raise Http404(f"Invalid adoption ID format in URL: {str(ve)}")
-    except Http404: # Biarkan Http404 dari dalam view terlempar
+    except Http404: 
         raise
     except Exception as e:
-        raise # Melempar ulang error untuk debugging
+        raise
 
 @role_required(('staff', 'pengunjung_adopter'))
 def register_adopter(request, animal_id=None):
@@ -123,7 +122,6 @@ def register_adopter(request, animal_id=None):
         adoption_period_months = request.POST.get('adoption_period')
         contribution_str = request.POST.get('contribution')
         
-        # Get animal_id from form if not in URL
         if not animal_uuid and request.POST.get('animal_id'):
             try:
                 animal_uuid = uuid.UUID(request.POST.get('animal_id'))
@@ -136,7 +134,6 @@ def register_adopter(request, animal_id=None):
         
         if not animal_uuid:
             return render(request, 'adoption_form.html', {
-                'error': "ID hewan diperlukan untuk registrasi adopsi.",
                 'animal': None,
                 'animal_id': None
             })
@@ -153,7 +150,6 @@ def register_adopter(request, animal_id=None):
                     raise Exception("Adopter tidak ditemukan")
                 adopter_uuid = adopter_result[0]
                 
-                # Calculate end date
                 new_month = start_date.month - 1 + months_to_add
                 new_year = start_date.year + new_month // 12
                 new_month = new_month % 12 + 1
@@ -186,7 +182,6 @@ def register_adopter(request, animal_id=None):
             error_message = str(e)
             animal_data_for_form = None
             
-            # Now animal_uuid is always defined here
             if animal_uuid:
                 with connection.cursor() as cursor_err:
                     cursor_err.execute("SELECT nama, spesies, status_kesehatan FROM sizopi.hewan WHERE id = %s", [animal_uuid])
@@ -205,7 +200,6 @@ def register_adopter(request, animal_id=None):
                 'animal_id': str(animal_uuid) if animal_uuid else None
             })
     
-    # GET request
     if animal_id:
         try:
             animal_uuid_get = uuid.UUID(animal_id)
@@ -229,10 +223,9 @@ def register_adopter(request, animal_id=None):
     else:
         return render(request, 'adoption_form.html')
     
-    # GET request
-    if animal_id: # animal_id adalah string UUID dari URL
+    if animal_id: 
         try:
-            animal_uuid_get = uuid.UUID(animal_id) # Validasi lagi untuk GET
+            animal_uuid_get = uuid.UUID(animal_id) 
             with connection.cursor() as cursor:
                 cursor.execute("SELECT nama, spesies, status_kesehatan FROM sizopi.hewan WHERE id = %s", [animal_uuid_get])
                 animal = cursor.fetchone()
@@ -246,10 +239,10 @@ def register_adopter(request, animal_id=None):
         except ValueError:
             raise Http404("Format ID hewan tidak valid.")
     else:
-        return render(request, 'adoption_form.html') # Form untuk adopsi tanpa pra-seleksi hewan
+        return render(request, 'adoption_form.html')
 
 @role_required(('staff', 'pengunjung_adopter'))
-def extend_adoption(request, adoption_id=None): # adoption_id adalah string gabungan
+def extend_adoption(request, adoption_id=None): 
     if not adoption_id:
         raise Http404("ID Adopsi diperlukan.")
 
@@ -522,7 +515,6 @@ def create_animal_report(request, adoption_id=None): # adoption_id adalah string
             weight_val = float(weight) if weight else None
             temperature_val = float(temperature) if temperature else None
         except ValueError:
-            # Handle error konversi tipe jika input tidak valid
             error_message = "Berat atau suhu tidak valid."
             pass 
 
@@ -552,7 +544,6 @@ def create_animal_report(request, adoption_id=None): # adoption_id adalah string
                 """, [_parse_adoption_id(adoption_id)[0], animal_uuid]) 
 
                 adoption_data_for_form = None # Isi dengan data yang relevan
-                # ... (logika untuk mengisi adoption_data_for_form)
 
             return render(request, 'create_animal_report.html', {
                 'error': error_message, 
