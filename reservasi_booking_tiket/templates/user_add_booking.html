@@ -1,129 +1,310 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 {% include 'navbar_pengunjung.html' %}
 
 <div class="container mx-auto px-4 py-8 max-w-5xl mt-20">
     <!-- Header -->
-    <h1 class="text-4xl font-bold text-green-500 mb-2">Reservasi Tiket Atraksi</h1>
-    <p class="text-gray-600 mb-6">Pesan tiket untuk atraksi favorit Anda di Taman Safari dan nikmati pengalaman yang tak terlupakan</p>
-
-    <!-- Navigation Link -->
-    <div class="mb-6">
-        <a href="{% url 'show_user_booking' %}" class="inline-flex items-center text-green-600 hover:text-green-800 transition">
-            <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
-            </svg>
-            Kembali ke Daftar Reservasi
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-4xl font-bold text-green-500">Tambah Reservasi Atraksi</h1>
+        <a href="{% url 'show_user_booking' %}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center">
+            Kembali
         </a>
     </div>
 
-    <!-- Form Reservasi Section -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-        <div class="bg-green-100 p-4 flex items-center">
-            <span class="text-green-600 mr-2"><i class="fas fa-ticket-alt"></i></span>
-            <h2 class="text-xl font-bold text-gray-800">TAMBAH RESERVASI</h2>
+    <!-- Display messages -->
+    {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+                <div class="p-4 mb-2 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         </div>
-        <div class="p-4 bg-green-50">
-            <p class="text-gray-600">Isi formulir untuk membuat reservasi tiket baru</p>
-        </div>
-        
-        <form method="post" action="{% url 'show_user_booking' %}" class="p-6">
-            {% csrf_token %}
-            
-            <div class="mb-4">
-                <label for="namaAtraksi" class="block text-gray-700 font-medium mb-2">Nama Atraksi:</label>
-                <div class="relative">
-                    <select id="namaAtraksi" name="nama_atraksi" class="w-full p-3 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="">Pilih Atraksi</option>
-                        <option value="pertunjukan_singa_laut" data-lokasi="Arena singa laut" data-kapasitas="10">Pertunjukan Singa Laut</option>
-                        <option value="show_burung_bebas" data-lokasi="Arena Burung" data-kapasitas="20">Show Burung Bebas</option>
-                        <option value="pertunjukan_gajah" data-lokasi="Arena gajah" data-kapasitas="50">Pertunjukan Gajah</option>
-                        <option value="atraksi_harimau" data-lokasi="Arena harimau" data-kapasitas="15">Atraksi Harimau</option>
-                        <option value="feeding_show" data-lokasi="Arena tempat makan" data-kapasitas="20">Feeding Show</option>
-                        <option value="pertunjukan_lumba_lumba" data-lokasi="Area Akuatik" data-kapasitas="30">Pertunjukan lumba-lumba</option>
-                        <option value="show_kuda_laut" data-lokasi="Arena Kuda laut" data-kapasitas="20">Show Kuda Laut</option>
-                        <option value="pertunjukan_komodo" data-lokasi="Arena Komodo" data-kapasitas="20">Pertunjukan Komodo</option>
-                        <option value="atraksi_penguin" data-lokasi="Arena Penguin" data-kapasitas="20">Atraksi Penguin</option>
-                        <option value="show_penguin" data-lokasi="Arena Penguin" data-kapasitas="20">Show Penguin</option>
-                        <option value="roller_coaster" data-lokasi="Area Wahana" data-kapasitas="10">Roller Coaster</option>
-                        <option value="komedi_putar" data-lokasi="Area Wahana" data-kapasitas="30">Komedi Putar</option>
-                        <option value="rumah_hantu" data-lokasi="Area Wahana" data-kapasitas="5">Rumah Hantu</option>
-                        <option value="tornado" data-lokasi="Area Wahana" data-kapasitas="15">Tornado</option>
-                        <option value="kora_kora" data-lokasi="Area Wahana" data-kapasitas="35">Kora-kora</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </div>
+    {% endif %}
+    
+    <!-- Main content -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+            <!-- Informasi Pengunjung -->
+            <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                <div class="text-lg font-medium text-gray-700 mb-2">Informasi Pengunjung</div>
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="font-semibold">{{ session_username|default:user.username|default:"Pengunjung" }}</span>
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label for="lokasi" class="block text-gray-700 font-medium mb-2">Lokasi:</label>
-                <input type="text" id="lokasi" name="lokasi" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" readonly>
+            <!-- FORM RESERVASI ATRAKSI -->
+            <div class="tab-content">
+                <div class="text-center text-xl font-bold mb-4">FORM RESERVASI ATRAKSI</div>
+                
+                <form id="atraksi-form" method="post" action="{% url 'show_user_add_booking' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="jenis_reservasi" value="atraksi">
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2" for="nama_atraksi">Nama Atraksi:</label>
+                        <select name="nama_fasilitas" id="nama_atraksi" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required onchange="updateAtraksiDetails()">
+                            <option value="">-- Pilih Atraksi --</option>
+                            {% for atraksi in atraksi_list %}
+                                <option 
+                                    value="{{ atraksi.nama_atraksi }}" 
+                                    data-lokasi="{{ atraksi.lokasi|default:'' }}" 
+                                    data-kapasitas="{{ atraksi.kapasitas_max }}"
+                                    data-jadwal="{{ atraksi.jadwal_formatted|default:'' }}"
+                                >
+                                    {{ atraksi.nama_atraksi }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Detail Atraksi -->
+                    <div id="atraksi-details" class="mb-4 bg-gray-50 p-4 rounded-lg hidden">
+                        <h3 class="font-semibold text-gray-700 mb-2">Detail Atraksi</h3>
+                        <div class="grid grid-cols-1 gap-2">
+                            <div>
+                                <strong>Lokasi:</strong> <span id="detail-lokasi"></span>
+                            </div>
+                            <div>
+                                <strong>Jadwal:</strong> <span id="detail-jadwal"></span>
+                            </div>
+                            <div>
+                                <strong>Kapasitas Maksimal:</strong> <span id="detail-kapasitas"></span> pengunjung
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2" for="lokasi_atraksi">Lokasi:</label>
+                        <input type="text" id="lokasi_atraksi" name="lokasi" class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100" readonly>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2" for="jam_atraksi">Jadwal:</label>
+                        <input type="text" id="jam_atraksi" class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100" readonly>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2" for="tanggal_kunjungan_atraksi">Tanggal Kunjungan:</label>
+                        <input type="date" id="tanggal_kunjungan_atraksi" name="tanggal_kunjungan" class="w-full border border-gray-300 rounded px-3 py-2" min="{{ today }}" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2" for="jumlah_tiket_atraksi">Jumlah tiket yang ingin dibeli:</label>
+                        <input type="number" id="jumlah_tiket_atraksi" name="jumlah_tiket" class="w-full border border-gray-300 rounded px-3 py-2" min="1" value="1" required>
+                        <p id="ticket-availability" class="text-sm text-gray-500 mt-1"></p>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-4 mt-6">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            [SIMPAN]
+                        </button>
+                        <button type="reset" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="resetForm()">
+                            [BATAL]
+                        </button>
+                    </div>
+                </form>
             </div>
-
-            <div class="mb-4">
-                <label for="jam" class="block text-gray-700 font-medium mb-2">Jam:</label>
-                <input type="time" id="jam" name="jam" value="10:00" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-            </div>
-
-            <div class="mb-4">
-                <label for="tanggal" class="block text-gray-700 font-medium mb-2">Tanggal:</label>
-                <input type="date" id="tanggal" name="tanggal" value="2025-05-15" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-            </div>
-
-            <div class="mb-6">
-                <label for="jumlahTiket" class="block text-gray-700 font-medium mb-2">Jumlah tiket yang ingin dibeli:</label>
-                <input type="number" id="jumlahTiket" name="jumlah_tiket" min="1" value="2" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                <p id="maxTiket" class="text-sm text-gray-500 mt-1">Maksimal 120 tiket per reservasi</p>
-            </div>
-
-            <div class="flex justify-end space-x-3">
-                <a href="{% url 'show_user_booking' %}" class="px-6 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition">
-                    Batal
-                </a>
-                <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-                    Simpan
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const namaAtraksiSelect = document.getElementById('namaAtraksi');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded");
+    
+    // Set minimum date ke hari ini
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('tanggal_kunjungan_atraksi').min = today;
+    
+    // Debug all options in the dropdown
+    const namaAtraksiDropdown = document.getElementById('nama_atraksi');
+    if (namaAtraksiDropdown) {
+        console.log("Available atraksi options:");
+        for (let i = 0; i < namaAtraksiDropdown.options.length; i++) {
+            const option = namaAtraksiDropdown.options[i];
+            console.log(`Option ${i}: ${option.text}, value: ${option.value}, data-lokasi: ${option.getAttribute('data-lokasi')}, data-jadwal: ${option.getAttribute('data-jadwal')}, data-kapasitas: ${option.getAttribute('data-kapasitas')}`);
+        }
+    }
+});
+
+// Data untuk detail atraksi
+const atraksiData = {
+{% for atraksi in atraksi_list %}
+    "{{ atraksi.nama_atraksi }}": {
+        "lokasi": "{{ atraksi.lokasi|default:'Tidak tersedia' }}",
+        "kapasitas": "{{ atraksi.kapasitas_max }}",
+        "jadwal": "{{ atraksi.jadwal_formatted|default:'Sesuai jadwal atraksi' }}"
+    }{% if not forloop.last %},{% endif %}
+{% endfor %}
+};
+
+// Function to update atraksi details
+function updateAtraksiDetails() {
+    console.log("Running updateAtraksiDetails");
+    const namaAtraksiDropdown = document.getElementById('nama_atraksi');
+    const lokasiAtraksiField = document.getElementById('lokasi_atraksi');
+    const jamAtraksiField = document.getElementById('jam_atraksi');
+    const detailsDiv = document.getElementById('atraksi-details');
+    const ticketAvailability = document.getElementById('ticket-availability');
+    const jumlahTiketInput = document.getElementById('jumlah_tiket_atraksi');
+    
+    if (!namaAtraksiDropdown || !lokasiAtraksiField || !jamAtraksiField) {
+        console.error("Required elements not found");
+        return;
+    }
+    
+    const selectedIndex = namaAtraksiDropdown.selectedIndex;
+    console.log(`Selected index: ${selectedIndex}`);
+    
+    if (selectedIndex > 0) {
+        const selectedOption = namaAtraksiDropdown.options[selectedIndex];
+        const atraksiName = selectedOption.value;
+        const lokasi = selectedOption.getAttribute('data-lokasi');
+        const jadwal = selectedOption.getAttribute('data-jadwal');
+        const kapasitas = selectedOption.getAttribute('data-kapasitas');
         
-        // Function to update location and capacity based on selected attraction
-        function updateAttractionDetails() {
-            // Get the selected option
-            const selectedOption = namaAtraksiSelect.options[namaAtraksiSelect.selectedIndex];
+        console.log(`Selected atraksi: ${atraksiName}, lokasi: ${lokasi}, jadwal: ${jadwal}, kapasitas: ${kapasitas}`);
+        
+        // Update fields with selected data
+        lokasiAtraksiField.value = lokasi || 'Tidak tersedia';
+        jamAtraksiField.value = jadwal || 'Sesuai jadwal atraksi';
+        
+        // Update detail panel
+        const detailLokasi = document.getElementById('detail-lokasi');
+        const detailJadwal = document.getElementById('detail-jadwal');
+        const detailKapasitas = document.getElementById('detail-kapasitas');
+        
+        if (detailLokasi) detailLokasi.textContent = lokasi || 'Tidak tersedia';
+        if (detailJadwal) detailJadwal.textContent = jadwal || 'Sesuai jadwal atraksi';
+        if (detailKapasitas) detailKapasitas.textContent = kapasitas || 'Tidak diketahui';
+        
+        // Show details div
+        detailsDiv.classList.remove('hidden');
+        
+        // Update ticket availability message
+        if (ticketAvailability && kapasitas) {
+            ticketAvailability.textContent = `Maksimal ${kapasitas} tiket per reservasi`;
             
-            // Update lokasi field
-            const lokasiValue = selectedOption.getAttribute('data-lokasi');
-            if (lokasiValue) {
-                document.getElementById('lokasi').value = lokasiValue;
-            } else {
-                document.getElementById('lokasi').value = '';
-            }
-            
-            // Update max tiket text
-            const kapasitasValue = selectedOption.getAttribute('data-kapasitas');
-            if (kapasitasValue) {
-                document.getElementById('maxTiket').textContent = 'Maksimal ' + kapasitasValue + ' tiket per reservasi';
-            } else {
-                document.getElementById('maxTiket').textContent = 'Maksimal 120 tiket per reservasi';
+            // Set max value for ticket input
+            if (jumlahTiketInput) {
+                jumlahTiketInput.max = kapasitas;
             }
         }
-        
-        // Add event listener for atraksi selection change
-        namaAtraksiSelect.addEventListener('change', updateAttractionDetails);
-        
-        // Call the function once on page load to initialize
-        updateAttractionDetails();
-    });
+    } else {
+        // Reset fields and hide details
+        lokasiAtraksiField.value = '';
+        jamAtraksiField.value = '';
+        detailsDiv.classList.add('hidden');
+        if (ticketAvailability) ticketAvailability.textContent = '';
+    }
+}
+
+// Fallback function if primary method fails
+function fallbackUpdateAtraksi() {
+    console.log("Running fallbackUpdateAtraksi");
+    const dropdown = document.getElementById('nama_atraksi');
+    const lokasiField = document.getElementById('lokasi_atraksi');
+    const jamField = document.getElementById('jam_atraksi');
+    
+    if (dropdown && dropdown.value) {
+        const atraksi = atraksiData[dropdown.value];
+        if (atraksi) {
+            console.log("Using fallback method with data:", atraksi);
+            
+            if (lokasiField) {
+                lokasiField.value = atraksi.lokasi || 'Tidak tersedia';
+                console.log("Set lokasi to:", atraksi.lokasi);
+            }
+            
+            if (jamField) {
+                jamField.value = atraksi.jadwal || 'Sesuai jadwal atraksi';
+                console.log("Set jadwal to:", atraksi.jadwal);
+            }
+            
+            // Update detail elements too
+            const detailLokasi = document.getElementById('detail-lokasi');
+            const detailJadwal = document.getElementById('detail-jadwal');
+            const detailKapasitas = document.getElementById('detail-kapasitas');
+            
+            if (detailLokasi) detailLokasi.textContent = atraksi.lokasi || 'Tidak tersedia';
+            if (detailJadwal) detailJadwal.textContent = atraksi.jadwal || 'Sesuai jadwal atraksi';
+            if (detailKapasitas) detailKapasitas.textContent = atraksi.kapasitas || 'Tidak diketahui';
+            
+            // Show details div
+            document.getElementById('atraksi-details').classList.remove('hidden');
+        }
+    }
+}
+
+// Reset form function
+function resetForm() {
+    document.getElementById('lokasi_atraksi').value = '';
+    document.getElementById('jam_atraksi').value = '';
+    document.getElementById('atraksi-details').classList.add('hidden');
+    document.getElementById('ticket-availability').textContent = '';
+    document.getElementById('jumlah_tiket_atraksi').value = '1';
+}
+
+// Add event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const atraksiDropdown = document.getElementById('nama_atraksi');
+    
+    if (atraksiDropdown) {
+        atraksiDropdown.addEventListener('change', function() {
+            updateAtraksiDetails();
+            // If first method fails, try fallback after a short delay
+            setTimeout(function() {
+                const lokasiValue = document.getElementById('lokasi_atraksi').value;
+                const jamValue = document.getElementById('jam_atraksi').value;
+                
+                if (!lokasiValue || !jamValue) {
+                    console.log("First method incomplete, trying fallback...");
+                    fallbackUpdateAtraksi();
+                }
+            }, 100);
+        });
+    }
+    
+    // Optional: Check availability on date change
+    const tanggalInput = document.getElementById('tanggal_kunjungan_atraksi');
+    if (tanggalInput) {
+        tanggalInput.addEventListener('change', function() {
+            const atraksiName = document.getElementById('nama_atraksi').value;
+            const tanggal = this.value;
+            
+            if (atraksiName && tanggal) {
+                console.log(`Checking availability for ${atraksiName} on ${tanggal}`);
+                
+                // You can add AJAX call here to check real-time availability
+                fetch(`/check-availability/?jenis=atraksi&nama=${atraksiName}&tanggal=${tanggal}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error("Error checking availability:", data.error);
+                        } else {
+                            console.log("Availability data:", data);
+                            document.getElementById('ticket-availability').textContent = 
+                                `Tersedia: ${data.kapasitas_tersisa} tiket (dari ${data.kapasitas_max} total)`;
+                                
+                            // Set max untuk input tiket berdasarkan ketersediaan real-time
+                            document.getElementById('jumlah_tiket_atraksi').max = data.kapasitas_tersisa;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("AJAX error:", error);
+                    });
+            }
+        });
+    }
+});
 </script>
 {% endblock %}
