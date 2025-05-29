@@ -2,10 +2,17 @@
 {% load static %}
 
 {% block content %}
-{% include 'navbar_staff.html' %} 
-<div class="h-20"></div> <!-- Spacer adjusted to match navbar height -->
+{% if user_role == 'penjaga_hewan' %}
+  {% include 'navbar_penjaga_hewan.html' %}
+{% elif user_role == 'staff' %}
+  {% include 'navbar_staff.html' %}
+{% else %}
+  {% include 'navbar_staff.html' %}
+{% endif %}
+
+<div class="h-20"></div>
 <div class="max-w-md mx-auto mt-12 bg-white p-8 rounded-2xl shadow animate-float">
-  
+
   <!-- Header -->
   <div class="flex items-center justify-center space-x-4 mb-6">
     <img src="{% static 'image/habitat.svg' %}" alt="Habitat Icon" class="h-12 w-12 text-green-500" />
@@ -13,6 +20,26 @@
       {% if habitat %}Edit Data Habitat{% else %}Tambah Data Habitat{% endif %}
     </h2>
   </div>
+
+  <!-- Pesan pop out di sini -->
+  {% if messages %}
+    <div id="django-messages">
+      {% for msg in messages %}
+        {% if msg.tags == 'error' %}
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded fixed top-8 left-1/2 transform -translate-x-1/2 shadow-lg z-[9999] my-2">
+            <strong class="font-bold">Error:</strong>
+            <span>{{ msg }}</span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(function() {
+        var el = document.getElementById('django-messages');
+        if (el) el.remove();
+      }, 4000);
+    </script>
+  {% endif %}
 
   <!-- Form -->
   <form action="" method="post" class="space-y-4">
@@ -57,8 +84,6 @@
         Batal
       </a>
     </div>
-
   </form>
-
 </div>
 {% endblock %}

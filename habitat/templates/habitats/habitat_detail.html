@@ -2,22 +2,28 @@
 {% load static %}
 
 {% block content %}
-{% include 'navbar_staff.html' %} 
-<div class="h-20"></div> <!-- Spacer adjusted to match navbar height -->
+{% if user_role == 'penjaga_hewan' %}
+  {% include 'navbar_penjaga_hewan.html' %}
+{% elif user_role == 'staff' %}
+  {% include 'navbar_staff.html' %}
+{% else %}
+  {% include 'navbar_staff.html' %}
+{% endif %}
+
+<div class="h-20"></div>
 <div class="w-full px-4 py-6">
-  <!-- Detail Habitat Card Full Width -->
   <div class="bg-white p-6 rounded-2xl shadow-md animate-float w-full relative">
     <!-- Top Right Buttons -->
     <div class="absolute top-4 right-4 flex space-x-2">
-      <button onclick="openModal()" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Edit</button>
-      <button onclick="openDeleteModal()" class="text-red-500 hover:text-red-700 text-sm font-medium">Hapus</button>
+      <a href="{% url 'habitat:habitat_edit' habitat.nama %}" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Edit</a>
+      <a href="{% url 'habitat:habitat_delete' habitat.nama %}" class="text-red-500 hover:text-red-700 text-sm font-medium">Hapus</a>
     </div>
-    <h2 class="text-3xl font-bold text-green-500 mb-4">Detail Habitat: Savana</h2>
+    <h2 class="text-3xl font-bold text-green-500 mb-4">Detail Habitat: {{ habitat.nama }}</h2>
     <div class="flex flex-col md:flex-row md:space-x-8 mb-6">
       <div class="flex-1 space-y-2">
-        <p><span class="font-medium">Luas Area:</span> 5.000 m²</p>
-        <p><span class="font-medium">Status Lingkungan:</span> Suhu: 30°C, Kelembapan: 40%, Vegetasi: Rumput luas</p>
-        <p><span class="font-medium">Kapasitas Maksimal:</span> 25 hewan</p>
+        <p><span class="font-medium">Luas Area:</span> {{ habitat.luas_area|floatformat:2 }} m²</p>
+        <p><span class="font-medium">Status Lingkungan:</span> {{ habitat.status }}</p>
+        <p><span class="font-medium">Kapasitas Maksimal:</span> {{ habitat.kapasitas }} hewan</p>
       </div>
     </div>
 
@@ -38,13 +44,19 @@
           </tr>
         </thead>
         <tbody>
+          {% for a in animals %}
           <tr class="border-t">
-            <td class="px-4 py-2 text-gray-700">simba</td>
-            <td class="px-4 py-2 text-gray-700">Singa</td>
-            <td class="px-4 py-2 text-gray-700">Afrika</td>
-            <td class="px-4 py-2 text-gray-700">2018-05-12</td>
-            <td class="px-4 py-2 text-gray-700">Sehat</td>
+            <td class="px-4 py-2 text-gray-700">{{ a.name }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ a.species }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ a.origin }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ a.birth_date }}</td>
+            <td class="px-4 py-2 text-gray-700">{{ a.health_status }}</td>
           </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-gray-400 py-4">Belum ada hewan di habitat ini.</td>
+          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
