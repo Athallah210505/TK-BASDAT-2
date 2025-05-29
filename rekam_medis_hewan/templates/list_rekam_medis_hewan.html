@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    {% include 'navbar_dokter_hewan.html' %}
+
+    <h1 class="text-4xl font-bold text-center text-green-600 mb-8">Daftar Hewan</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for hewan in hewan_list %}
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover-scale">
+            <div class="flex items-center mb-4">
+                <img src="{{ hewan.url_foto }}" alt="{{ hewan.nama }}" class="w-20 h-20 rounded-full object-cover mr-4">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800">{{ hewan.nama }}</h2>
+                    <p class="text-sm text-gray-500">Spesies: {{ hewan.spesies }}</p>
+                    <p class="text-sm text-gray-500">Asal: {{ hewan.asal_hewan }}</p>
+                </div>
+            </div>
+            <a href="{% url 'show_rekam_medis' %}?id={{ hewan.id }}" class="block text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded transition">
+                Lihat Rekam Medis
+            </a>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 col-span-full text-center">Tidak ada data hewan ditemukan.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

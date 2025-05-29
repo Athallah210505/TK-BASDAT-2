@@ -16,16 +16,18 @@
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-8">
         <!-- Common links for all roles -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+         <a href="{% url 'dokter_hewan_dashboard' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Dashboard
+        </a>
+        <a href="{% url 'show_jadwal_pemeriksaan' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+          Jadwal Pemeriksaan
         </a>
         
         <!-- Doctor-specific links -->
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="{% url 'list_rekam_medis_hewan' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Rekam Medis Hewan
         </a>
-        
-        <a href="#" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="{% url 'vet_profile' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Profile
         </a>
         
@@ -56,11 +58,11 @@
       </a>
       
       <!-- Doctor-specific mobile links -->
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
-        Rekam Medis Hewan
-      </a>
+      <a href="{% url 'list_rekam_medis_hewan' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+    Rekam Medis Hewan
+    </a>
       
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="{% url 'vet_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
         Profile
       </a>
       
