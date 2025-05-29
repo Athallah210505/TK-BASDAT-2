@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+  <title>Pengaturan Profil</title>
+{% endblock %}
+
+{% block content %}
+{% include 'navbar_dokter_hewan.html' %}
+
+<div class="max-w-7xl mx-auto mt-8 mb-16 px-4 animate__animated animate__fadeIn">
+    <div class="pt-20 text-center">
+        <h1 class="text-3xl font-bold text-green-600">Pengaturan Profil</h1>
+        <p class="text-gray-600 mt-2">Kelola informasi profil Anda</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+        {% if messages %}
+            <div class="p-4">
+                {% for message in messages %}
+                    <div class="p-3 mb-2 border-l-4 {% if message.tags == 'success' %}border-green-500 bg-green-100{% else %}border-red-500 bg-red-100{% endif %} rounded-r animate__animated animate__fadeIn">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="bg-gray-50 border-b border-gray-200">
+            <div class="flex overflow-x-auto">
+                <a href="#" class="tab-btn active-tab px-6 py-3 font-medium text-green-600 border-b-2 border-green-500">Profil</a>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <form method="POST" action="{% url 'pengaturan_profil_dh' %}">
+                {% csrf_token %}
+                
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/3 pr-0 md:pr-8">
+                        <div class="flex flex-col items-center mb-6">
+                            <div class="w-32 h-32 bg-gray-200 rounded-full overflow-hidden mb-4 border-4 border-white shadow-lg">
+                                <div class="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white text-4xl font-bold">
+                                    {{ request.user.username|first|upper }}
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-semibold text-center">{{ request.user.username }}</h3>
+                            <p class="text-sm text-gray-500 text-center">{% if is_dokter %}Dokter Hewan{% else %}User{% endif %}</p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username:</label>
+                            <input type="text" id="username" name="username" value="{{ request.user.username }}" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700" readonly>
+                            <p class="text-xs text-gray-500 mt-1">(tidak dapat diubah)</p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                            <input type="email" id="email" name="email" value="{{ request.user.email|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon:</label>
+                            <input type="tel" id="no_telepon" name="no_telepon" value="{{ request.user.profile.no_telepon|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-2/3 md:border-l md:border-gray-200 md:pl-8">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Informasi Personal</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="nama_depan" class="block text-sm font-medium text-gray-700 mb-1">Nama Depan:</label>
+                                <input type="text" id="nama_depan" name="nama_depan" value="{{ request.user.first_name|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            
+                            <div>
+                                <label for="nama_tengah" class="block text-sm font-medium text-gray-700 mb-1">Nama Tengah (Opsional):</label>
+                                <input type="text" id="nama_tengah" name="nama_tengah" value="{{ request.user.profile.nama_tengah|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            
+                            <div>
+                                <label for="nama_belakang" class="block text-sm font-medium text-gray-700 mb-1">Nama Belakang:</label>
+                                <input type="text" id="nama_belakang" name="nama_belakang" value="{{ request.user.last_name|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                        </div>
+                        
+                        {% if is_dokter %}
+                        <div class="mt-8">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Informasi Dokter Hewan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="no_str" class="block text-sm font-medium text-gray-700 mb-1">Nomor Sertifikasi Profesional:</label>
+                                    <input type="text" id="no_str" name="no_str" value="{{ user_data.no_str|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700" readonly>
+                                    <p class="text-xs text-gray-500 mt-1">(tidak dapat diubah)</p>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">Spesialisasi:</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        {% for pilihan in spesialisasi_list %}
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="spec_{{ forloop.counter }}" name="spesialisasi" value="{{ pilihan }}" 
+                                                {% if pilihan in user_data.spesialisasi %}checked{% endif %}
+                                                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                            <label for="spec_{{ forloop.counter }}" class="ml-2 block text-sm text-gray-700">{{ pilihan }}</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center space-x-4">
+                    <button type="submit" class="btn-shine bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-10 rounded-md font-medium transition duration-300 ease-in-out shadow-md hover:shadow-lg">
+                        Simpan Perubahan
+                    </button>
+                    <button type="button" onclick="togglePasswordModal()" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-8 rounded-md font-medium transition duration-300 ease-in-out shadow-md hover:shadow-lg">
+                        Ubah Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ubah Password -->
+<div id="modalPassword" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-4 animate__animated animate__fadeIn">
+        <h3 class="text-xl font-bold mb-6 text-gray-800">Ubah Password</h3>
+        <form method="POST" action="{% url 'ubah_password' %}">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label for="password_lama" class="block text-sm font-medium text-gray-700 mb-1">Password Lama:</label>
+                    <input type="password" id="password_lama" name="password_lama" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="password_baru" class="block text-sm font-medium text-gray-700 mb-1">Password Baru:</label>
+                    <input type="password" id="password_baru" name="password_baru" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="konfirmasi_password_baru" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru:</label>
+                    <input type="password" id="konfirmasi_password_baru" name="konfirmasi_password_baru" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" onclick="togglePasswordModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-md font-medium transition duration-300">
+                    Batal
+                </button>
+                <button type="submit" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-md font-medium transition duration-300 shadow-md hover:shadow-lg">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function togglePasswordModal() {
+        const modal = document.getElementById('modalPassword');
+        modal.classList.toggle('hidden');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('modalPassword').addEventListener('click', function(e) {
+        if (e.target === this) {
+            togglePasswordModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('modalPassword');
+            if (!modal.classList.contains('hidden')) {
+                togglePasswordModal();
+            }
+        }
+    });
+</script>
+
+{% endblock %}
