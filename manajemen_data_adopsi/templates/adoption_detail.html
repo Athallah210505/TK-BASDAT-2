@@ -14,81 +14,113 @@
       <h1 class="text-3xl font-bold text-green-600 mb-8">Detail Adopsi Hewan</h1>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-<!-- Update the animal info section -->
-<div class="bg-green-100 p-8 rounded-xl border border-green-200 safari-card">
-  <h2 class="text-2xl font-semibold text-green-700 mb-6">Informasi Hewan</h2>
-  <div class="space-y-4">
-      <div>
-          <p class="text-gray-500 text-sm mb-1">Nama Hewan:</p>
-          <p class="font-medium text-lg">{{ adoption.animal.nama }}</p>
-      </div>
-      <div>
-          <p class="text-gray-500 text-sm mb-1">Jenis Hewan:</p>
-          <p class="font-medium text-lg">{{ adoption.animal.jenis }}</p>
-      </div>
-      <div>
-          <p class="text-gray-500 text-sm mb-1">Kondisi:</p>
-          <p class="font-medium text-lg">{{ adoption.animal.kondisi }}</p>
-      </div>
-  </div>
-</div>
+        <!-- Informasi Hewan -->
+        <div class="bg-green-100 p-8 rounded-xl border border-green-200 safari-card">
+          <h2 class="text-2xl font-semibold text-green-700 mb-6">Informasi Hewan</h2>
+          <div class="space-y-4">
+              <div>
+                  <p class="text-gray-500 text-sm mb-1">Nama Hewan:</p>
+                  <p class="font-medium text-lg">{{ adoption.animal.nama }}</p>
+              </div>
+              <div>
+                  <p class="text-gray-500 text-sm mb-1">Jenis Hewan:</p>
+                  <p class="font-medium text-lg">{{ adoption.animal.jenis }}</p>
+              </div>
+              <div>
+                  <p class="text-gray-500 text-sm mb-1">Kondisi:</p>
+                  <p class="font-medium text-lg">{{ adoption.animal.kondisi }}</p>
+              </div>
+          </div>
+        </div>
 
-<!-- Update the adopter info section -->
-<div class="bg-blue-50 p-8 rounded-xl border border-blue-200 safari-card">
-  <h2 class="text-2xl font-semibold text-blue-700 mb-6">Informasi Adopter</h2>
-  <div class="space-y-4">
-      <div>
-          <p class="text-gray-500 text-sm mb-1">Username Adopter:</p>
-          <p class="font-medium text-lg">{{ adoption.adopter.username }}</p>
+        <!-- Informasi Adopter -->
+        <div class="bg-blue-50 p-8 rounded-xl border border-blue-200 safari-card">
+          <h2 class="text-2xl font-semibold text-blue-700 mb-6">Informasi Adopter</h2>
+          <div class="space-y-4">
+              <div>
+                  <p class="text-gray-500 text-sm mb-1">Username Adopter:</p>
+                  <p class="font-medium text-lg">{{ adoption.adopter.username }}</p>
+              </div>
+              <div>
+                  <p class="text-gray-500 text-sm mb-1">Nama Adopter:</p>
+                  <p class="font-medium text-lg">{{ adoption.adopter.nama_adopter }}</p>
+              </div>
+              <div>
+                  <p class="text-gray-500 text-sm mb-1">Tipe Adopter:</p>
+                  <p class="font-medium text-lg">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                          {% if adoption.adopter.tipe_adopter == 'Individu' %}
+                              bg-green-100 text-green-800
+                          {% elif adoption.adopter.tipe_adopter == 'Organisasi' %}
+                              bg-blue-100 text-blue-800
+                          {% else %}
+                              bg-gray-100 text-gray-800
+                          {% endif %}">
+                          {{ adoption.adopter.tipe_adopter }}
+                      </span>
+                  </p>
+              </div>
+              <div>
+                  <p class="text-gray-500 text-sm mb-1">Total Kontribusi:</p>
+                  <p class="font-medium text-lg">{{ adoption.adopter.total_kontribusi }}</p>
+              </div>
+          </div>
+        </div>
       </div>
-      <div>
-          <p class="text-gray-500 text-sm mb-1">Total Kontribusi:</p>
-          <p class="font-medium text-lg">{{ adoption.adopter.total_kontribusi }}</p>
-      </div>
-  </div>
-</div>
 
-<!-- Update the adoption details section -->
-<div class="bg-green-100 p-8 rounded-xl border border-green-200 mb-8 safari-card">
-  <h2 class="text-2xl font-semibold text-green-700 mb-6">Detail Adopsi</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="space-y-4">
-          <div>
-              <p class="text-gray-500 text-sm mb-1">Tanggal Mulai Adopsi:</p>
-              <p class="font-medium text-lg">{{ adoption.mulai_adopsi }}</p>
-          </div>
-          <div>
-              <p class="text-gray-500 text-sm mb-1">Tanggal Akhir Adopsi:</p>
-              <p class="font-medium text-lg">{{ adoption.berhenti_adopsi }}</p>
-          </div>
+      <!-- Detail Adopsi -->
+      <div class="bg-green-100 p-8 rounded-xl border border-green-200 mb-8 safari-card">
+        <h2 class="text-2xl font-semibold text-green-700 mb-6">Detail Adopsi</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">Tanggal Mulai Adopsi:</p>
+                    <p class="font-medium text-lg">{{ adoption.mulai_adopsi }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">Tanggal Akhir Adopsi:</p>
+                    <p class="font-medium text-lg">{{ adoption.berhenti_adopsi }}</p>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">Status Pembayaran:</p>
+                    <p class="font-medium text-lg">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            {% if adoption.status_pembayaran == 'Lunas' %}
+                                bg-green-100 text-green-800
+                            {% elif adoption.status_pembayaran == 'Tertunda' %}
+                                bg-yellow-100 text-yellow-800
+                            {% else %}
+                                bg-red-100 text-red-800
+                            {% endif %}">
+                            {{ adoption.status_pembayaran }}
+                        </span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">Kontribusi Finansial:</p>
+                    <p class="font-medium text-lg">{{ adoption.kontribusi_finansial }}</p>
+                </div>
+            </div>
+        </div>
       </div>
-      <div class="space-y-4">
-          <div>
-              <p class="text-gray-500 text-sm mb-1">Status Pembayaran:</p>
-              <p class="font-medium text-lg">{{ adoption.status_pembayaran }}</p>
-          </div>
-          <div>
-              <p class="text-gray-500 text-sm mb-1">Kontribusi Finansial:</p>
-              <p class="font-medium text-lg">{{ adoption.kontribusi_finansial }}</p>
-          </div>
-      </div>
-  </div>
-</div>
       
+      <!-- Tombol Aksi -->
       <div class="flex flex-wrap justify-end gap-4">
-        <a href="/adoption/reports/1" class="bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+        <a href="{% url 'animal_condition_report' adoption.id %}" class="bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
           </svg>
           Pantau Kondisi
         </a>
-        <a href="/adoption/certificate/1" class="bg-purple-500 hover:bg-purple-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+        <a href="{% url 'adoption_certificate' adoption.id %}" class="bg-purple-500 hover:bg-purple-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
           Sertifikat
         </a>
-        <a href="/adoption/extend/1" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+        <a href="{% url 'extend_adoption' adoption.id %}" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
           </svg>
@@ -105,45 +137,66 @@
   </div>
 </div>
 
-<!-- Modal Konfirmasi Berhenti Adopsi -->
-<div id="endAdoptionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate__animated animate__fadeIn hidden">
-  <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4 animate__animated animate__zoomIn safari-card">
-    <div class="text-center mb-6">
-      <div class="flex justify-center">
-        <div class="bg-red-100 p-3 rounded-full inline-block">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
-        </div>
-      </div>
-      <h2 class="text-2xl font-bold text-gray-800 mt-4">Hentikan Adopsi</h2>
-    </div>
-    
-    <p class="text-center text-gray-600 mb-8">
-      Apakah Anda yakin ingin berhenti mengadopsi satwa ini?
-    </p>
-    
-    <div class="flex flex-col sm:flex-row justify-center gap-4">
-      <button id="cancelButton" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-full btn-shine inline-flex items-center justify-center">
-        <span>Batal</span>
-      </button>
-      <a href="/adoption/end/1" id="confirmButton" class="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+<!-- Modal Konfirmasi Hentikan Adopsi -->
+<div id="endAdoptionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center animate__animated animate__fadeIn">
+  <div class="relative mx-auto p-6 border w-full max-w-md shadow-lg rounded-xl bg-white transform transition-all animate__animated animate__zoomIn">
+    <div class="mt-3 text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+        <svg class="h-6 w-6 text-red-600" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
         </svg>
-        <span>Ya</span>
-      </a>
+      </div>
+      <h3 class="text-xl leading-6 font-bold text-gray-900 mb-2">Hentikan Adopsi?</h3>
+      <div class="px-7 py-3">
+        <p class="text-sm text-gray-600">
+          Apakah Anda yakin ingin menghentikan adopsi untuk hewan <strong>{{ adoption.animal.nama }}</strong> oleh <strong>{{ adoption.adopter.username }}</strong>? Tindakan ini akan mengubah tanggal berhenti adopsi menjadi hari ini.
+        </p>
+      </div>
+      <div class="items-center px-4 py-3 mt-4 flex justify-center gap-3">
+        <button id="cancelButton" class="px-6 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-full shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+          Batal
+        </button>
+        <!-- Form untuk mengirim POST request saat tombol "Ya, Hentikan" diklik -->
+        <form action="{% url 'end_adoption' adoption.id %}" method="POST" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="px-6 py-2 bg-red-500 text-white text-base font-medium rounded-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 btn-shine">
+                Ya, Hentikan
+            </button>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-  document.getElementById('showEndModal').addEventListener('click', function() {
-    document.getElementById('endAdoptionModal').classList.remove('hidden');
-  });
-  
-  document.getElementById('cancelButton').addEventListener('click', function() {
-    document.getElementById('endAdoptionModal').classList.add('hidden');
+  document.addEventListener('DOMContentLoaded', function () {
+    const showEndModalButton = document.getElementById('showEndModal');
+    const endAdoptionModal = document.getElementById('endAdoptionModal');
+    const cancelButton = document.getElementById('cancelButton');
+
+    if (showEndModalButton && endAdoptionModal) {
+        showEndModalButton.addEventListener('click', function() {
+            endAdoptionModal.classList.remove('hidden');
+            // endAdoptionModal.classList.add('flex'); // Jika menggunakan flex untuk centering
+        });
+    }
+
+    if (cancelButton && endAdoptionModal) {
+        cancelButton.addEventListener('click', function() {
+            endAdoptionModal.classList.add('hidden');
+            // endAdoptionModal.classList.remove('flex');
+        });
+    }
+
+    // Optional: Close modal if clicked outside
+    if (endAdoptionModal) {
+        endAdoptionModal.addEventListener('click', function(event) {
+            if (event.target === endAdoptionModal) { // Klik pada backdrop modal
+                endAdoptionModal.classList.add('hidden');
+                // endAdoptionModal.classList.remove('flex');
+            }
+        });
+    }
   });
 </script>
 {% endblock %}
