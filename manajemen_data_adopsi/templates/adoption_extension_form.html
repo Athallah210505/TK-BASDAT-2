@@ -13,6 +13,13 @@
     <div class="bg-white rounded-2xl shadow-xl p-8 animate__animated animate__fadeIn">
       <h1 class="text-3xl font-bold text-green-600 mb-8">Perpanjang Periode Adopsi</h1>
       
+      {% if error %}
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ error }}
+      </div>
+      {% endif %}
+      
+      {% if adoption %}
       <div class="bg-green-100 p-8 rounded-xl border border-green-200 mb-8 safari-card">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -20,11 +27,11 @@
             <div class="space-y-3">
               <div>
                 <p class="text-gray-500 text-sm">Nama Hewan:</p>
-                <p class="font-medium">Simba</p>
+                <p class="font-medium">{{ adoption.animal.nama }}</p>
               </div>
               <div>
                 <p class="text-gray-500 text-sm">Jenis Hewan:</p>
-                <p class="font-medium">Singa Afrika</p>
+                <p class="font-medium">{{ adoption.animal.jenis }}</p>
               </div>
             </div>
           </div>
@@ -33,12 +40,20 @@
             <h2 class="text-xl font-semibold text-green-700 mb-4">Informasi Adopter</h2>
             <div class="space-y-3">
               <div>
-                <p class="text-gray-500 text-sm">Nama Adopter:</p>
-                <p class="font-medium">Budi Santoso</p>
+                <p class="text-gray-500 text-sm">Username:</p>
+                <p class="font-medium">{{ adoption.adopter.username }}</p>
               </div>
               <div>
-                <p class="text-gray-500 text-sm">Kontak:</p>
-                <p class="font-medium">08123456789</p>
+                <p class="text-gray-500 text-sm">Nama Adopter:</p>
+                <p class="font-medium">{{ adoption.adopter.display_name }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 text-sm">Tipe Adopter:</p>
+                <p class="font-medium">{{ adoption.adopter.tipe_adopter }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 text-sm">Total Kontribusi:</p>
+                <p class="font-medium">{{ adoption.adopter.total_kontribusi_formatted }}</p>
               </div>
             </div>
           </div>
@@ -50,15 +65,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <p class="text-gray-500 text-sm">Tanggal Mulai:</p>
-            <p class="font-medium">15 Januari 2023</p>
+            <p class="font-medium">{{ adoption.mulai_adopsi }}</p>
           </div>
           <div>
             <p class="text-gray-500 text-sm">Tanggal Akhir:</p>
-            <p class="font-medium">15 Januari 2024</p>
+            <p class="font-medium">{{ adoption.berhenti_adopsi }}</p>
           </div>
           <div>
             <p class="text-gray-500 text-sm">Kontribusi Awal:</p>
-            <p class="font-medium">Rp 5.000.000</p>
+            <p class="font-medium">{{ adoption.kontribusi_finansial_formatted }}</p>
           </div>
         </div>
       </div>
@@ -72,7 +87,9 @@
           <div class="grid grid-cols-1 gap-6">
             <div>
               <label class="block text-gray-700 mb-2">Tanggal Akhir Baru:</label>
-              <input type="date" name="end_date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value="2025-01-15">
+              <input type="date" name="end_date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                     value="{{ adoption.berhenti_adopsi_raw }}" min="{{ adoption.berhenti_adopsi_raw }}" required>
+              <p class="text-sm text-gray-500 mt-1">Tanggal berakhir saat ini: {{ adoption.berhenti_adopsi }}</p>
             </div>
             
             <div>
@@ -81,14 +98,17 @@
                 <span class="inline-flex items-center px-4 text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg">
                   Rp
                 </span>
-                <input type="number" name="contribution" min="0" step="1000" class="w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value="5000000">
+                <input type="number" name="contribution" min="100000" step="100000" 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                       placeholder="Masukkan kontribusi tambahan" required>
               </div>
+              <p class="text-sm text-gray-500 mt-1">Minimal: Rp 100.000</p>
             </div>
           </div>
         </div>
         
         <div class="flex justify-end space-x-4">
-          <a href="/adoption/1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-full transition">
+          <a href="{% url 'adoption_detail' adoption.id %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-full transition">
             Batal
           </a>
           <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine">
@@ -96,7 +116,43 @@
           </button>
         </div>
       </form>
+      
+      {% else %}
+      <div class="text-center py-12">
+        <p class="text-gray-500">Data adopsi tidak ditemukan.</p>
+        <a href="{% url 'adoption_list' %}" class="text-green-600 hover:text-green-700 mt-4 inline-block">
+          Kembali ke Daftar Adopsi
+        </a>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
+
+<style>
+.safari-card {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s;
+}
+
+.btn-shine:hover:before {
+  left: 100%;
+}
+</style>
 {% endblock %}

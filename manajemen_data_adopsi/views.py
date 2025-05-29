@@ -1,17 +1,18 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.db import connection
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from datetime import datetime
+import uuid
 
 def adoption_list(request):
     with connection.cursor() as cursor:
-        # Get all animals with their adoption status
+        # Get all animals with their adoption status and adoption ID if adopted
         cursor.execute("""
             SELECT h.id, h.nama, h.spesies, h.status_kesehatan, 
-                   CASE WHEN a.id_hewan IS NOT NULL THEN 'Diadopsi' ELSE 'Belum Diadopsi' END as status_adopsi
+                   CASE WHEN a.id_hewan IS NOT NULL THEN 'Diadopsi' ELSE 'Belum Diadopsi' END as status_adopsi,
+                   CASE WHEN a.id_hewan IS NOT NULL THEN CONCAT(a.id_adopter, '-', a.id_hewan) ELSE NULL END as adoption_id
             FROM sizopi.hewan h
-            LEFT JOIN sizopi.adopsi a ON h.id = a.id_hewan
-            WHERE a.tgl_berhenti_adopsi >= CURRENT_DATE OR a.id_hewan IS NULL
+            LEFT JOIN sizopi.adopsi a ON h.id = a.id_hewan AND a.tgl_berhenti_adopsi >= CURRENT_DATE
         """)
         animals = cursor.fetchall()
         
@@ -19,56 +20,90 @@ def adoption_list(request):
         animal_list = []
         for animal in animals:
             animal_list.append({
-                'id_hewan': animal[0],
-                'nama_hewan': animal[1],
-                'jenis_hewan': animal[2],
-                'kondisi': animal[3],
-                'status_adopsi': animal[4]
+                'id_hewan': str(animal[0]),
+                'nama': animal[1],
+                'spesies': animal[2],
+                'status_kesehatan': animal[3],
+                'status_adopsi': animal[4],
+                'adoption_id': animal[5]
             })
     
     return render(request, 'adoption_list.html', {'animals': animal_list})
 
 def adoption_detail(request, adoption_id):
-    with connection.cursor() as cursor:
-        # Get adoption details
-        cursor.execute("""
-            SELECT a.id_adopter, a.id_hewan, a.status_pembayaran, 
-                   a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi, a.kontribusi_finansial,
-                   h.nama, h.spesies, h.status_kesehatan,
-                   ad.username_adopter, ad.total_kontribusi
-            FROM sizopi.adopsi a
-            JOIN sizopi.hewan h ON a.id_hewan = h.id
-            JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
-            WHERE a.id_adopter = %s AND a.id_hewan = %s
-        """, [adoption_id.split('-')[0], adoption_id.split('-')[1] if '-' in str(adoption_id) else adoption_id])
-        adoption = cursor.fetchone()
-        
-        if not adoption:
-            raise Http404("Adopsi tidak ditemukan")
+    try:
+        # Split the adoption_id into its components
+        parts = adoption_id.split('-')
+        if len(parts) != 10:  # Expecting 10 parts for two UUIDs
+            return HttpResponse(f"Invalid adoption ID format: {adoption_id}")
+
+        # Reconstruct the UUIDs
+        adopter_id = '-'.join(parts[:5])  # First 5 parts for adopter_id
+        animal_id = '-'.join(parts[5:])   # Last 5 parts for animal_id
+
+        # Convert both IDs to UUID
+        try:
+            adopter_id = uuid.UUID(adopter_id)
+            animal_id = uuid.UUID(animal_id)
+        except ValueError:
+            return HttpResponse(f"Invalid UUID in adoption ID: adopter_id={adopter_id}, animal_id={animal_id}")
+
+        with connection.cursor() as cursor:
+            # Updated query with potential column name fixes
+            query = """
+                SELECT a.id_adopter, a.id_hewan, a.status_pembayaran, 
+                       a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi, a.kontribusi_finansial,
+                       h.nama, h.spesies, h.status_kesehatan,
+                       ad.username_adopter, ad.total_kontribusi,
+                       COALESCE(i.nama, o.nama_organisasi) as nama_adopter,
+                       CASE 
+                           WHEN i.id_adopter IS NOT NULL THEN 'Individu'
+                           WHEN o.id_adopter IS NOT NULL THEN 'Organisasi'
+                           ELSE 'Tidak Diketahui'
+                       END as tipe_adopter
+                FROM sizopi.adopsi a
+                JOIN sizopi.hewan h ON a.id_hewan = h.id
+                JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
+                LEFT JOIN sizopi.individu i ON ad.id_adopter = i.id_adopter
+                LEFT JOIN sizopi.organisasi o ON ad.id_adopter = o.id_adopter
+                WHERE a.id_adopter = %s AND a.id_hewan = %s
+            """
+            cursor.execute(query, [adopter_id, animal_id])
             
-        # Format dates
-        mulai_adopsi = datetime.strptime(str(adoption[3]), '%Y-%m-%d').strftime('%d %B %Y')
-        berhenti_adopsi = datetime.strptime(str(adoption[4]), '%Y-%m-%d').strftime('%d %B %Y')
-        
-        context = {
-            'adoption': {
-                'id': f"{adoption[0]}-{adoption[1]}",
-                'status_pembayaran': adoption[2],
-                'mulai_adopsi': mulai_adopsi,
-                'berhenti_adopsi': berhenti_adopsi,
-                'kontribusi_finansial': f"Rp {adoption[5]:,}",
-                'animal': {
-                    'nama': adoption[6],
-                    'jenis': adoption[7],
-                    'kondisi': adoption[8]
-                },
-                'adopter': {
-                    'username': adoption[9],
-                    'total_kontribusi': f"Rp {adoption[10]:,}"
+            adoption = cursor.fetchone()
+            
+            if not adoption:
+                return HttpResponse(f"Adoption not found for adopter_id={adopter_id}, animal_id={animal_id}")
+            
+            # Format dates
+            mulai_adopsi = datetime.strptime(str(adoption[3]), '%Y-%m-%d').strftime('%d %B %Y')
+            berhenti_adopsi = datetime.strptime(str(adoption[4]), '%Y-%m-%d').strftime('%d %B %Y')
+            
+            context = {
+                'adoption': {
+                    'id': adoption_id,
+                    'status_pembayaran': adoption[2],
+                    'mulai_adopsi': mulai_adopsi,
+                    'berhenti_adopsi': berhenti_adopsi,
+                    'kontribusi_finansial': f"Rp {adoption[5]:,}",
+                    'animal': {
+                        'nama': adoption[6],
+                        'jenis': adoption[7],
+                        'kondisi': adoption[8]
+                    },
+                    'adopter': {
+                        'username': adoption[9],
+                        'total_kontribusi': f"Rp {adoption[10]:,}",
+                        'nama_adopter': adoption[11],
+                        'tipe_adopter': adoption[12]
+                    }
                 }
             }
-        }
-    
+
+    except Exception as e:
+        # Log the error for debugging
+        return HttpResponse(f"Error in adoption_detail: {str(e)}")
+
     return render(request, 'adoption_detail.html', context)
 
 def register_adopter(request, animal_id=None):
@@ -93,7 +128,11 @@ def register_adopter(request, animal_id=None):
                 
                 # Calculate end date
                 end_date = datetime.strptime(start_date, '%Y-%m-%d')
-                end_date = end_date.replace(month=end_date.month + int(adoption_period))
+                months_to_add = int(adoption_period)
+                new_month = end_date.month + months_to_add
+                new_year = end_date.year + (new_month - 1) // 12
+                new_month = ((new_month - 1) % 12) + 1
+                end_date = end_date.replace(year=new_year, month=new_month)
                 
                 # Create adoption record
                 cursor.execute("""
@@ -131,12 +170,15 @@ def register_adopter(request, animal_id=None):
             """, [animal_id])
             animal = cursor.fetchone()
             
+            if not animal:
+                raise Http404("Hewan tidak ditemukan")
+            
             context = {
                 'animal': {
                     'id': animal_id,
                     'nama': animal[0],
-                    'jenis': animal[1],
-                    'kondisi': animal[2]
+                    'spesies': animal[1],
+                    'status_kesehatan': animal[2]
                 }
             }
             
@@ -151,7 +193,7 @@ def extend_adoption(request, adoption_id=None):
         
         try:
             # Parse adoption_id (format: adopter_id-animal_id)
-            adopter_id, animal_id = adoption_id.split('-')
+            adopter_id, animal_id = adoption_id.split('-', 1)
             
             with connection.cursor() as cursor:
                 # Update adoption record
@@ -178,7 +220,7 @@ def extend_adoption(request, adoption_id=None):
     # GET request - show form
     if adoption_id:
         try:
-            adopter_id, animal_id = adoption_id.split('-')
+            adopter_id, animal_id = adoption_id.split('-', 1)
             
             with connection.cursor() as cursor:
                 cursor.execute("""
@@ -203,7 +245,7 @@ def extend_adoption(request, adoption_id=None):
                         'kontribusi_finansial': adoption[2],
                         'animal': {
                             'nama': adoption[3],
-                            'jenis': adoption[4]
+                            'spesies': adoption[4]
                         },
                         'adopter': {
                             'username': adoption[5]
@@ -221,7 +263,7 @@ def extend_adoption(request, adoption_id=None):
 def end_adoption(request, adoption_id=None):
     if request.method == 'POST' and adoption_id:
         try:
-            adopter_id, animal_id = adoption_id.split('-')
+            adopter_id, animal_id = adoption_id.split('-', 1)
             
             with connection.cursor() as cursor:
                 # Update adoption end date to current date
@@ -292,7 +334,7 @@ def adopter_info(request, adopter_id=None):
 def adoption_certificate(request, adoption_id=None):
     if adoption_id:
         try:
-            adopter_id, animal_id = adoption_id.split('-')
+            adopter_id, animal_id = adoption_id.split('-', 1)
             
             with connection.cursor() as cursor:
                 cursor.execute("""
@@ -314,7 +356,7 @@ def adoption_certificate(request, adoption_id=None):
                         'id': adoption_id,
                         'animal': {
                             'nama': adoption[0],
-                            'jenis': adoption[1]
+                            'spesies': adoption[1]
                         },
                         'adopter': {
                             'username': adoption[2]
@@ -335,7 +377,7 @@ def adoption_certificate(request, adoption_id=None):
 def animal_condition_report(request, adoption_id=None):
     if adoption_id:
         try:
-            adopter_id, animal_id = adoption_id.split('-')
+            adopter_id, animal_id = adoption_id.split('-', 1)
             
             with connection.cursor() as cursor:
                 # Get adoption info
@@ -351,34 +393,40 @@ def animal_condition_report(request, adoption_id=None):
                 
                 if not adoption:
                     raise Http404("Adopsi tidak ditemukan")
-                    
-                # Get medical records (assuming table exists)
-                cursor.execute("""
-                    SELECT tanggal_pemeriksaan, nama_dokter, status_kesehatan, 
-                           diagnosa, pengobatan, catatan_tindak_lanjut
-                    FROM sizopi.rekam_medis
-                    WHERE id_hewan = %s
-                    ORDER BY tanggal_pemeriksaan DESC
-                """, [animal_id])
-                medical_records = cursor.fetchall()
                 
-                # Get condition reports (assuming table exists)
-                cursor.execute("""
-                    SELECT tanggal_laporan, kondisi_satwa, foto_kondisi, 
-                           berat_badan, suhu_tubuh, nafsu_makan
-                    FROM sizopi.laporan_kondisi
-                    WHERE id_hewan = %s
-                    ORDER BY tanggal_laporan DESC
-                """, [animal_id])
-                condition_reports = cursor.fetchall()
+                # Try to get medical records (table might not exist)
+                try:
+                    cursor.execute("""
+                        SELECT tanggal_pemeriksaan, nama_dokter, status_kesehatan, 
+                               diagnosa, pengobatan, catatan_tindak_lanjut
+                        FROM sizopi.rekam_medis
+                        WHERE id_hewan = %s
+                        ORDER BY tanggal_pemeriksaan DESC
+                    """, [animal_id])
+                    medical_records = cursor.fetchall()
+                except:
+                    medical_records = []
+                
+                # Try to get condition reports (table might not exist)
+                try:
+                    cursor.execute("""
+                        SELECT tanggal_laporan, kondisi_satwa, foto_kondisi, 
+                               berat_badan, suhu_tubuh, nafsu_makan
+                        FROM sizopi.laporan_kondisi
+                        WHERE id_hewan = %s
+                        ORDER BY tanggal_laporan DESC
+                    """, [animal_id])
+                    condition_reports = cursor.fetchall()
+                except:
+                    condition_reports = []
                 
                 context = {
                     'adoption': {
                         'id': adoption_id,
                         'animal': {
                             'nama': adoption[0],
-                            'jenis': adoption[1],
-                            'habitat': adoption[2]
+                            'spesies': adoption[1],
+                            'habitat': adoption[2] if adoption[2] else 'N/A'
                         },
                         'adopter': {
                             'username': adoption[3]
@@ -405,10 +453,10 @@ def create_animal_report(request, adoption_id=None):
         appetite = request.POST.get('appetite')
         
         try:
-            adopter_id, animal_id = adoption_id.split('-')
+            adopter_id, animal_id = adoption_id.split('-', 1)
             
             with connection.cursor() as cursor:
-                # Insert condition report
+                # Insert condition report (table might not exist)
                 cursor.execute("""
                     INSERT INTO sizopi.laporan_kondisi
                     (id_hewan, tanggal_laporan, kondisi_satwa, foto_kondisi,
@@ -426,7 +474,7 @@ def create_animal_report(request, adoption_id=None):
     # GET request - show form
     if adoption_id:
         try:
-            adopter_id, animal_id = adoption_id.split('-')
+            adopter_id, animal_id = adoption_id.split('-', 1)
             
             with connection.cursor() as cursor:
                 cursor.execute("""
@@ -447,7 +495,7 @@ def create_animal_report(request, adoption_id=None):
                         'id': adoption_id,
                         'animal': {
                             'nama': adoption[0],
-                            'jenis': adoption[1]
+                            'spesies': adoption[1]
                         },
                         'adopter': {
                             'username': adoption[2]

@@ -13,27 +13,41 @@
     <div class="bg-white rounded-2xl shadow-xl p-8 animate__animated animate__fadeIn">
       <h1 class="text-3xl font-bold text-green-600 mb-8">Tambah Laporan Kondisi</h1>
       
+      {% if error %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {{ error }}
+        </div>
+      {% endif %}
+      
+      {% if adoption %}
       <div class="bg-green-100 p-8 rounded-xl border border-green-200 mb-8 safari-card">
         <h2 class="text-xl font-semibold text-green-700 mb-4">Informasi Hewan</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <p class="text-gray-500 text-sm">Nama Hewan:</p>
-            <p class="font-medium">Simba</p>
+            <p class="font-medium">{{ adoption.animal.nama }}</p>
           </div>
           <div>
             <p class="text-gray-500 text-sm">Jenis Hewan:</p>
-            <p class="font-medium">Singa Afrika</p>
+            <p class="font-medium">{{ adoption.animal.jenis }}</p>
           </div>
           <div>
             <p class="text-gray-500 text-sm">Adopter:</p>
-            <p class="font-medium">Budi Santoso</p>
+            <p class="font-medium">{{ adoption.adopter.nama_adopter }} ({{ adoption.adopter.username_adopter }})</p>
           </div>
           <div>
             <p class="text-gray-500 text-sm">Periode Adopsi:</p>
-            <p class="font-medium">15 Jan 2023 s/d 15 Jan 2024</p>
+            <p class="font-medium">{{ adoption.periode }}</p>
           </div>
+          {% if adoption.adopter.total_kontribusi %}
+          <div>
+            <p class="text-gray-500 text-sm">Total Kontribusi:</p>
+            <p class="font-medium">{{ adoption.adopter.total_kontribusi }}</p>
+          </div>
+          {% endif %}
         </div>
       </div>
+      {% endif %}
       
       <form method="POST" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
@@ -44,7 +58,7 @@
           <div class="space-y-6">
             <div>
               <label class="block text-gray-700 mb-2">Kondisi Satwa:</label>
-              <textarea name="condition" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Deskripsikan kondisi terbaru satwa...">Simba dalam kondisi sangat baik, aktif bermain dan nafsu makan normal. Berat badan stabil di 182kg.</textarea>
+              <textarea name="condition" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Deskripsikan kondisi terbaru satwa..." required>{% if adoption %}{{ adoption.animal.nama }} dalam kondisi baik, aktif bermain dan nafsu makan normal.{% endif %}</textarea>
             </div>
             
             <div>
@@ -58,7 +72,7 @@
                     <p class="mb-2 text-sm text-gray-500">Klik untuk upload foto</p>
                     <p class="text-xs text-gray-500">PNG, JPG (Max. 5MB)</p>
                   </div>
-                  <input id="photo" name="photo" type="file" class="hidden" />
+                  <input id="photo" name="photo" type="file" class="hidden" accept="image/*" />
                 </label>
               </div>
             </div>
@@ -66,9 +80,15 @@
         </div>
         
         <div class="flex justify-end space-x-4">
-          <a href="/adoption/reports/1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-full transition">
-            Batal
-          </a>
+          {% if adoption %}
+            <a href="{% url 'animal_condition_report' adoption.id %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-full transition">
+              Batal
+            </a>
+          {% else %}
+            <a href="/" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-full transition">
+              Batal
+            </a>
+          {% endif %}
           <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine">
             Simpan Laporan
           </button>
@@ -77,4 +97,36 @@
     </div>
   </div>
 </div>
+
+<style>
+.safari-card {
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.btn-shine {
+  background: linear-gradient(45deg, #10b981, #059669);
+  transition: all 0.3s ease;
+}
+
+.btn-shine:hover {
+  background: linear-gradient(45deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+.animate__animated.animate__fadeIn {
+  animation-duration: 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate__fadeIn {
+  animation-name: fadeIn;
+}
+</style>
 {% endblock %}
