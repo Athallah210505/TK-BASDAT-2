@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.db import connection
+from utils.decorators import role_required
 
 # Create your views here.
-
+@role_required('pengunjung')
 def satwa_list(request):
     with connection.cursor() as cur:
         cur.execute("""
