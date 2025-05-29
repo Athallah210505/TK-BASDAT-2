@@ -19,33 +19,34 @@
         <p class="text-xl text-gray-500">Sertifikat ini diberikan atas partisipasi dalam program konservasi satwa</p>
       </div>
       
-      <div class="bg-green-100 border-8 border-double border-green-300 p-12 rounded-xl mb-12 text-center">
-        <div class="mb-10">
-          <h2 class="text-3xl font-serif font-bold text-green-700 mb-2">Budi Santoso</h2>
-          <p class="text-gray-600 text-lg">Individu</p>
-        </div>
-        
-        <div class="mb-10">
-          <p class="text-xl text-gray-700 mb-6">telah berpartisipasi dalam program adopsi simbolis satwa</p>
-          <h3 class="text-2xl font-semibold text-green-600">Simba (Singa Afrika)</h3>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-          <div class="text-center">
-            <p class="text-gray-500 text-sm">Tanggal mulai adopsi:</p>
-            <p class="font-medium text-lg">15 Januari 2023</p>
-          </div>
-          <div class="text-center">
-            <p class="text-gray-500 text-sm">Tanggal akhir adopsi:</p>
-            <p class="font-medium text-lg">15 Januari 2024</p>
-          </div>
-        </div>
-        
-        <div class="text-center">
-          <p class="mb-4 text-lg">Terima kasih atas kepedulian dan kontribusi Anda</p>
-          <p class="text-sm text-gray-500">Sertifikat ini menunjukkan partisipasi dalam program adopsi simbolis untuk membantu pelestarian satwa di Taman Safari kami.</p>
-        </div>
+<!-- Update the certificate content -->
+<div class="bg-green-100 border-8 border-double border-green-300 p-12 rounded-xl mb-12 text-center">
+  <div class="mb-10">
+      <h2 class="text-3xl font-serif font-bold text-green-700 mb-2">{{ adoption.adopter.username }}</h2>
+      <p class="text-gray-600 text-lg">Adopter</p>
+  </div>
+  
+  <div class="mb-10">
+      <p class="text-xl text-gray-700 mb-6">telah berpartisipasi dalam program adopsi simbolis satwa</p>
+      <h3 class="text-2xl font-semibold text-green-600">{{ adoption.animal.nama }} ({{ adoption.animal.jenis }})</h3>
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+      <div class="text-center">
+          <p class="text-gray-500 text-sm">Tanggal mulai adopsi:</p>
+          <p class="font-medium text-lg">{{ adoption.mulai_adopsi }}</p>
       </div>
+      <div class="text-center">
+          <p class="text-gray-500 text-sm">Tanggal akhir adopsi:</p>
+          <p class="font-medium text-lg">{{ adoption.berhenti_adopsi }}</p>
+      </div>
+  </div>
+  
+  <div class="text-center">
+      <p class="mb-4 text-lg">Terima kasih atas kepedulian dan kontribusi Anda</p>
+      <p class="text-sm text-gray-500">Sertifikat ini menunjukkan partisipasi dalam program adopsi simbolis untuk membantu pelestarian satwa di Taman Safari kami.</p>
+  </div>
+</div>
       
       <div class="flex justify-center">
         <a href="/adoption/1" class="bg-green-500 hover:bg-green-600 text-white py-3 px-8 rounded-full btn-shine inline-flex items-center">
