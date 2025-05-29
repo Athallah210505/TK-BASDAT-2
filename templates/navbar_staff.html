@@ -25,17 +25,17 @@
           Kelola Pengunjung
         </a>
         
-        <a href="/dokter/atraksi/" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href= "{% url 'adoption_list' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Kelola Adopsi
         </a>
         
-        <a href="/dokter/kandang/" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="{% url 'adopter_info_general' %}"class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Kelola Adopter
         </a>
         
-        <a href="/profile/" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        {% comment %} <a href={% url 'staff_profile' %} class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Profile
-        </a>
+        </a> {% endcomment %}
         
         <!-- Logout button -->
         <div class="px-4 py-2">
