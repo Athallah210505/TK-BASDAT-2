@@ -3,7 +3,7 @@ from django.db import DatabaseError, connection
 from django.contrib import messages
 from django.urls import reverse
 from utils.decorators import role_required
-from psycopg2 import errors
+from psycopg2 import ProgrammingError, errors
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 @role_required('dokter')
@@ -80,6 +80,7 @@ def form_rekam_medis(request):
                 raw_conn = connection.connection
                 raw_conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
+                # Insert data rekam medis
                 cursor.execute("""
                     INSERT INTO sizopi.catatan_medis (
                         id_hewan, username_dh, tanggal_pemeriksaan, 
@@ -88,17 +89,19 @@ def form_rekam_medis(request):
                 """, [id_hewan, username_dh, tanggal_pemeriksaan,
                       diagnosis, pengobatan, status_kesehatan])
 
-                # Ambil pesan dari trigger
-                cursor.execute("SHOW app.message;")
-                result = cursor.fetchone()
-
-                if result and result[0]:
-                    success_message = result[0]
-                    messages.success(request, success_message)
-                else:
+                # Coba ambil pesan dari session variable (trigger)
+                try:
+                    cursor.execute("SHOW app.message;")
+                    result = cursor.fetchone()
+                    if result and result[0]:
+                        messages.success(request, result[0])
+                    else:
+                        messages.success(request, "Rekam medis berhasil ditambahkan.")
+                except ProgrammingError:
+                    # Jika variable belum diset
                     messages.success(request, "Rekam medis berhasil ditambahkan.")
 
-                # Tambahan jika status sakit
+                # Tambahan: jika status sakit, beri notifikasi tambahan
                 if status_kesehatan == 'Sakit':
                     cursor.execute("""
                         SELECT nama FROM sizopi.hewan WHERE id = %s
