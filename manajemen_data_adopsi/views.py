@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.db import connection
 from django.http import Http404, HttpResponse
 from datetime import datetime
