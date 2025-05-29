@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+  <title>Pengaturan Profil</title>
+{% endblock %}
+
+{% block content %}
+{% include 'navbar_pengunjung.html' %}
+
+<div class="max-w-4xl mx-auto mt-20 mb-16 px-4">
+    <div class="text-center">
+        <h1 class="text-3xl font-bold text-green-600">Pengaturan Profil</h1>
+        <p class="text-gray-600 mt-2">Kelola informasi profil Anda sebagai pengunjung</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mt-6 border border-gray-100">
+        {% if messages %}
+        <div class="p-4">
+            {% for message in messages %}
+                <div class="p-3 mb-2 border-l-4 {% if message.tags == 'success' %}border-green-500 bg-green-100{% else %}border-red-500 bg-red-100{% endif %} rounded-r">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'pengaturan_profil_pengunjung' %}" class="p-6 space-y-6">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" name="username" value="{{ user_data.username }}" class="mt-1 block w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2" readonly>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" name="email" value="{{ user_data.email }}" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+
+                <div>
+                    <label for="nama_depan" class="block text-sm font-medium text-gray-700">Nama Depan</label>
+                    <input type="text" id="nama_depan" name="nama_depan" value="{{ user_data.nama_depan }}" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+
+                <div>
+                    <label for="nama_tengah" class="block text-sm font-medium text-gray-700">Nama Tengah (opsional)</label>
+                    <input type="text" id="nama_tengah" name="nama_tengah" value="{{ user_data.nama_tengah }}" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+
+                <div>
+                    <label for="nama_belakang" class="block text-sm font-medium text-gray-700">Nama Belakang</label>
+                    <input type="text" id="nama_belakang" name="nama_belakang" value="{{ user_data.nama_belakang }}" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+
+                <div>
+                    <label for="no_telepon" class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
+                    <input type="text" id="no_telepon" name="no_telepon" value="{{ user_data.no_telepon }}" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Informasi Pengunjung</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="alamat" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
+                        <input type="text" id="alamat" name="alamat" value="{{ user_data.alamat }}" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+
+                    <div>
+                        <label for="tgl_lahir" class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+                        <input type="date" id="tgl_lahir" name="tgl_lahir" value="{{ user_data.tgl_lahir }}" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center space-x-4">
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md font-medium shadow">Simpan</button>
+                <button type="button" onclick="togglePasswordModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md font-medium shadow">Ubah Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Ubah Password -->
+<div id="modalPassword" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-4">
+        <h3 class="text-xl font-bold mb-6 text-gray-800">Ubah Password</h3>
+        <form method="POST" action="{% url 'ubah_password_pengunjung' %}">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label for="password_lama" class="block text-sm font-medium text-gray-700">Password Lama</label>
+                    <input type="password" id="password_lama" name="password_lama" required class="block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label for="password_baru" class="block text-sm font-medium text-gray-700">Password Baru</label>
+                    <input type="password" id="password_baru" name="password_baru" required class="block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label for="konfirmasi_password_baru" class="block text-sm font-medium text-gray-700">Konfirmasi Password Baru</label>
+                    <input type="password" id="konfirmasi_password_baru" name="konfirmasi_password_baru" required class="block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 mt-6">
+                <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded-md hover:bg-green-700">Simpan</button>
+                <button type="button" onclick="togglePasswordModal()" class="bg-gray-300 px-5 py-2 rounded-md">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function togglePasswordModal() {
+        const modal = document.getElementById('modalPassword');
+        modal.classList.toggle('hidden');
+    }
+
+    document.getElementById('modalPassword').addEventListener('click', function(e) {
+        if (e.target === this) {
+            togglePasswordModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('modalPassword');
+            if (!modal.classList.contains('hidden')) {
+                togglePasswordModal();
+            }
+        }
+    });
+</script>
+{% endblock %}
