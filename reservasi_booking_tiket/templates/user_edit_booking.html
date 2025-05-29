@@ -132,6 +132,15 @@
                     </a>
                 </div>
             </form>
+
+            <!-- Form Pembatalan (Tersembunyi) - Untuk pengiriman langsung jika modal bermasalah -->
+            <form id="cancel-direct-form" method="post" action="{% url 'show_user_edit_booking' %}" class="hidden">
+                {% csrf_token %}
+                <input type="hidden" name="jenis_reservasi" value="{{ jenis_reservasi }}">
+                <input type="hidden" name="nama_fasilitas" value="{{ nama_fasilitas }}">
+                <input type="hidden" name="tanggal_kunjungan" value="{{ tanggal_kunjungan|date:'Y-m-d' }}">
+                <input type="hidden" name="action" value="cancel">
+            </form>
         </div>
     </div>
     
@@ -149,12 +158,14 @@
                 <button type="button" onclick="closeModal('cancel-modal')" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
                     [TIDAK]
                 </button>
-                <form method="post" action="{% url 'user_cancel_booking' %}">
+                <!-- PERBAIKAN: Form dengan action yang benar dan parameter action="cancel" -->
+                <form method="post" action="{% url 'show_user_edit_booking' %}">
                     {% csrf_token %}
                     <input type="hidden" name="jenis_reservasi" value="{{ jenis_reservasi }}">
                     <input type="hidden" name="nama_fasilitas" value="{{ nama_fasilitas }}">
                     <input type="hidden" name="tanggal_kunjungan" value="{{ tanggal_kunjungan|date:'Y-m-d' }}">
-                    <button type="submit" class="px-6 py-2 text-red-600 font-bold rounded-lg hover:bg-red-50 transition">
+                    <input type="hidden" name="action" value="cancel">
+                    <button type="submit" class="px-6 py-2 text-white bg-red-500 font-bold rounded-lg hover:bg-red-600 transition">
                         [YA]
                     </button>
                 </form>
@@ -177,7 +188,7 @@
                 <button type="button" onclick="closeModal('delete-modal')" class="px-6 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition">
                     [TIDAK]
                 </button>
-                <form method="post" action="{% url 'user_cancel_booking' %}">
+                <form method="post" action="{% url 'show_user_edit_booking' %}">
                     {% csrf_token %}
                     <input type="hidden" name="jenis_reservasi" value="{{ jenis_reservasi }}">
                     <input type="hidden" name="nama_fasilitas" value="{{ nama_fasilitas }}">
@@ -196,16 +207,39 @@
     // Fungsi untuk menampilkan modal konfirmasi pembatalan
     function showCancelConfirmation() {
         document.getElementById('cancel-modal').classList.remove('hidden');
+        console.log("Cancel modal opened");
+        
+        // Debug data yang akan dikirim
+        const jenis = document.querySelector('input[name="jenis_reservasi"]').value;
+        const nama = document.querySelector('input[name="nama_fasilitas"]').value;
+        const tanggal = document.querySelector('input[name="tanggal_kunjungan"]').value;
+        console.log(`Cancellation data: ${jenis} - ${nama} on ${tanggal}`);
     }
+    
+    // Fungsi pembatalan alternatif jika modal tidak berfungsi
+    function cancelDirectly() {
+        console.log("Direct cancellation triggered");
+        document.getElementById('cancel-direct-form').submit();
+    }
+    
+    // Tambahkan hotkey untuk pembatalan langsung (Ctrl+Alt+C)
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.altKey && event.key === 'c') {
+            console.log("Hotkey cancellation triggered");
+            cancelDirectly();
+        }
+    });
     
     // Fungsi untuk menampilkan modal konfirmasi hapus permanen
     function showDeleteConfirmation() {
         document.getElementById('delete-modal').classList.remove('hidden');
+        console.log("Delete modal opened");
     }
     
     // Fungsi untuk menutup modal
     function closeModal(modalId) {
         document.getElementById(modalId).classList.add('hidden');
+        console.log(`Modal ${modalId} closed`);
     }
     
     // Close modals when clicking outside
@@ -213,16 +247,20 @@
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 this.classList.add('hidden');
+                console.log("Modal closed by clicking outside");
             }
         });
     });
     
     document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded");
+        
         // Set tanggal minimum untuk tanggal kunjungan
         const today = new Date().toISOString().split('T')[0];
         const tanggalInput = document.getElementById('tanggal_kunjungan_new');
         if (tanggalInput) {
             tanggalInput.min = today;
+            console.log(`Set min date to ${today}`);
         }
         
         // Validasi form sebelum submit
@@ -233,83 +271,86 @@
                 if (jumlahTiket < 1) {
                     e.preventDefault();
                     alert('Jumlah tiket harus minimal 1.');
+                    console.log("Form submission prevented: invalid ticket amount");
+                } else {
+                    console.log("Form submission valid");
                 }
-                // Validasi kapasitas dilakukan oleh trigger database
             });
         }
         
         // Cek ketersediaan tiket saat tanggal berubah
-       // Cek ketersediaan tiket saat tanggal berubah
-if (tanggalInput) {
-    tanggalInput.addEventListener('change', function() {
-        const namaFasilitas = document.querySelector('input[name="nama_fasilitas"]').value;
-        const jenisReservasi = document.querySelector('input[name="jenis_reservasi"]').value;
-        const tanggal = this.value;
-        const availabilityText = document.getElementById('ticket-availability');
-        
-        if (namaFasilitas && tanggal && availabilityText) {
-            // Status loading
-            availabilityText.textContent = 'Mengecek ketersediaan...';
-            availabilityText.className = 'text-sm text-gray-500 mt-1';
-            
-            // Tambahkan debugging untuk melihat parameter yang dikirim
-            console.log(`Checking availability: jenis=${jenisReservasi}, nama=${namaFasilitas}, tanggal=${tanggal}`);
-            
-            // AJAX call ke server untuk mengecek ketersediaan
-            fetch(`/check-availability/?jenis=${jenisReservasi}&nama=${encodeURIComponent(namaFasilitas)}&tanggal=${encodeURIComponent(tanggal)}`)
-                .then(response => {
-                    console.log(`Response status: ${response.status}`);
-                    if (!response.ok) {
-                        // Jangan throw error, tetap proses response
-                        return response.json().catch(() => ({ error: `HTTP Error: ${response.status}` }));
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log(`Data received:`, data);
-                    const jumlahCurrentTiket = parseInt('{{ jumlah_tiket|default:0 }}');
-                    
-                    if (data.kapasitas_tersisa !== undefined) {
-                        // Tambahkan tiket yang sudah dipesan pada reservasi ini
-                        const adjustedAvailability = data.kapasitas_tersisa + jumlahCurrentTiket;
-                        availabilityText.textContent = `Tersedia: ${adjustedAvailability} tiket dari ${data.kapasitas_max} total`;
-                        
-                        if (adjustedAvailability <= 5) {
-                            availabilityText.className = 'text-sm text-red-500 font-medium mt-1';
-                            
-                            if (adjustedAvailability <= 0) {
-                                availabilityText.textContent = 'Tidak ada tiket tersedia untuk tanggal ini';
-                            }
-                        } else {
-                            availabilityText.className = 'text-sm text-green-500 font-medium mt-1';
-                        }
-                    } else if (data.error) {
-                        // Tampilkan message yang lebih user-friendly
-                        availabilityText.textContent = 'Data ketersediaan tiket tidak tersedia';
-                        availabilityText.className = 'text-sm text-gray-500 mt-1';
-                        console.error(`API Error: ${data.error}`);
-                    } else {
-                        // Fallback jika format data tidak sesuai
-                        availabilityText.textContent = 'Data ketersediaan tidak dapat diproses';
-                        availabilityText.className = 'text-sm text-gray-500 mt-1';
-                    }
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-                    // Tampilkan pesan yang lebih user-friendly, bukan error message
-                    availabilityText.textContent = 'Ketersediaan tiket sedang diproses';
+        if (tanggalInput) {
+            tanggalInput.addEventListener('change', function() {
+                const namaFasilitas = document.querySelector('input[name="nama_fasilitas"]').value;
+                const jenisReservasi = document.querySelector('input[name="jenis_reservasi"]').value;
+                const tanggal = this.value;
+                const availabilityText = document.getElementById('ticket-availability');
+                
+                if (namaFasilitas && tanggal && availabilityText) {
+                    // Status loading
+                    availabilityText.textContent = 'Mengecek ketersediaan...';
                     availabilityText.className = 'text-sm text-gray-500 mt-1';
-                });
+                    
+                    // Tambahkan debugging untuk melihat parameter yang dikirim
+                    console.log(`Checking availability: jenis=${jenisReservasi}, nama=${namaFasilitas}, tanggal=${tanggal}`);
+                    
+                    // AJAX call ke server untuk mengecek ketersediaan
+                    fetch(`/check-availability/?jenis=${jenisReservasi}&nama=${encodeURIComponent(namaFasilitas)}&tanggal=${encodeURIComponent(tanggal)}`)
+                        .then(response => {
+                            console.log(`Response status: ${response.status}`);
+                            if (!response.ok) {
+                                // Jangan throw error, tetap proses response
+                                return response.json().catch(() => ({ error: `HTTP Error: ${response.status}` }));
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log(`Data received:`, data);
+                            const jumlahCurrentTiket = parseInt('{{ jumlah_tiket|default:0 }}');
+                            
+                            if (data.kapasitas_tersisa !== undefined) {
+                                // Tambahkan tiket yang sudah dipesan pada reservasi ini
+                                const adjustedAvailability = data.kapasitas_tersisa + jumlahCurrentTiket;
+                                availabilityText.textContent = `Tersedia: ${adjustedAvailability} tiket dari ${data.kapasitas_max} total`;
+                                
+                                if (adjustedAvailability <= 5) {
+                                    availabilityText.className = 'text-sm text-red-500 font-medium mt-1';
+                                    
+                                    if (adjustedAvailability <= 0) {
+                                        availabilityText.textContent = 'Tidak ada tiket tersedia untuk tanggal ini';
+                                    }
+                                } else {
+                                    availabilityText.className = 'text-sm text-green-500 font-medium mt-1';
+                                }
+                            } else if (data.error) {
+                                // Tampilkan message yang lebih user-friendly
+                                availabilityText.textContent = 'Data ketersediaan tiket tidak tersedia';
+                                availabilityText.className = 'text-sm text-gray-500 mt-1';
+                                console.error(`API Error: ${data.error}`);
+                            } else {
+                                // Fallback jika format data tidak sesuai
+                                availabilityText.textContent = 'Data ketersediaan tidak dapat diproses';
+                                availabilityText.className = 'text-sm text-gray-500 mt-1';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                            // Tampilkan pesan yang lebih user-friendly, bukan error message
+                            availabilityText.textContent = 'Ketersediaan tiket sedang diproses';
+                            availabilityText.className = 'text-sm text-gray-500 mt-1';
+                        });
+                }
+            });
+            
+            // Trigger cek ketersediaan saat halaman load dengan delay lebih lama
+            if (tanggalInput.value) {
+                setTimeout(() => {
+                    const event = new Event('change');
+                    tanggalInput.dispatchEvent(event);
+                    console.log("Auto-triggered availability check");
+                }, 1000); // Tambah delay menjadi 1 detik
+            }
         }
     });
-    
-    // Trigger cek ketersediaan saat halaman load dengan delay lebih lama
-    if (tanggalInput.value) {
-        setTimeout(() => {
-            const event = new Event('change');
-            tanggalInput.dispatchEvent(event);
-        }, 1000); // Tambah delay menjadi 1 detik
-    }
-}
 </script>
 {% endblock %}
