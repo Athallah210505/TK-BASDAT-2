@@ -1,22 +1,22 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import render, redirect 
 from django.db import connection
 from django.http import Http404, HttpResponse
-from datetime import datetime
+from datetime import datetime, timedelta 
 import uuid
+from utils.decorators import role_required
 
+@role_required(('staff', 'pengunjung_adopter'))
 def adoption_list(request):
     with connection.cursor() as cursor:
-        # Get all animals with their adoption status and adoption ID if adopted
         cursor.execute("""
-            SELECT h.id, h.nama, h.spesies, h.status_kesehatan, 
+            SELECT h.id, h.nama, h.spesies, h.status_kesehatan, h.url_foto,
                    CASE WHEN a.id_hewan IS NOT NULL THEN 'Diadopsi' ELSE 'Belum Diadopsi' END as status_adopsi,
-                   CASE WHEN a.id_hewan IS NOT NULL THEN CONCAT(a.id_adopter, '-', a.id_hewan) ELSE NULL END as adoption_id
+                   CASE WHEN a.id_hewan IS NOT NULL THEN CONCAT(CAST(a.id_adopter AS VARCHAR), '-', CAST(a.id_hewan AS VARCHAR)) ELSE NULL END as adoption_id
             FROM sizopi.hewan h
             LEFT JOIN sizopi.adopsi a ON h.id = a.id_hewan AND a.tgl_berhenti_adopsi >= CURRENT_DATE
         """)
         animals = cursor.fetchall()
         
-        # Convert to list of dicts for easier template access
         animal_list = []
         for animal in animals:
             animal_list.append({
@@ -24,32 +24,33 @@ def adoption_list(request):
                 'nama': animal[1],
                 'spesies': animal[2],
                 'status_kesehatan': animal[3],
-                'status_adopsi': animal[4],
-                'adoption_id': animal[5]
+                'url_foto': animal[4],  
+                'status_adopsi': animal[5],
+                'adoption_id': animal[6]
             })
     
     return render(request, 'adoption_list.html', {'animals': animal_list})
-
-def adoption_detail(request, adoption_id):
+    
+@role_required(('staff', 'pengunjung_adopter'))
+def _parse_adoption_id(adoption_id_str):
+    """Helper function to parse combined adoption ID."""
+    parts = adoption_id_str.split('-')
+    if len(parts) != 10:  # UUID format: 8-4-4-4-12 (5 parts). Two UUIDs = 10 parts.
+        raise ValueError(f"Invalid adoption ID format: {adoption_id_str}")
+    
     try:
-        # Split the adoption_id into its components
-        parts = adoption_id.split('-')
-        if len(parts) != 10:  # Expecting 10 parts for two UUIDs
-            return HttpResponse(f"Invalid adoption ID format: {adoption_id}")
+        adopter_id = uuid.UUID('-'.join(parts[:5]))
+        animal_id = uuid.UUID('-'.join(parts[5:]))
+        return adopter_id, animal_id
+    except ValueError as e:
+        raise ValueError(f"Invalid UUID in adoption ID: {adoption_id_str} - {e}")
 
-        # Reconstruct the UUIDs
-        adopter_id = '-'.join(parts[:5])  # First 5 parts for adopter_id
-        animal_id = '-'.join(parts[5:])   # Last 5 parts for animal_id
-
-        # Convert both IDs to UUID
-        try:
-            adopter_id = uuid.UUID(adopter_id)
-            animal_id = uuid.UUID(animal_id)
-        except ValueError:
-            return HttpResponse(f"Invalid UUID in adoption ID: adopter_id={adopter_id}, animal_id={animal_id}")
+@role_required(('staff', 'pengunjung_adopter'))
+def adoption_detail(request, adoption_id): # adoption_id adalah string gabungan
+    try:
+        adopter_uuid, animal_uuid = _parse_adoption_id(adoption_id)
 
         with connection.cursor() as cursor:
-            # Updated query with potential column name fixes
             query = """
                 SELECT a.id_adopter, a.id_hewan, a.status_pembayaran, 
                        a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi, a.kontribusi_finansial,
@@ -68,445 +69,475 @@ def adoption_detail(request, adoption_id):
                 LEFT JOIN sizopi.organisasi o ON ad.id_adopter = o.id_adopter
                 WHERE a.id_adopter = %s AND a.id_hewan = %s
             """
-            cursor.execute(query, [adopter_id, animal_id])
+            cursor.execute(query, [adopter_uuid, animal_uuid])
             
-            adoption = cursor.fetchone()
+            adoption_data = cursor.fetchone()
             
-            if not adoption:
-                return HttpResponse(f"Adoption not found for adopter_id={adopter_id}, animal_id={animal_id}")
+            if not adoption_data:
+                raise Http404(f"Adoption not found for adopter_id={adopter_uuid}, animal_id={animal_uuid}")
             
-            # Format dates
-            mulai_adopsi = datetime.strptime(str(adoption[3]), '%Y-%m-%d').strftime('%d %B %Y')
-            berhenti_adopsi = datetime.strptime(str(adoption[4]), '%Y-%m-%d').strftime('%d %B %Y')
+            mulai_adopsi = datetime.strptime(str(adoption_data[3]), '%Y-%m-%d').strftime('%d %B %Y')
+            berhenti_adopsi = datetime.strptime(str(adoption_data[4]), '%Y-%m-%d').strftime('%d %B %Y')
             
             context = {
                 'adoption': {
-                    'id': adoption_id,
-                    'status_pembayaran': adoption[2],
+                    'id': adoption_id, # Kirim ID string gabungan asli ke template
+                    'status_pembayaran': adoption_data[2],
                     'mulai_adopsi': mulai_adopsi,
                     'berhenti_adopsi': berhenti_adopsi,
-                    'kontribusi_finansial': f"Rp {adoption[5]:,}",
+                    'kontribusi_finansial': f"Rp {adoption_data[5]:,}",
                     'animal': {
-                        'nama': adoption[6],
-                        'jenis': adoption[7],
-                        'kondisi': adoption[8]
+                        'nama': adoption_data[6],
+                        'jenis': adoption_data[7],
+                        'kondisi': adoption_data[8]
                     },
                     'adopter': {
-                        'username': adoption[9],
-                        'total_kontribusi': f"Rp {adoption[10]:,}",
-                        'nama_adopter': adoption[11],
-                        'tipe_adopter': adoption[12]
+                        'username': adoption_data[9],
+                        'total_kontribusi': f"Rp {adoption_data[10]:,}",
+                        'nama_adopter': adoption_data[11],
+                        'tipe_adopter': adoption_data[12]
                     }
                 }
             }
+        return render(request, 'adoption_detail.html', context)
 
+    except ValueError as ve: # Tangkap error dari _parse_adoption_id
+        raise Http404(f"Invalid adoption ID format in URL: {str(ve)}")
+    except Http404: # Biarkan Http404 dari dalam view terlempar
+        raise
     except Exception as e:
-        # Log the error for debugging
-        return HttpResponse(f"Error in adoption_detail: {str(e)}")
+        raise # Melempar ulang error untuk debugging
 
-    return render(request, 'adoption_detail.html', context)
+@role_required(('staff', 'pengunjung_adopter'))
+def register_adopter(request, animal_id=None): # animal_id di sini adalah UUID hewan tunggal
+    if animal_id:
+        try:
+            animal_uuid = uuid.UUID(animal_id)
+        except ValueError:
+            raise Http404("Invalid animal ID format for registration.")
 
-def register_adopter(request, animal_id=None):
     if request.method == 'POST':
-        # Handle form submission
         username = request.POST.get('username')
-        adopter_type = request.POST.get('adopter_type')
-        start_date = request.POST.get('start_date')
-        adoption_period = request.POST.get('adoption_period')
-        contribution = request.POST.get('contribution')
+        start_date_str = request.POST.get('start_date')
+        adoption_period_months = request.POST.get('adoption_period')
+        contribution_str = request.POST.get('contribution')
         
         try:
+            contribution = int(contribution_str) # Pastikan ini adalah angka
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            months_to_add = int(adoption_period_months)
+
             with connection.cursor() as cursor:
-                # Get adopter ID first
-                cursor.execute("""
-                    SELECT id_adopter FROM sizopi.adopter WHERE username_adopter = %s
-                """, [username])
+                cursor.execute("SELECT id_adopter FROM sizopi.adopter WHERE username_adopter = %s", [username])
                 adopter_result = cursor.fetchone()
                 if not adopter_result:
                     raise Exception("Adopter tidak ditemukan")
-                adopter_id = adopter_result[0]
+                adopter_uuid = adopter_result[0] # Ini seharusnya sudah UUID
                 
-                # Calculate end date
-                end_date = datetime.strptime(start_date, '%Y-%m-%d')
-                months_to_add = int(adoption_period)
-                new_month = end_date.month + months_to_add
-                new_year = end_date.year + (new_month - 1) // 12
-                new_month = ((new_month - 1) % 12) + 1
-                end_date = end_date.replace(year=new_year, month=new_month)
-                
-                # Create adoption record
+                # Kalkulasi tanggal akhir yang lebih aman
+                end_date = start_date
+                for _ in range(months_to_add):
+                    days_in_month = (end_date.replace(month=end_date.month % 12 + 1, day=1) - timedelta(days=1)).day
+                    end_date += timedelta(days=days_in_month)
+                new_month = start_date.month -1 + months_to_add # 0-indexed month
+                new_year = start_date.year + new_month // 12
+                new_month = new_month % 12 + 1
+                try:
+                    end_date = start_date.replace(year=new_year, month=new_month)
+                except ValueError: # e.g. trying to set Feb 30
+                    end_date = start_date.replace(year=new_year, month=new_month, day=1) + timedelta(days=-1)
+
+
                 cursor.execute("""
                     INSERT INTO sizopi.adopsi 
                     (id_adopter, id_hewan, status_pembayaran, tgl_mulai_adopsi, tgl_berhenti_adopsi, kontribusi_finansial)
                     VALUES (%s, %s, 'Tertunda', %s, %s, %s)
                 """, [
-                    adopter_id,
-                    animal_id,
-                    start_date,
+                    adopter_uuid,
+                    animal_uuid, # Gunakan animal_uuid dari parameter URL
+                    start_date_str,
                     end_date.strftime('%Y-%m-%d'),
                     contribution
                 ])
                 
-                # Update adopter's total contribution
                 cursor.execute("""
                     UPDATE sizopi.adopter
                     SET total_kontribusi = total_kontribusi + %s
-                    WHERE username_adopter = %s
-                """, [contribution, username])
+                    WHERE id_adopter = %s
+                """, [contribution, adopter_uuid]) # Update berdasarkan id_adopter (UUID)
                 
             return redirect('adoption_list')
             
         except Exception as e:
             error_message = str(e)
-            return render(request, 'adoption_form.html', {'error': error_message, 'animal_id': animal_id})
+            animal_data_for_form = None
+            if animal_uuid: # Gunakan animal_uuid
+                 with connection.cursor() as cursor_err:
+                    cursor_err.execute("SELECT nama, spesies, status_kesehatan FROM sizopi.hewan WHERE id = %s", [animal_uuid])
+                    animal_q_res = cursor_err.fetchone()
+                    if animal_q_res:
+                        animal_data_for_form = {
+                            'id': str(animal_uuid), 'nama': animal_q_res[0], 
+                            'spesies': animal_q_res[1], 'status_kesehatan': animal_q_res[2]
+                        }
+            return render(request, 'adoption_form.html', {'error': error_message, 'animal': animal_data_for_form, 'animal_id': str(animal_uuid) if animal_uuid else None})
     
-    # GET request - show form
-    if animal_id:
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT nama, spesies, status_kesehatan
-                FROM sizopi.hewan
-                WHERE id = %s
-            """, [animal_id])
-            animal = cursor.fetchone()
-            
-            if not animal:
-                raise Http404("Hewan tidak ditemukan")
-            
-            context = {
-                'animal': {
-                    'id': animal_id,
-                    'nama': animal[0],
-                    'spesies': animal[1],
-                    'status_kesehatan': animal[2]
+    # GET request
+    if animal_id: # animal_id adalah string UUID dari URL
+        try:
+            animal_uuid_get = uuid.UUID(animal_id) # Validasi lagi untuk GET
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT nama, spesies, status_kesehatan FROM sizopi.hewan WHERE id = %s", [animal_uuid_get])
+                animal = cursor.fetchone()
+                if not animal:
+                    raise Http404("Hewan tidak ditemukan")
+                context = {
+                    'animal': {'id': str(animal_uuid_get), 'nama': animal[0], 'spesies': animal[1], 'status_kesehatan': animal[2]},
+                    'animal_id': str(animal_uuid_get) # Kirim animal_id ke template
                 }
-            }
-            
-        return render(request, 'adoption_form.html', context)
+            return render(request, 'adoption_form.html', context)
+        except ValueError:
+            raise Http404("Format ID hewan tidak valid.")
     else:
-        return render(request, 'adoption_form.html')
+        return render(request, 'adoption_form.html') # Form untuk adopsi tanpa pra-seleksi hewan
 
-def extend_adoption(request, adoption_id=None):
+@role_required(('staff', 'pengunjung_adopter'))
+def extend_adoption(request, adoption_id=None): # adoption_id adalah string gabungan
+    if not adoption_id:
+        raise Http404("ID Adopsi diperlukan.")
+
+    try:
+        adopter_uuid, animal_uuid = _parse_adoption_id(adoption_id)
+    except ValueError as e:
+        raise Http404(str(e))
+
     if request.method == 'POST':
-        end_date = request.POST.get('end_date')
-        additional_contribution = request.POST.get('contribution')
+        end_date_str = request.POST.get('end_date')
+        additional_contribution_str = request.POST.get('contribution')
         
         try:
-            # Parse adoption_id (format: adopter_id-animal_id)
-            adopter_id, animal_id = adoption_id.split('-', 1)
-            
+            additional_contribution = int(additional_contribution_str)
+
             with connection.cursor() as cursor:
-                # Update adoption record
                 cursor.execute("""
                     UPDATE sizopi.adopsi
                     SET tgl_berhenti_adopsi = %s,
                         kontribusi_finansial = kontribusi_finansial + %s
                     WHERE id_adopter = %s AND id_hewan = %s
-                """, [end_date, additional_contribution, adopter_id, animal_id])
+                """, [end_date_str, additional_contribution, adopter_uuid, animal_uuid])
                 
-                # Update adopter's total contribution
                 cursor.execute("""
                     UPDATE sizopi.adopter
                     SET total_kontribusi = total_kontribusi + %s
                     WHERE id_adopter = %s
-                """, [additional_contribution, adopter_id])
+                """, [additional_contribution, adopter_uuid])
                 
-            return redirect('adoption_detail', adoption_id=adoption_id)
+            return redirect('adoption_detail', adoption_id=adoption_id) # Redirect kembali dengan ID gabungan
             
         except Exception as e:
             error_message = str(e)
-            return render(request, 'adoption_extension_form.html', {'error': error_message})
+            return render(request, 'adoption_extension_form.html', {'error': error_message, 'adoption_id': adoption_id}) # Sertakan adoption_id
     
-    # GET request - show form
-    if adoption_id:
-        try:
-            adopter_id, animal_id = adoption_id.split('-', 1)
+    # GET request
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi, a.kontribusi_finansial,
+                   h.nama, h.spesies,
+                   ad.username_adopter
+            FROM sizopi.adopsi a
+            JOIN sizopi.hewan h ON a.id_hewan = h.id
+            JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
+            WHERE a.id_adopter = %s AND a.id_hewan = %s
+        """, [adopter_uuid, animal_uuid])
+        adoption_data = cursor.fetchone()
+        
+        if not adoption_data:
+            raise Http404("Adopsi tidak ditemukan")
             
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi, a.kontribusi_finansial,
-                           h.nama, h.spesies,
-                           ad.username_adopter
-                    FROM sizopi.adopsi a
-                    JOIN sizopi.hewan h ON a.id_hewan = h.id
-                    JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
-                    WHERE a.id_adopter = %s AND a.id_hewan = %s
-                """, [adopter_id, animal_id])
-                adoption = cursor.fetchone()
-                
-                if not adoption:
-                    raise Http404("Adopsi tidak ditemukan")
-                    
-                context = {
-                    'adoption': {
-                        'id': adoption_id,
-                        'mulai_adopsi': adoption[0],
-                        'berhenti_adopsi': adoption[1],
-                        'kontribusi_finansial': adoption[2],
-                        'animal': {
-                            'nama': adoption[3],
-                            'spesies': adoption[4]
-                        },
-                        'adopter': {
-                            'username': adoption[5]
-                        }
-                    }
-                }
-                
-        except ValueError:
-            raise Http404("Format ID adopsi tidak valid")
-            
-        return render(request, 'adoption_extension_form.html', context)
-    else:
-        return render(request, 'adoption_extension_form.html')
+        context = {
+            'adoption': {
+                'id': adoption_id, # Kirim ID string gabungan
+                'mulai_adopsi': adoption_data[0],
+                'berhenti_adopsi': adoption_data[1],
+                'kontribusi_finansial': adoption_data[2],
+                'animal': {'nama': adoption_data[3], 'spesies': adoption_data[4]},
+                'adopter': {'username': adoption_data[5]}
+            },
+            'adoption_id': adoption_id # Untuk form action
+        }
+    return render(request, 'adoption_extension_form.html', context)
 
-def end_adoption(request, adoption_id=None):
-    if request.method == 'POST' and adoption_id:
+@role_required(('staff', 'pengunjung_adopter'))
+def end_adoption(request, adoption_id=None): # adoption_id adalah string gabungan
+    if not adoption_id:
+        return redirect('adoption_list') # Atau tampilkan error
+
+    if request.method == 'POST': # Hanya proses jika POST
         try:
-            adopter_id, animal_id = adoption_id.split('-', 1)
+            adopter_uuid, animal_uuid = _parse_adoption_id(adoption_id)
             
             with connection.cursor() as cursor:
-                # Update adoption end date to current date
                 cursor.execute("""
                     UPDATE sizopi.adopsi
                     SET tgl_berhenti_adopsi = CURRENT_DATE
                     WHERE id_adopter = %s AND id_hewan = %s
-                """, [adopter_id, animal_id])
+                """, [adopter_uuid, animal_uuid])
                 
             return redirect('adoption_list')
             
-        except Exception as e:
-            error_message = str(e)
-            return render(request, 'adoption_detail.html', {'error': error_message})
+        except ValueError as e: # Dari _parse_adoption_id
+            return redirect('adoption_list') 
+        except Exception as e: # Error database atau lainnya
+            return redirect('adoption_detail', adoption_id=adoption_id) 
     
-    return redirect('adoption_list')
+    return redirect('adoption_detail', adoption_id=adoption_id) # Redirect ke detail jika bukan POST
 
-def adopter_info(request, adopter_id=None):
-    if adopter_id:
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT a.username_adopter, a.total_kontribusi,
-                       COUNT(ad.id_adopter) as jumlah_adopsi
-                FROM sizopi.adopter a
-                LEFT JOIN sizopi.adopsi ad ON a.id_adopter = ad.id_adopter
-                WHERE a.id_adopter = %s
-                GROUP BY a.username_adopter, a.total_kontribusi
-            """, [adopter_id])
-            adopter = cursor.fetchone()
+@role_required(('staff', 'pengunjung_adopter'))
+def adopter_info(request, adopter_id=None): # adopter_id di sini adalah UUID adopter tunggal
+    if not adopter_id:
+        raise Http404("ID Adopter diperlukan.")
+    
+    try:
+        adopter_uuid = uuid.UUID(adopter_id)
+    except ValueError:
+        raise Http404("Format ID adopter tidak valid.")
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT a.username_adopter, a.total_kontribusi,
+                   COUNT(ad.id_adopter) as jumlah_adopsi_aktif
+            FROM sizopi.adopter a
+            LEFT JOIN sizopi.adopsi ad ON a.id_adopter = ad.id_adopter AND ad.tgl_berhenti_adopsi >= CURRENT_DATE
+            WHERE a.id_adopter = %s
+            GROUP BY a.id_adopter, a.username_adopter, a.total_kontribusi 
+            -- GROUP BY a.username_adopter, a.total_kontribusi (Jika id_adopter adalah PK)
+        """, [adopter_uuid]) # Gunakan UUID
+        adopter = cursor.fetchone()
+        
+        if not adopter:
+            raise Http404("Adopter tidak ditemukan")
             
-            if not adopter:
-                raise Http404("Adopter tidak ditemukan")
-                
-            cursor.execute("""
-                SELECT ad.id_adopter, ad.id_hewan, h.nama, h.spesies, 
-                       ad.tgl_mulai_adopsi, ad.tgl_berhenti_adopsi, ad.kontribusi_finansial
-                FROM sizopi.adopsi ad
-                JOIN sizopi.hewan h ON ad.id_hewan = h.id
-                WHERE ad.id_adopter = %s
-                AND ad.tgl_berhenti_adopsi >= CURRENT_DATE
-            """, [adopter_id])
-            adoptions = cursor.fetchall()
+        cursor.execute("""
+            SELECT CAST(ad.id_adopter AS VARCHAR), CAST(ad.id_hewan AS VARCHAR), h.nama, h.spesies, 
+                   ad.tgl_mulai_adopsi, ad.tgl_berhenti_adopsi, ad.kontribusi_finansial
+            FROM sizopi.adopsi ad
+            JOIN sizopi.hewan h ON ad.id_hewan = h.id
+            WHERE ad.id_adopter = %s
+            AND ad.tgl_berhenti_adopsi >= CURRENT_DATE
+        """, [adopter_uuid]) # Gunakan UUID
+        adoptions_data = cursor.fetchall()
+        
+        adoption_list_for_template = []
+        for adoption_row in adoptions_data:
+            adoption_list_for_template.append({
+                'id': f"{adoption_row[0]}-{adoption_row[1]}", # Buat ID gabungan untuk link
+                'nama_hewan': adoption_row[2],
+                'jenis_hewan': adoption_row[3],
+                'mulai_adopsi': adoption_row[4],
+                'berhenti_adopsi': adoption_row[5],
+                'kontribusi_finansial': adoption_row[6]
+            })
+        
+        context = {
+            'adopter': {
+                'id': str(adopter_uuid), # Kirim ID adopter untuk referensi jika perlu
+                'username': adopter[0],
+                'total_kontribusi': f"Rp {adopter[1]:,}",
+                'jumlah_adopsi': adopter[2]
+            },
+            'adoptions': adoption_list_for_template
+        }
             
-            adoption_list = []
-            for adoption in adoptions:
-                adoption_list.append({
-                    'id': f"{adoption[0]}-{adoption[1]}",
-                    'nama_hewan': adoption[2],
-                    'jenis_hewan': adoption[3],
-                    'mulai_adopsi': adoption[4],
-                    'berhenti_adopsi': adoption[5],
-                    'kontribusi_finansial': adoption[6]
-                })
+    return render(request, 'adopter_info.html', context)
+
+@role_required(('staff', 'pengunjung_adopter'))
+def adoption_certificate(request, adoption_id=None): # adoption_id adalah string gabungan
+    if not adoption_id:
+        # return render(request, 'adoption_certificate.html') # Halaman kosong
+        raise Http404("ID Adopsi diperlukan.")
+
+    try:
+        adopter_uuid, animal_uuid = _parse_adoption_id(adoption_id)
+    except ValueError as e:
+        raise Http404(str(e))
             
-            context = {
-                'adopter': {
-                    'username': adopter[0],
-                    'total_kontribusi': f"Rp {adopter[1]:,}",
-                    'jumlah_adopsi': adopter[2]
-                },
-                'adoptions': adoption_list
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT h.nama, h.spesies,
+                   ad.username_adopter, a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi,
+                   a.kontribusi_finansial
+            FROM sizopi.adopsi a
+            JOIN sizopi.hewan h ON a.id_hewan = h.id
+            JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
+            WHERE a.id_adopter = %s AND a.id_hewan = %s
+        """, [adopter_uuid, animal_uuid]) # Gunakan UUID
+        adoption_data = cursor.fetchone()
+        
+        if not adoption_data:
+            raise Http404("Adopsi tidak ditemukan")
+            
+        context = {
+            'adoption': {
+                'id': adoption_id, # Kirim ID string gabungan
+                'animal': {'nama': adoption_data[0], 'spesies': adoption_data[1]},
+                'adopter': {'username': adoption_data[2]},
+                'mulai_adopsi': adoption_data[3],
+                'berhenti_adopsi': adoption_data[4],
+                'kontribusi_finansial': f"Rp {adoption_data[5]:,}"
             }
-            
-        return render(request, 'adopter_info.html', context)
-    else:
-        return render(request, 'adopter_info.html')
+        }
+    return render(request, 'adoption_certificate.html', context)
 
-def adoption_certificate(request, adoption_id=None):
-    if adoption_id:
+@role_required(('staff', 'pengunjung_adopter'))
+def animal_condition_report(request, adoption_id=None): # adoption_id adalah string gabungan
+    if not adoption_id:
+        raise Http404("ID Adopsi diperlukan.")
+
+    try:
+        adopter_uuid, animal_uuid = _parse_adoption_id(adoption_id)
+    except ValueError as e:
+        raise Http404(str(e))
+            
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT h.nama, h.spesies, h.nama_habitat, 
+                   ad.username_adopter, a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi
+            FROM sizopi.adopsi a
+            JOIN sizopi.hewan h ON a.id_hewan = h.id
+            JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
+            WHERE a.id_adopter = %s AND a.id_hewan = %s
+        """, [adopter_uuid, animal_uuid]) # Gunakan UUID
+        adoption_data = cursor.fetchone()
+        
+        if not adoption_data:
+            raise Http404("Adopsi tidak ditemukan")
+        
+        medical_records = []
         try:
-            adopter_id, animal_id = adoption_id.split('-', 1)
-            
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT h.nama, h.spesies,
-                           ad.username_adopter, a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi,
-                           a.kontribusi_finansial
-                    FROM sizopi.adopsi a
-                    JOIN sizopi.hewan h ON a.id_hewan = h.id
-                    JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
-                    WHERE a.id_adopter = %s AND a.id_hewan = %s
-                """, [adopter_id, animal_id])
-                adoption = cursor.fetchone()
-                
-                if not adoption:
-                    raise Http404("Adopsi tidak ditemukan")
-                    
-                context = {
-                    'adoption': {
-                        'id': adoption_id,
-                        'animal': {
-                            'nama': adoption[0],
-                            'spesies': adoption[1]
-                        },
-                        'adopter': {
-                            'username': adoption[2]
-                        },
-                        'mulai_adopsi': adoption[3],
-                        'berhenti_adopsi': adoption[4],
-                        'kontribusi_finansial': f"Rp {adoption[5]:,}"
-                    }
-                }
-                
-        except ValueError:
-            raise Http404("Format ID adopsi tidak valid")
-            
-        return render(request, 'adoption_certificate.html', context)
-    else:
-        return render(request, 'adoption_certificate.html')
-
-def animal_condition_report(request, adoption_id=None):
-    if adoption_id:
+            cursor.execute("""
+                SELECT tanggal_pemeriksaan, nama_dokter, status_kesehatan, 
+                       diagnosa, pengobatan, catatan_tindak_lanjut
+                FROM sizopi.rekam_medis
+                WHERE id_hewan = %s
+                ORDER BY tanggal_pemeriksaan DESC
+            """, [animal_uuid]) # Gunakan UUID hewan
+            medical_records = cursor.fetchall()
+        except Exception: # Tangkap error jika tabel tidak ada atau query gagal
+            pass # Biarkan medical_records kosong
+        
+        condition_reports = []
         try:
-            adopter_id, animal_id = adoption_id.split('-', 1)
+            cursor.execute("""
+                SELECT tanggal_laporan, kondisi_satwa, foto_kondisi, 
+                       berat_badan, suhu_tubuh, nafsu_makan
+                FROM sizopi.laporan_kondisi
+                WHERE id_hewan = %s
+                ORDER BY tanggal_laporan DESC
+            """, [animal_uuid]) # Gunakan UUID hewan
+            condition_reports = cursor.fetchall()
+        except Exception:
+            pass
+        
+        context = {
+            'adoption': {
+                'id': adoption_id, # Kirim ID string gabungan
+                'animal': {
+                    'nama': adoption_data[0], 'spesies': adoption_data[1], 
+                    'habitat': adoption_data[2] if adoption_data[2] else 'N/A'
+                },
+                'adopter': {'username': adoption_data[3]},
+                'periode': f"{adoption_data[4]} s/d {adoption_data[5]}"
+            },
+            'medical_records': medical_records,
+            'condition_reports': condition_reports
+        }
             
-            with connection.cursor() as cursor:
-                # Get adoption info
-                cursor.execute("""
-                    SELECT h.nama, h.spesies, h.nama_habitat,
-                           ad.username_adopter, a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi
-                    FROM sizopi.adopsi a
-                    JOIN sizopi.hewan h ON a.id_hewan = h.id
-                    JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
-                    WHERE a.id_adopter = %s AND a.id_hewan = %s
-                """, [adopter_id, animal_id])
-                adoption = cursor.fetchone()
-                
-                if not adoption:
-                    raise Http404("Adopsi tidak ditemukan")
-                
-                # Try to get medical records (table might not exist)
-                try:
-                    cursor.execute("""
-                        SELECT tanggal_pemeriksaan, nama_dokter, status_kesehatan, 
-                               diagnosa, pengobatan, catatan_tindak_lanjut
-                        FROM sizopi.rekam_medis
-                        WHERE id_hewan = %s
-                        ORDER BY tanggal_pemeriksaan DESC
-                    """, [animal_id])
-                    medical_records = cursor.fetchall()
-                except:
-                    medical_records = []
-                
-                # Try to get condition reports (table might not exist)
-                try:
-                    cursor.execute("""
-                        SELECT tanggal_laporan, kondisi_satwa, foto_kondisi, 
-                               berat_badan, suhu_tubuh, nafsu_makan
-                        FROM sizopi.laporan_kondisi
-                        WHERE id_hewan = %s
-                        ORDER BY tanggal_laporan DESC
-                    """, [animal_id])
-                    condition_reports = cursor.fetchall()
-                except:
-                    condition_reports = []
-                
-                context = {
-                    'adoption': {
-                        'id': adoption_id,
-                        'animal': {
-                            'nama': adoption[0],
-                            'spesies': adoption[1],
-                            'habitat': adoption[2] if adoption[2] else 'N/A'
-                        },
-                        'adopter': {
-                            'username': adoption[3]
-                        },
-                        'periode': f"{adoption[4]} s/d {adoption[5]}"
-                    },
-                    'medical_records': medical_records,
-                    'condition_reports': condition_reports
-                }
-                
-        except ValueError:
-            raise Http404("Format ID adopsi tidak valid")
-            
-        return render(request, 'animal_condition_report.html', context)
-    else:
-        return render(request, 'animal_condition_report.html')
+    return render(request, 'animal_condition_report.html', context)
 
-def create_animal_report(request, adoption_id=None):
+@role_required(('staff', 'pengunjung_adopter'))
+def create_animal_report(request, adoption_id=None): # adoption_id adalah string gabungan
+    if not adoption_id:
+        raise Http404("ID Adopsi diperlukan.")
+
+    try:
+        _, animal_uuid = _parse_adoption_id(adoption_id) # Hanya butuh animal_uuid untuk insert
+    except ValueError as e:
+        raise Http404(str(e))
+
     if request.method == 'POST':
         condition = request.POST.get('condition')
-        photo = request.FILES.get('photo')
+        photo = request.FILES.get('photo') # Handle file upload
         weight = request.POST.get('weight')
         temperature = request.POST.get('temperature')
         appetite = request.POST.get('appetite')
         
         try:
-            adopter_id, animal_id = adoption_id.split('-', 1)
-            
+            weight_val = float(weight) if weight else None
+            temperature_val = float(temperature) if temperature else None
+        except ValueError:
+            # Handle error konversi tipe jika input tidak valid
+            error_message = "Berat atau suhu tidak valid."
+            pass 
+
+        try:
             with connection.cursor() as cursor:
-                # Insert condition report (table might not exist)
+                photo_data = photo.read() if photo else None
                 cursor.execute("""
                     INSERT INTO sizopi.laporan_kondisi
                     (id_hewan, tanggal_laporan, kondisi_satwa, foto_kondisi,
                      berat_badan, suhu_tubuh, nafsu_makan)
                     VALUES (%s, CURRENT_DATE, %s, %s, %s, %s, %s)
-                """, [animal_id, condition, photo.read() if photo else None, 
-                      weight, temperature, appetite])
+                """, [animal_uuid, condition, photo_data, 
+                      weight_val, temperature_val, appetite])
                 
             return redirect('animal_condition_report', adoption_id=adoption_id)
             
         except Exception as e:
             error_message = str(e)
-            return render(request, 'create_animal_report.html', {'error': error_message})
-    
-    # GET request - show form
-    if adoption_id:
-        try:
-            adopter_id, animal_id = adoption_id.split('-', 1)
-            
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT h.nama, h.spesies,
-                           ad.username_adopter, a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi
+            with connection.cursor() as cursor_err:
+                cursor_err.execute("""
+                    SELECT h.nama, h.spesies, ad.username_adopter, a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi
                     FROM sizopi.adopsi a
                     JOIN sizopi.hewan h ON a.id_hewan = h.id
                     JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
-                    WHERE a.id_adopter = %s AND a.id_hewan = %s
-                """, [adopter_id, animal_id])
-                adoption = cursor.fetchone()
-                
-                if not adoption:
-                    raise Http404("Adopsi tidak ditemukan")
-                    
-                context = {
-                    'adoption': {
-                        'id': adoption_id,
-                        'animal': {
-                            'nama': adoption[0],
-                            'spesies': adoption[1]
-                        },
-                        'adopter': {
-                            'username': adoption[2]
-                        },
-                        'periode': f"{adoption[3]} s/d {adoption[4]}"
-                    }
-                }
-                
-        except ValueError:
-            raise Http404("Format ID adopsi tidak valid")
+                    WHERE a.id_hewan = %s AND a.id_adopter = %s -- (Perlu adopter_uuid juga jika query ini digunakan)
+                                                                -- atau cukup WHERE a.id_hewan = animal_uuid jika informasi adopter tidak krusial di sini
+                """, [_parse_adoption_id(adoption_id)[0], animal_uuid]) 
+
+                adoption_data_for_form = None # Isi dengan data yang relevan
+                # ... (logika untuk mengisi adoption_data_for_form)
+
+            return render(request, 'create_animal_report.html', {
+                'error': error_message, 
+                'adoption_id': adoption_id, 
+                'adoption': adoption_data_for_form # atau context yang sesuai
+            })
+    
+    try:
+        adopter_uuid_get, animal_uuid_get = _parse_adoption_id(adoption_id)
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT h.nama, h.spesies,
+                       ad.username_adopter, a.tgl_mulai_adopsi, a.tgl_berhenti_adopsi
+                FROM sizopi.adopsi a
+                JOIN sizopi.hewan h ON a.id_hewan = h.id
+                JOIN sizopi.adopter ad ON a.id_adopter = ad.id_adopter
+                WHERE a.id_adopter = %s AND a.id_hewan = %s
+            """, [adopter_uuid_get, animal_uuid_get])
+            adoption_data = cursor.fetchone()
             
-        return render(request, 'create_animal_report.html', context)
-    else:
-        return render(request, 'create_animal_report.html')
+            if not adoption_data:
+                raise Http404("Adopsi tidak ditemukan")
+                
+            context_get = {
+                'adoption': {
+                    'id': adoption_id,
+                    'animal': {'nama': adoption_data[0], 'spesies': adoption_data[1]},
+                    'adopter': {'username': adoption_data[2]},
+                    'periode': f"{adoption_data[3]} s/d {adoption_data[4]}"
+                },
+                'adoption_id': adoption_id # Untuk form action
+            }
+        return render(request, 'create_animal_report.html', context_get)
+    except ValueError as e: # Dari _parse_adoption_id saat GET
+        raise Http404(str(e))

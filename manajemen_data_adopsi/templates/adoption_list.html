@@ -30,9 +30,13 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for animal in animals %}
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover-scale safari-card">
-            <div class="aspect-w-16 aspect-h-9 bg-green-100 p-6 flex items-center justify-center">
-                <img src="https://via.placeholder.com/150" class="h-32 w-32 object-cover" alt="{{ animal.nama }} Icon">
-            </div>
+          <div class="aspect-w-16 aspect-h-9 bg-green-100 p-6 flex items-center justify-center">
+            {% if animal.url_foto %}
+                <img src="{{ animal.url_foto }}" class="h-32 w-32 object-cover rounded-full" alt="{{ animal.nama }}">
+            {% else %}
+                <img src="{% static 'images/default_animal.png' %}" class="h-32 w-32 object-cover" alt="Default image">
+            {% endif %}
+        </div>
             
             <div class="p-6">
                 <h3 class="font-semibold text-xl text-gray-800 mb-1">{{ animal.nama }}</h3>
@@ -57,12 +61,12 @@
                       </svg>
                   </a>
                   {% else %}
-                  <a href="{% url 'register_adopter' animal.id_hewan %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full btn-shine text-sm inline-flex items-center">
-                      Adopsi Sekarang
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                      </svg>
-                  </a>
+                  <a href="{% url 'register_adopter_general' %}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full btn-shine text-sm inline-flex items-center">
+                    Adopsi Sekarang
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                    </svg>
+                </a>                
                   {% endif %}
                 </div>
             </div>
