@@ -197,4 +197,182 @@ def ubah_password_penjaga_hewan(request):
             messages.error(request, f"Gagal mengubah password: {str(e)}")
 
         return redirect(reverse('pengaturan_profil_penjaga_hewan'))
+
+@role_required('staff')
+def pengaturan_profil_staff(request):
+    username = request.user.username
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        nama_depan = request.POST.get('nama_depan')
+        nama_tengah = request.POST.get('nama_tengah')
+        nama_belakang = request.POST.get('nama_belakang')
+        no_telepon = request.POST.get('no_telepon')
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE sizopi.pengguna
+                    SET email = %s,
+                        nama_depan = %s,
+                        nama_tengah = %s,
+                        nama_belakang = %s,
+                        no_telepon = %s
+                    WHERE username = %s
+                """, [email, nama_depan, nama_tengah, nama_belakang, no_telepon, username])
+            messages.success(request, "Profil berhasil diperbarui.")
+        except Exception as e:
+            messages.error(request, f"Gagal memperbarui profil: {str(e)}")
+        return redirect(reverse('pengaturan_profil_staff'))
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT p.username, p.email, p.nama_depan, p.nama_tengah,
+                   p.nama_belakang, p.no_telepon, s.id_staf
+            FROM sizopi.pengguna p
+            JOIN sizopi.staf_admin s ON p.username = s.username_sa
+            WHERE p.username = %s
+        """, [username])
+        row = cursor.fetchone()
+
+    user_data = {
+        'username': row[0],
+        'email': row[1],
+        'nama_depan': row[2],
+        'nama_tengah': row[3],
+        'nama_belakang': row[4],
+        'no_telepon': row[5],
+        'id_staf': row[6],
+    }
+
+    return render(request, 'pengaturan_profil_staff.html', {
+        'user_data': user_data,
+        'role': 'staff'
+    })
+
+
+@role_required('staff')
+def ubah_password_staff(request):
+    if request.method == 'POST':
+        username = request.user.username
+        password_lama = request.POST.get('password_lama')
+        password_baru = request.POST.get('password_baru')
+        konfirmasi = request.POST.get('konfirmasi_password_baru')
+
+        if password_baru != konfirmasi:
+            messages.error(request, "Konfirmasi password tidak cocok.")
+            return redirect(reverse('pengaturan_profil_staff'))
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT password FROM sizopi.pengguna WHERE username = %s", [username])
+                row = cursor.fetchone()
+
+                if not row or password_lama != row[0]:
+                    messages.error(request, "Password lama salah.")
+                    return redirect(reverse('pengaturan_profil_staff'))
+
+                cursor.execute("""
+                    UPDATE sizopi.pengguna SET password = %s WHERE username = %s
+                """, [password_baru, username])
+
+            messages.success(request, "Password berhasil diubah.")
+        except Exception as e:
+            messages.error(request, f"Gagal mengubah password: {str(e)}")
+
+        return redirect(reverse('pengaturan_profil_staff'))
     
+    # Jika metode GET, redirect saja ke halaman profil staff
+    # karena password akan diubah melalui modal di halaman tersebut
+    else:
+        return redirect(reverse('pengaturan_profil_staff'))
+    
+    
+    
+
+@role_required('pelatih_pertunjukan')
+def pengaturan_profil_pelatih(request):
+    username = request.user.username
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        nama_depan = request.POST.get('nama_depan')
+        nama_tengah = request.POST.get('nama_tengah')
+        nama_belakang = request.POST.get('nama_belakang')
+        no_telepon = request.POST.get('no_telepon')
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE sizopi.pengguna
+                    SET email = %s,
+                        nama_depan = %s,
+                        nama_tengah = %s,
+                        nama_belakang = %s,
+                        no_telepon = %s
+                    WHERE username = %s
+                """, [email, nama_depan, nama_tengah, nama_belakang, no_telepon, username])
+            messages.success(request, "Profil berhasil diperbarui.")
+        except Exception as e:
+            messages.error(request, f"Gagal memperbarui profil: {str(e)}")
+        return redirect(reverse('pengaturan_profil_pelatih'))
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT p.username, p.email, p.nama_depan, p.nama_tengah,
+                   p.nama_belakang, p.no_telepon, ph.id_staf
+            FROM sizopi.pengguna p
+            JOIN sizopi.pelatih_hewan ph ON p.username = ph.username_lh
+            WHERE p.username = %s
+        """, [username])
+        row = cursor.fetchone()
+
+    user_data = {
+        'username': row[0],
+        'email': row[1],
+        'nama_depan': row[2],
+        'nama_tengah': row[3],
+        'nama_belakang': row[4],
+        'no_telepon': row[5],
+        'id_pelatih': row[6],
+    }
+
+    return render(request, 'pengaturan_profil_pelatih.html', {
+        'user_data': user_data,
+        'role': 'pelatih_hewan'
+    })
+
+
+@role_required('pelatih_pertunjukan')
+def ubah_password_pelatih(request):
+    if request.method == 'POST':
+        username = request.user.username
+        password_lama = request.POST.get('password_lama')
+        password_baru = request.POST.get('password_baru')
+        konfirmasi = request.POST.get('konfirmasi_password_baru')
+
+        if password_baru != konfirmasi:
+            messages.error(request, "Konfirmasi password tidak cocok.")
+            return redirect(reverse('pengaturan_profil_pelatih'))
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT password FROM sizopi.pengguna WHERE username = %s", [username])
+                row = cursor.fetchone()
+
+                if not row or password_lama != row[0]:
+                    messages.error(request, "Password lama salah.")
+                    return redirect(reverse('pengaturan_profil_pelatih'))
+
+                cursor.execute("""
+                    UPDATE sizopi.pengguna SET password = %s WHERE username = %s
+                """, [password_baru, username])
+
+            messages.success(request, "Password berhasil diubah.")
+        except Exception as e:
+            messages.error(request, f"Gagal mengubah password: {str(e)}")
+
+        return redirect(reverse('pengaturan_profil_pelatih'))
+    
+    else:
+        return redirect(reverse('pengaturan_profil_pelatih'))

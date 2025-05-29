@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+  <title>Profil Pelatih Pertunjukan</title>
+{% endblock %}
+
+{% block content %}
+{% include 'navbar_pelatih_pertunjukan.html' %}
+
+<div class="max-w-7xl mx-auto mt-8 mb-16 px-4 animate__animated animate__fadeIn">
+    <div class="pt-20 text-center">
+        <h1 class="text-3xl font-bold text-green-600">Profil Pelatih Pertunjukan</h1>
+        <p class="text-gray-600 mt-2">Kelola informasi profil Anda</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 mt-6">
+        {% if messages %}
+            <div class="p-4">
+                {% for message in messages %}
+                    <div class="p-3 mb-2 border-l-4 {% if message.tags == 'success' %}border-green-500 bg-green-100{% else %}border-red-500 bg-red-100{% endif %} rounded-r animate__animated animate__fadeIn">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="bg-gray-50 border-b border-gray-200">
+            <div class="flex overflow-x-auto">
+                <a href="{% url 'pengaturan_profil_pelatih' %}" class="tab-btn active-tab px-6 py-3 font-medium text-green-600 border-b-2 border-green-500">Profil</a>
+                <button id="openPasswordModal" class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-green-600">Kata Sandi</button>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <form method="POST" action="{% url 'pengaturan_profil_pelatih' %}">
+                {% csrf_token %}
+                
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/3 pr-0 md:pr-8">
+                        <div class="flex flex-col items-center mb-6">
+                            <div class="w-32 h-32 bg-gray-200 rounded-full overflow-hidden mb-4 border-4 border-white shadow-lg">
+                                <div class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl font-bold">
+                                    {{ user_data.username|first|upper }}
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-semibold text-center">{{ user_data.username }}</h3>
+                            <p class="text-sm text-gray-500 text-center">{{ role|title }}</p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username:</label>
+                            <input type="text" id="username" name="username" value="{{ user_data.username }}" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700" readonly>
+                            <p class="text-xs text-gray-500 mt-1">(tidak dapat diubah)</p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                            <input type="email" id="email" name="email" value="{{ user_data.email|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon:</label>
+                            <input type="tel" id="no_telepon" name="no_telepon" value="{{ user_data.no_telepon|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-2/3 md:border-l md:border-gray-200 md:pl-8">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Informasi Personal</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="nama_depan" class="block text-sm font-medium text-gray-700 mb-1">Nama Depan:</label>
+                                <input type="text" id="nama_depan" name="nama_depan" value="{{ user_data.nama_depan|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            
+                            <div>
+                                <label for="nama_tengah" class="block text-sm font-medium text-gray-700 mb-1">Nama Tengah (Opsional):</label>
+                                <input type="text" id="nama_tengah" name="nama_tengah" value="{{ user_data.nama_tengah|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            
+                            <div>
+                                <label for="nama_belakang" class="block text-sm font-medium text-gray-700 mb-1">Nama Belakang:</label>
+                                <input type="text" id="nama_belakang" name="nama_belakang" value="{{ user_data.nama_belakang|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Informasi Pelatih</h3>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label for="id_pelatih" class="block text-sm font-medium text-gray-700 mb-1">ID Pelatih:</label>
+                                    <input type="text" id="id_pelatih" name="id_pelatih" value="{{ user_data.id_pelatih|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700" readonly>
+                                    <p class="text-xs text-gray-500 mt-1">(tidak dapat diubah)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <button type="submit" class="btn-shine bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-10 rounded-md font-medium transition duration-300 ease-in-out shadow-md hover:shadow-lg">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Password -->
+<div id="passwordModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center hidden animate__animated animate__fadeIn">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 animate__animated animate__fadeInUp animate__faster">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">Ubah Password</h3>
+            <button id="closePasswordModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form id="passwordForm" method="POST" action="{% url 'ubah_password_pelatih' %}">
+            {% csrf_token %}
+            <div class="p-6">
+                <div class="mb-4">
+                    <label for="password_lama" class="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini:</label>
+                    <div class="relative">
+                        <input type="password" id="password_lama" name="password_lama" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" required>
+                        <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="password_baru" class="block text-sm font-medium text-gray-700 mb-1">Password Baru:</label>
+                    <div class="relative">
+                        <input type="password" id="password_baru" name="password_baru" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" required>
+                        <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Password minimal 8 karakter.</p>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="konfirmasi_password_baru" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru:</label>
+                    <div class="relative">
+                        <input type="password" id="konfirmasi_password_baru" name="konfirmasi_password_baru" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500" required>
+                        <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="password-error text-red-500 text-sm hidden mb-4"></div>
+            </div>
+            
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+                <button type="button" id="cancelPasswordChange" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Batal
+                </button>
+                <button type="button" id="submitPassword" class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .btn-shine {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-shine::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+        transform: rotate(45deg);
+        transition: all 0.5s;
+        opacity: 0;
+    }
+    
+    .btn-shine:hover::after {
+        opacity: 1;
+        left: 100%;
+        top: 100%;
+    }
+    
+    .tab-btn {
+        position: relative;
+        transition: all 0.3s;
+    }
+    
+    .tab-btn:not(.active-tab)::after {
+        content: '';
+        position: absolute;
+        width: 0%;
+        height: 2px;
+        bottom: 0;
+        left: 50%;
+        background-color: #10B981;
+        transform: translateX(-50%);
+        transition: width 0.3s;
+    }
+    
+    .tab-btn:not(.active-tab):hover::after {
+        width: 80%;
+    }
+
+    /* Modal animation */
+    .animate__fadeIn {
+        animation-duration: 0.3s;
+    }
+    
+    .animate__fadeInUp {
+        animation-duration: 0.3s;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.innerHTML = `
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                    `;
+                } else {
+                    input.type = 'password';
+                    this.innerHTML = `
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    `;
+                }
+            });
+        });
+
+        // Password modal functionality
+        const passwordModal = document.getElementById('passwordModal');
+        const openPasswordModal = document.getElementById('openPasswordModal');
+        const closePasswordModal = document.getElementById('closePasswordModal');
+        const cancelPasswordChange = document.getElementById('cancelPasswordChange');
+        const submitPassword = document.getElementById('submitPassword');
+        const passwordForm = document.getElementById('passwordForm');
+        const passwordError = document.querySelector('.password-error');
+
+        function openModal() {
+            passwordModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            passwordForm.reset();
+            passwordError.classList.add('hidden');
+            passwordError.textContent = '';
+        }
+
+        function closeModal() {
+            passwordModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        openPasswordModal.addEventListener('click', openModal);
+        closePasswordModal.addEventListener('click', closeModal);
+        cancelPasswordChange.addEventListener('click', closeModal);
+
+        // Close modal when clicking outside
+        passwordModal.addEventListener('click', function(e) {
+            if (e.target === passwordModal) {
+                closeModal();
+            }
+        });
+
+        // Handle form submission with validation
+        submitPassword.addEventListener('click', function() {
+            const passwordBaru = document.getElementById('password_baru').value;
+            const konfirmasiPassword = document.getElementById('konfirmasi_password_baru').value;
+            
+            if (passwordBaru !== konfirmasiPassword) {
+                passwordError.textContent = 'Konfirmasi password tidak cocok.';
+                passwordError.classList.remove('hidden');
+                return;
+            }
+
+            if (passwordBaru.length < 8) {
+                passwordError.textContent = 'Password minimal 8 karakter.';
+                passwordError.classList.remove('hidden');
+                return;
+            }
+
+            passwordForm.submit();
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !passwordModal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    });
+</script>
+
+{% endblock %}
