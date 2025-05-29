@@ -113,6 +113,12 @@ DATABASES = {
     }
 }
 
+if DATABASES['default']:
+    DATABASES['default']['OPTIONS'] = {
+        'options': '-c search_path=sizopi,public'
+    }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
