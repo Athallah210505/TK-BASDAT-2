@@ -5,8 +5,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.db.utils import DatabaseError
 from django.utils import timezone
+from utils.decorators import role_required
 import json
 
+@role_required(('staff'))
 def adopter_list(request):
     try:
         with connection.cursor() as cursor:
@@ -57,6 +59,7 @@ def adopter_list(request):
             'error': error_message
         })
 
+@role_required(('staff'))
 def adopter_detail(request, adopter_id=None):
     if not adopter_id:
         return redirect('adopter_list')
@@ -136,6 +139,7 @@ def adopter_detail(request, adopter_id=None):
             'active_adoptions': 0
         })
 
+@role_required(('staff'))
 @csrf_exempt
 @require_http_methods(["DELETE"])
 def delete_adoption(request, adoption_id):
@@ -178,6 +182,7 @@ def delete_adoption(request, adoption_id):
             'message': error_message
         }, status=500)
 
+@role_required(('staff'))
 @csrf_exempt
 @require_http_methods(["DELETE"])
 def delete_adopter(request, adopter_id):
