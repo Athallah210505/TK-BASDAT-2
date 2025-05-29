@@ -99,20 +99,19 @@ WSGI_APPLICATION = 'Sizopi.wsgi.application'
 
 import dj_database_url
 import os
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
-
-# Tambahkan opsi search_path jika koneksi berhasil di-parse
-if DATABASES['default']:
-    DATABASES['default']['OPTIONS'] = {
-        'options': '-c search_path=sizopi,public'
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  
+        'USER': 'postgres.hoxpxfbibceytauyecgd', 
+        'PASSWORD': '080808',  
+        'HOST': 'aws-0-ap-southeast-1.pooler.supabase.com',  
+        'PORT': '5432',  
+        'OPTIONS': {
+            'options': '-c search_path=sizopi,public'
+        }
     }
+}
 
 
 # Password validation
