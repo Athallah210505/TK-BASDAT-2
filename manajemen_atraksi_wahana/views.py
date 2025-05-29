@@ -372,14 +372,55 @@ def delete_atraksi(request, id):
     if request.method == 'POST':
         try:
             with connection.cursor() as cursor:
-              
+                # 1. Hapus dulu data reservasi yang terkait
+                cursor.execute("""
+                    DELETE FROM sizopi.RESERVASI
+                    WHERE nama_fasilitas = %s
+                """, [id])
+                reservasi_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted {reservasi_deleted} related reservations for attraction: {id}")
+
+                # 2. Hapus data jadwal penugasan
+                cursor.execute("""
+                    DELETE FROM sizopi.jadwal_penugasan
+                    WHERE nama_atraksi = %s
+                """, [id])
+                jadwal_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted {jadwal_deleted} related trainer assignments for attraction: {id}")
+                
+                # 3. Hapus data berpartisipasi (tabel yang menghubungkan fasilitas dengan hewan)
+                cursor.execute("""
+                    DELETE FROM sizopi.berpartisipasi
+                    WHERE nama_fasilitas = %s
+                """, [id])
+                partisipasi_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted {partisipasi_deleted} related animal participations for attraction: {id}")
+                
+                # 4. Hapus data atraksi
+                cursor.execute("""
+                    DELETE FROM sizopi.atraksi
+                    WHERE nama_atraksi = %s
+                """, [id])
+                atraksi_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted attraction record: {atraksi_deleted}")
+
+                # 5. Terakhir, hapus data fasilitas
                 cursor.execute("""
                     DELETE FROM sizopi.fasilitas
                     WHERE nama = %s
                 """, [id])
+                fasilitas_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted facility record: {fasilitas_deleted}")
             
-            messages.success(request, "Atraksi berhasil dihapus!")
+            if reservasi_deleted > 0:
+                messages.info(request, f"{reservasi_deleted} reservasi terkait atraksi '{id}' juga dihapus.")
+            
+            messages.success(request, f"Atraksi '{id}' berhasil dihapus beserta seluruh data terkait!")
+            
         except Exception as e:
+            import traceback
+            print(f"ERROR deleting attraction: {str(e)}")
+            print(traceback.format_exc())
             messages.error(request, f"Gagal menghapus atraksi: {str(e)}")
     
     return redirect('show_atraksi_management')
@@ -544,18 +585,39 @@ def delete_wahana(request, nama_wahana):
     if request.method == 'POST':
         try:
             with connection.cursor() as cursor:
+                # 1. Hapus dulu data reservasi yang terkait
+                cursor.execute("""
+                    DELETE FROM sizopi.RESERVASI
+                    WHERE nama_fasilitas = %s
+                """, [nama_wahana])
+                reservasi_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted {reservasi_deleted} related reservations for wahana: {nama_wahana}")
+                
+                # 2. Hapus data wahana
                 cursor.execute("""
                     DELETE FROM sizopi.wahana
                     WHERE nama_wahana = %s
                 """, [nama_wahana])
+                wahana_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted wahana record: {wahana_deleted}")
                 
+                # 3. Terakhir, hapus data fasilitas
                 cursor.execute("""
                     DELETE FROM sizopi.fasilitas
                     WHERE nama = %s
                 """, [nama_wahana])
+                fasilitas_deleted = cursor.rowcount
+                print(f"DEBUG - Deleted facility record: {fasilitas_deleted}")
                 
-            messages.success(request, f"Wahana '{nama_wahana}' berhasil dihapus!")
+                if reservasi_deleted > 0:
+                    messages.info(request, f"{reservasi_deleted} reservasi terkait wahana '{nama_wahana}' juga dihapus.")
+                
+                messages.success(request, f"Wahana '{nama_wahana}' berhasil dihapus beserta seluruh data terkait!")
+                
         except Exception as e:
+            import traceback
+            print(f"ERROR deleting wahana: {str(e)}")
+            print(traceback.format_exc())
             messages.error(request, f"Gagal menghapus wahana: {str(e)}")
             
     return redirect('show_wahana_management')
