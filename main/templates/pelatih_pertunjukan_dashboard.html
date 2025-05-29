@@ -78,15 +78,15 @@
         <!-- ID Card Section -->
         <div class="bg-green-100 rounded-lg p-2 mb-2">
             <span class="inline-block bg-white text-xs px-3 py-1 rounded-full text-green-700 font-medium">
-                ID Staf: c61d4e39-72a5-43b8-87f6-29e5d4c3b2a1
+                ID Staf: {{ id_staf }}
             </span>
         </div>
 
         <!-- User Profile Card -->
         <div class="bg-white rounded-lg p-6 shadow-sm mb-6">
             <div class="mb-4">
-                <h2 class="text-lg font-medium">yoonjang</h2>
-                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Staf Pelatih Pertunjukan</span>
+                <h2 class="text-lg font-medium">{{ nama_lengkap }}</h2>
+                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">{{ peran }}</span>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -96,7 +96,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Username</p>
-                        <p>yoonjang77</p>
+                        <p>{{ username }}</p>
                     </div>
                 </div>
                 
@@ -106,7 +106,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Nomor Telepon</p>
-                        <p>08234567890</p>
+                        <p>{{ no_telepon }}</p>
                     </div>
                 </div>
                 
@@ -116,7 +116,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Email</p>
-                        <p>yoonjang@example.com</p>
+                        <p>{{ email }}</p>
                     </div>
                 </div>
                 
@@ -126,7 +126,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Peran</p>
-                        <p>Staf Pelatih Pertunjukan</p>
+                        <p>{{ peran }}</p>
                     </div>
                 </div>
             </div>
@@ -149,7 +149,7 @@
                     <span class="text-sm text-gray-600">ID Staf</span>
                     <i class="fas fa-id-card text-green-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-1">c61d4e39-72a5-43b8-87f6-29e5d4c3b2a1</h3>
+                <h3 class="text-2xl font-bold mb-1">{{ id_staf }}</h3>
                 <p class="text-xs text-gray-500">ID Staf Pelatih Pertunjukan</p>
             </div>
 
@@ -159,7 +159,7 @@
                     <span class="text-sm text-gray-600">Jumlah Pertunjukan Hari Ini</span>
                     <i class="fas fa-calendar-check text-green-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-1">4</h3>
+                <h3 class="text-2xl font-bold mb-1">{{ jumlah_pertunjukan_hari_ini }}</h3>
                 <p class="text-xs text-gray-500">Pertunjukan terjadwal hari ini</p>
             </div>
         </div>
@@ -184,42 +184,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">10:00</td>
-                            <td class="py-3">Pertunjukan Burung</td>
-                            <td class="py-3">Amfiteater Utama</td>
-                            <td class="py-3">30 menit</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-siap">Siap</span>
-                            </td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">13:00</td>
-                            <td class="py-3">Atraksi Lumba-lumba</td>
-                            <td class="py-3">Kolam Lumba-lumba</td>
-                            <td class="py-3">45 menit</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-siap">Siap</span>
-                            </td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">15:30</td>
-                            <td class="py-3">Pertunjukan Gajah</td>
-                            <td class="py-3">Arena Gajah</td>
-                            <td class="py-3">40 menit</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-persiapan">Persiapan</span>
-                            </td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="py-3 pl-1">17:00</td>
-                            <td class="py-3">Pertunjukan Harimau</td>
-                            <td class="py-3">Arena Harimau</td>
-                            <td class="py-3">30 menit</td>
-                            <td class="py-3 text-center">
-                                <span class="status-badge status-persiapan">Persiapan</span>
-                            </td>
-                        </tr>
+                        {% for jadwal in jadwal_hari_ini %}
+                            <tr class="border-t border-gray-100">
+                                <td class="py-3 pl-1">{{ jadwal.waktu }}</td>
+                                <td class="py-3">{{ jadwal.nama_atraksi }}</td>
+                                <td class="py-3">{{ jadwal.lokasi }}</td>
+                                <td class="py-3">{{ jadwal.durasi }}</td>
+                                <td class="py-3 text-center">
+                                    <span class="status-badge status-siap">{{ jadwal.status }}</span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-gray-400 py-4">Tidak ada jadwal hari ini.</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -234,59 +213,17 @@
                     <h3 class="text-lg font-medium">Daftar Hewan yang Dilatih</h3>
                 </div>
                 <p class="text-xs text-gray-500 mb-4">Hewan-hewan yang sedang dalam pelatihan</p>
-                
                 <div class="space-y-5">
-                    <div>
-                        <div class="flex justify-between">
-                            <div>
-                                <p class="font-medium">Ara (Burung Macaw)</p>
-                                <p class="text-xs text-gray-500">Burung | Performa: 95%</p>
+                    {% for hewan in daftar_hewan %}
+                        <div>
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="font-medium">{{ hewan.nama }}</p>
+                                    <p class="text-xs text-gray-500">{{ hewan.spesies }}</p>
+                                </div>
                             </div>
-                            <span class="status-badge status-terlatih">Terlatih</span>
                         </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: 95%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between">
-                            <div>
-                                <p class="font-medium">Jumbo (Gajah Asia)</p>
-                                <p class="text-xs text-gray-500">Mamalia | Performa: 90%</p>
-                            </div>
-                            <span class="status-badge status-terlatih">Terlatih</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: 90%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between">
-                            <div>
-                                <p class="font-medium">Flipper (Lumba-lumba)</p>
-                                <p class="text-xs text-gray-500">Mamalia Laut | Performa: 75%</p>
-                            </div>
-                            <span class="status-badge status-pelatihan">Dalam Pelatihan</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar progress-bar-orange" style="width: 75%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between">
-                            <div>
-                                <p class="font-medium">Raja (Harimau Sumatera)</p>
-                                <p class="text-xs text-gray-500">Mamalia | Performa: 60%</p>
-                            </div>
-                            <span class="status-badge status-pelatihan">Dalam Pelatihan</span>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar progress-bar-orange" style="width: 60%"></div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -297,72 +234,48 @@
                     <h3 class="text-lg font-medium">Status Latihan Terakhir</h3>
                 </div>
                 <p class="text-xs text-gray-500 mb-4">Hasil latihan terbaru dari hewan-hewan</p>
-                
-                <div class="space-y-4">
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-medium">Ara (Burung Macaw)</p>
-                                    <p class="text-xs text-gray-500">2024-04-27 - Latihan Terbang</p>
+                <div id="latihan-list-short" class="space-y-4">
+                    {% for latihan in status_latihan|slice:':3' %}
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full {% if latihan.status == 'Sukses' %}bg-green-100 text-green-500{% else %}bg-yellow-100 text-yellow-500{% endif %} flex items-center justify-center mr-4 mt-1">
+                                <i class="fas {% if latihan.status == 'Sukses' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium">{{ latihan.nama }}</p>
+                                        <p class="text-xs text-gray-500">{{ latihan.tanggal }} - {{ latihan.latihan }}</p>
+                                    </div>
+                                    <span class="status-badge {% if latihan.status == 'Sukses' %}status-sukses{% else %}status-perbaikan{% endif %}">{{ latihan.status }}</span>
                                 </div>
-                                <span class="status-badge status-sukses">Sukses</span>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4 mt-1">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-medium">Jumbo (Gajah Asia)</p>
-                                    <p class="text-xs text-gray-500">2024-04-26 - Latihan Berdiri</p>
-                                </div>
-                                <span class="status-badge status-sukses">Sukses</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mr-4 mt-1">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-medium">Flipper (Lumba-lumba)</p>
-                                    <p class="text-xs text-gray-500">2024-04-26 - Latihan Lompat</p>
-                                </div>
-                                <span class="status-badge status-perbaikan">Perlu Perbaikan</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mr-4 mt-1">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-medium">Raja (Harimau Sumatera)</p>
-                                    <p class="text-xs text-gray-500">2024-04-25 - Latihan Dasar</p>
-                                </div>
-                                <span class="status-badge status-perbaikan">Perlu Perbaikan</span>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                
+                <div id="latihan-list-all" class="space-y-4" style="display:none;">
+                    {% for latihan in status_latihan %}
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full {% if latihan.status == 'Sukses' %}bg-green-100 text-green-500{% else %}bg-yellow-100 text-yellow-500{% endif %} flex items-center justify-center mr-4 mt-1">
+                                <i class="fas {% if latihan.status == 'Sukses' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium">{{ latihan.nama }}</p>
+                                        <p class="text-xs text-gray-500">{{ latihan.tanggal }} - {{ latihan.latihan }}</p>
+                                    </div>
+                                    <span class="status-badge {% if latihan.status == 'Sukses' %}status-sukses{% else %}status-perbaikan{% endif %}">{{ latihan.status }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
                 <div class="text-center mt-6">
-                    <button class="text-sm text-green-600 hover:text-green-700">
+                    <button id="lihat-semua-latihan" class="text-sm text-green-600 hover:text-green-700">
                         Lihat Semua Latihan
+                    </button>
+                    <button id="tutup-semua-latihan" class="text-sm text-green-600 hover:text-green-700" style="display:none;">
+                        Tutup
                     </button>
                 </div>
             </div>
@@ -396,6 +309,24 @@
                     bar.style.transition = 'width 1s ease-out';
                     bar.style.width = originalWidth;
                 }, 300);
+            });
+
+            // Expand/collapse status latihan
+            const btnLihat = document.getElementById('lihat-semua-latihan');
+            const btnTutup = document.getElementById('tutup-semua-latihan');
+            const listShort = document.getElementById('latihan-list-short');
+            const listAll = document.getElementById('latihan-list-all');
+            btnLihat.addEventListener('click', function() {
+                listShort.style.display = 'none';
+                listAll.style.display = '';
+                btnLihat.style.display = 'none';
+                btnTutup.style.display = '';
+            });
+            btnTutup.addEventListener('click', function() {
+                listShort.style.display = '';
+                listAll.style.display = 'none';
+                btnLihat.style.display = '';
+                btnTutup.style.display = 'none';
             });
         });
     </script>
