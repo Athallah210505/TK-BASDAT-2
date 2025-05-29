@@ -30,6 +30,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = ['https://tk-basdat-2-production.up.railway.app', 'http://127.0.0.1:8000']
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -94,21 +97,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Sizopi.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+import dj_database_url
+import os
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
+        default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
         ssl_require=True
     )
 }
 
-DATABASES['default']['OPTIONS'] = {
-    'options': '-c search_path=sizopi,public'
-}
-
+# Tambahkan opsi search_path jika koneksi berhasil di-parse
+if DATABASES['default']:
+    DATABASES['default']['OPTIONS'] = {
+        'options': '-c search_path=sizopi,public'
+    }
 
 
 # Password validation
