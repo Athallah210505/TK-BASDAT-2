@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rekam_medis_hewan',
     'penjadwalan_pemeriksaan',
     'pemberian_pakan',  
+    'informasi',
 ]
 
 MIDDLEWARE = [

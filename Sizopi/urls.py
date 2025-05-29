@@ -32,5 +32,5 @@ urlpatterns = [
     path('rekam_medis/', include('rekam_medis_hewan.urls')),
     path('jadwal_pemeriksaan/', include('penjadwalan_pemeriksaan.urls')),
     path('pemberian_pakan/', include('pemberian_pakan.urls')),
-
+    path('informasi/', include(('informasi.urls', 'informasi'), namespace='informasi')),
 ]
