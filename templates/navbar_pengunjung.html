@@ -21,7 +21,7 @@
         </a>
         
         <!-- Visitor-specific links -->
-        <a href='#' class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="{% url 'informasi:satwa_list' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Informasi Kebun Binatang
         </a>
 
@@ -29,9 +29,9 @@
           Reservasi tiket
         </a>
         
-          <a href="{% url 'visitor_profile' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
+        <a href="{% url 'pengaturan_profil_pengunjung' %}" class="nav-link text-gray-600 hover:text-green-600 transition-colors duration-200">
           Profile
-        </a>  
+        </a>
         
         <!-- Logout button -->
         <div class="px-4 py-2">
@@ -60,7 +60,7 @@
       </a>
       
       <!-- Visitor-specific mobile links -->
-      <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+      <a href="{% url 'informasi:satwa_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
         Informasi Kebun Binatang
       </a>
 

@@ -16,4 +16,7 @@ urlpatterns = [
     path('wahana/edit/<str:nama_wahana>/', views.edit_wahana, name='edit_wahana'),
     path('wahana/delete/<str:nama_wahana>/', views.delete_wahana, name='delete_wahana'),
     path('wahana/data/<str:nama_wahana>/', views.get_wahana_data, name='get_wahana_data'),
+    
+    
+    path ('atraksi_wahana/', views.show_atraksi_wahana, name='show_atraksi_wahana'),
 ]

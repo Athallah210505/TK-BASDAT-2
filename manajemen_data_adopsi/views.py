@@ -31,7 +31,6 @@ def adoption_list(request):
     
     return render(request, 'adoption_list.html', {'animals': animal_list})
     
-@role_required(('staff', 'pengunjung_adopter'))
 def _parse_adoption_id(adoption_id_str):
     """Helper function to parse combined adoption ID."""
     parts = adoption_id_str.split('-')
@@ -109,7 +108,9 @@ def adoption_detail(request, adoption_id): # adoption_id adalah string gabungan
         raise # Melempar ulang error untuk debugging
 
 @role_required(('staff', 'pengunjung_adopter'))
-def register_adopter(request, animal_id=None): # animal_id di sini adalah UUID hewan tunggal
+def register_adopter(request, animal_id=None):
+    animal_uuid = None  # Initialize the variable
+    
     if animal_id:
         try:
             animal_uuid = uuid.UUID(animal_id)
@@ -122,8 +123,26 @@ def register_adopter(request, animal_id=None): # animal_id di sini adalah UUID h
         adoption_period_months = request.POST.get('adoption_period')
         contribution_str = request.POST.get('contribution')
         
+        # Get animal_id from form if not in URL
+        if not animal_uuid and request.POST.get('animal_id'):
+            try:
+                animal_uuid = uuid.UUID(request.POST.get('animal_id'))
+            except ValueError:
+                return render(request, 'adoption_form.html', {
+                    'error': "Format ID hewan tidak valid.",
+                    'animal': None,
+                    'animal_id': None
+                })
+        
+        if not animal_uuid:
+            return render(request, 'adoption_form.html', {
+                'error': "ID hewan diperlukan untuk registrasi adopsi.",
+                'animal': None,
+                'animal_id': None
+            })
+        
         try:
-            contribution = int(contribution_str) # Pastikan ini adalah angka
+            contribution = int(contribution_str)
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
             months_to_add = int(adoption_period_months)
 
@@ -132,21 +151,16 @@ def register_adopter(request, animal_id=None): # animal_id di sini adalah UUID h
                 adopter_result = cursor.fetchone()
                 if not adopter_result:
                     raise Exception("Adopter tidak ditemukan")
-                adopter_uuid = adopter_result[0] # Ini seharusnya sudah UUID
+                adopter_uuid = adopter_result[0]
                 
-                # Kalkulasi tanggal akhir yang lebih aman
-                end_date = start_date
-                for _ in range(months_to_add):
-                    days_in_month = (end_date.replace(month=end_date.month % 12 + 1, day=1) - timedelta(days=1)).day
-                    end_date += timedelta(days=days_in_month)
-                new_month = start_date.month -1 + months_to_add # 0-indexed month
+                # Calculate end date
+                new_month = start_date.month - 1 + months_to_add
                 new_year = start_date.year + new_month // 12
                 new_month = new_month % 12 + 1
                 try:
                     end_date = start_date.replace(year=new_year, month=new_month)
-                except ValueError: # e.g. trying to set Feb 30
+                except ValueError:
                     end_date = start_date.replace(year=new_year, month=new_month, day=1) + timedelta(days=-1)
-
 
                 cursor.execute("""
                     INSERT INTO sizopi.adopsi 
@@ -154,7 +168,7 @@ def register_adopter(request, animal_id=None): # animal_id di sini adalah UUID h
                     VALUES (%s, %s, 'Tertunda', %s, %s, %s)
                 """, [
                     adopter_uuid,
-                    animal_uuid, # Gunakan animal_uuid dari parameter URL
+                    animal_uuid,
                     start_date_str,
                     end_date.strftime('%Y-%m-%d'),
                     contribution
@@ -164,23 +178,56 @@ def register_adopter(request, animal_id=None): # animal_id di sini adalah UUID h
                     UPDATE sizopi.adopter
                     SET total_kontribusi = total_kontribusi + %s
                     WHERE id_adopter = %s
-                """, [contribution, adopter_uuid]) # Update berdasarkan id_adopter (UUID)
+                """, [contribution, adopter_uuid])
                 
             return redirect('adoption_list')
             
         except Exception as e:
             error_message = str(e)
             animal_data_for_form = None
-            if animal_uuid: # Gunakan animal_uuid
-                 with connection.cursor() as cursor_err:
+            
+            # Now animal_uuid is always defined here
+            if animal_uuid:
+                with connection.cursor() as cursor_err:
                     cursor_err.execute("SELECT nama, spesies, status_kesehatan FROM sizopi.hewan WHERE id = %s", [animal_uuid])
                     animal_q_res = cursor_err.fetchone()
                     if animal_q_res:
                         animal_data_for_form = {
-                            'id': str(animal_uuid), 'nama': animal_q_res[0], 
-                            'spesies': animal_q_res[1], 'status_kesehatan': animal_q_res[2]
+                            'id': str(animal_uuid), 
+                            'nama': animal_q_res[0], 
+                            'spesies': animal_q_res[1], 
+                            'status_kesehatan': animal_q_res[2]
                         }
-            return render(request, 'adoption_form.html', {'error': error_message, 'animal': animal_data_for_form, 'animal_id': str(animal_uuid) if animal_uuid else None})
+            
+            return render(request, 'adoption_form.html', {
+                'error': error_message, 
+                'animal': animal_data_for_form, 
+                'animal_id': str(animal_uuid) if animal_uuid else None
+            })
+    
+    # GET request
+    if animal_id:
+        try:
+            animal_uuid_get = uuid.UUID(animal_id)
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT nama, spesies, status_kesehatan FROM sizopi.hewan WHERE id = %s", [animal_uuid_get])
+                animal = cursor.fetchone()
+                if not animal:
+                    raise Http404("Hewan tidak ditemukan")
+                context = {
+                    'animal': {
+                        'id': str(animal_uuid_get), 
+                        'nama': animal[0], 
+                        'spesies': animal[1], 
+                        'status_kesehatan': animal[2]
+                    },
+                    'animal_id': str(animal_uuid_get)
+                }
+            return render(request, 'adoption_form.html', context)
+        except ValueError:
+            raise Http404("Format ID hewan tidak valid.")
+    else:
+        return render(request, 'adoption_form.html')
     
     # GET request
     if animal_id: # animal_id adalah string UUID dari URL
