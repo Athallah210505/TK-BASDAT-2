@@ -21,6 +21,13 @@
         </a>
       </div>
       
+      {% if error %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {{ error }}
+        </div>
+      {% endif %}
+      
+      {% if adoption %}
       <!-- Animal Information Card -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <!-- Left Column: Animal Info -->
@@ -32,15 +39,15 @@
                 <div class="space-y-4">
                   <div>
                     <p class="text-gray-500 text-sm">Nama Hewan:</p>
-                    <p class="font-medium text-lg">Simba</p>
+                    <p class="font-medium text-lg">{{ adoption.animal.nama }}</p>
                   </div>
                   <div>
                     <p class="text-gray-500 text-sm">Jenis Hewan:</p>
-                    <p class="font-medium text-lg">Singa Afrika</p>
+                    <p class="font-medium text-lg">{{ adoption.animal.jenis }}</p>
                   </div>
                   <div>
                     <p class="text-gray-500 text-sm">Habitat:</p>
-                    <p class="font-medium text-lg">Savana</p>
+                    <p class="font-medium text-lg">{{ adoption.animal.habitat }}</p>
                   </div>
                 </div>
               </div>
@@ -48,15 +55,23 @@
                 <div class="space-y-4">
                   <div>
                     <p class="text-gray-500 text-sm">ID Adopsi:</p>
-                    <p class="font-medium text-lg">AD-20230115-001</p>
+                    <p class="font-medium text-lg">{{ adoption.id }}</p>
                   </div>
                   <div>
                     <p class="text-gray-500 text-sm">Nama Pengadopsi:</p>
-                    <p class="font-medium text-lg">Budi Santoso</p>
+                    <p class="font-medium text-lg">{{ adoption.adopter.nama_adopter }}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-500 text-sm">Username Adopter:</p>
+                    <p class="font-medium text-lg">{{ adoption.adopter.username_adopter }}</p>
                   </div>
                   <div>
                     <p class="text-gray-500 text-sm">Periode Adopsi:</p>
-                    <p class="font-medium text-lg">15 Jan 2023 s/d 15 Jan 2024</p>
+                    <p class="font-medium text-lg">{{ adoption.periode }}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-500 text-sm">Total Kontribusi:</p>
+                    <p class="font-medium text-lg">{{ adoption.adopter.total_kontribusi }}</p>
                   </div>
                 </div>
               </div>
@@ -68,13 +83,15 @@
         <div class="col-span-1">
           <div class="bg-green-100 p-4 rounded-xl border border-green-200 h-full flex items-center justify-center safari-card">
             <div class="relative w-full aspect-square rounded-lg overflow-hidden">
-              <img src="https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Simba%28TheLionKing%29.png/250px-Simba%28TheLionKing%29.png" alt="Foto Satwa" class="w-full h-full object-cover">
+              <!-- You can add dynamic image source here if available in database -->
+              <img src="{% static 'images/default-animal.jpg' %}" alt="Foto {{ adoption.animal.nama }}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x300?text=Foto+Tidak+Tersedia'">
             </div>
           </div>
         </div>
       </div>
       
       <!-- Medical Records Section -->
+      {% if medical_records %}
       <div class="mb-8">
         <h2 class="text-xl font-semibold text-green-700 mb-4">Rekam Medis Satwa</h2>
         <div class="overflow-x-auto bg-white rounded-xl border border-gray-200 shadow-sm">
@@ -90,119 +107,99 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Medical Record 1 -->
+              {% for record in medical_records %}
               <tr class="hover:bg-green-50 transition-colors">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2025-04-01</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Dr. Siti Aminah</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ record.tanggal_pemeriksaan }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ record.nama_dokter }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Sakit</span>
+                  {% if record.status_kesehatan == 'Sehat' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ record.status_kesehatan }}</span>
+                  {% elif record.status_kesehatan == 'Sakit' %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{{ record.status_kesehatan }}</span>
+                  {% else %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ record.status_kesehatan }}</span>
+                  {% endif %}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Infeksi saluran pernapasan</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Antibiotik selama 7 hari</td>
-                <td class="px-6 py-4 text-sm text-gray-700">Evaluasi kondisi perbaikan ventilasi kandang</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ record.diagnosa }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ record.pengobatan }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ record.catatan_tindak_lanjut }}</td>
               </tr>
-              
-              <!-- Medical Record 2 -->
-              <tr class="hover:bg-green-50 transition-colors">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2025-03-15</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Dr. Ahmad Fauzi</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sehat</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Pemeriksaan rutin</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Vitamin dan suplemen</td>
-                <td class="px-6 py-4 text-sm text-gray-700">Pemantauan berat badan</td>
-              </tr>
-              
-              <!-- Medical Record 3 -->
-              <tr class="hover:bg-green-50 transition-colors">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2025-02-20</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Dr. Siti Aminah</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pemeriksaan</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Pemeriksaan gigi</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">Pembersihan karang gigi</td>
-                <td class="px-6 py-4 text-sm text-gray-700">Jadwalkan pemeriksaan ulang dalam 6 bulan</td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
       </div>
+      {% else %}
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-green-700 mb-4">Rekam Medis Satwa</h2>
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 text-center">
+          <p class="text-gray-500">Belum ada rekam medis untuk hewan ini.</p>
+        </div>
+      </div>
+      {% endif %}
       
       <!-- Condition History Section -->
+      {% if condition_reports %}
       <div class="mb-8">
         <h2 class="text-xl font-semibold text-green-700 mb-4">Riwayat Kondisi</h2>
         
-        <!-- Report 1 -->
+        {% for report in condition_reports %}
         <div class="bg-white p-6 rounded-xl border border-gray-200 hover:border-green-300 mb-6 safari-card">
           <div class="flex justify-between items-start mb-4">
-            <h3 class="font-semibold text-lg">Laporan 10 Februari 2023</h3>
+            <h3 class="font-semibold text-lg">Laporan {{ report.tanggal_laporan }}</h3>
+            {% if forloop.counter0 == 0 %}
             <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Terbaru</span>
+            {% endif %}
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="md:col-span-3">
               <p class="text-gray-500 text-sm mb-2">Kondisi Satwa:</p>
-              <p class="text-gray-700">Simba dalam kondisi sangat sehat, nafsu makan baik, dan aktif bermain dengan pasangannya di kandang. Berat badan stabil di 180kg. Pemeriksaan fisik menunjukkan kondisi bulu yang baik dan tidak ada tanda-tanda infeksi.</p>
+              <p class="text-gray-700 mb-4">{{ report.kondisi_satwa }}</p>
               
               <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <p class="text-gray-500 text-sm">Berat Badan:</p>
-                  <p class="font-medium">180 kg</p>
+                  <p class="font-medium">{{ report.berat_badan }} kg</p>
                 </div>
                 <div>
                   <p class="text-gray-500 text-sm">Suhu Tubuh:</p>
-                  <p class="font-medium">38.2°C</p>
+                  <p class="font-medium">{{ report.suhu_tubuh }}°C</p>
                 </div>
                 <div>
                   <p class="text-gray-500 text-sm">Nafsu Makan:</p>
-                  <p class="font-medium">Baik</p>
+                  <p class="font-medium">{{ report.nafsu_makan }}</p>
                 </div>
               </div>
             </div>
             <div class="flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
-              <img src="https://img1.picmix.com/output/stamp/normal/7/4/3/3/863347_f56be.png" alt="Foto kondisi satwa" class="w-full h-full object-cover">
+              {% if report.foto_kondisi %}
+                <img src="{{ report.foto_kondisi_url }}" alt="Foto kondisi satwa" class="w-full h-full object-cover">
+              {% else %}
+                <img src="https://via.placeholder.com/200x150?text=Tidak+Ada+Foto" alt="Foto tidak tersedia" class="w-full h-full object-cover">
+              {% endif %}
             </div>
           </div>
         </div>
-        
-        <!-- Report 2 -->
-        <div class="bg-white p-6 rounded-xl border border-gray-200 hover:border-green-300 safari-card">
-          <div class="flex justify-between items-start mb-4">
-            <h3 class="font-semibold text-lg">Laporan 15 Januari 2023</h3>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="md:col-span-3">
-              <p class="text-gray-500 text-sm mb-2">Kondisi Satwa:</p>
-              <p class="text-gray-700">Pemeriksaan awal menunjukkan Simba dalam kondisi baik. Vaksinasi rutin telah dilakukan dan hasil laboratorium normal. Tidak ada masalah kesehatan yang terdeteksi.</p>
-              
-              <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <p class="text-gray-500 text-sm">Berat Badan:</p>
-                  <p class="font-medium">178 kg</p>
-                </div>
-                <div>
-                  <p class="text-gray-500 text-sm">Suhu Tubuh:</p>
-                  <p class="font-medium">38.5°C</p>
-                </div>
-                <div>
-                  <p class="text-gray-500 text-sm">Nafsu Makan:</p>
-                  <p class="font-medium">Baik</p>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
-              <img src="https://pngimg.com/d/lion_king_PNG20.png" alt="Foto kondisi satwa" class="w-full h-full object-cover">
-            </div>
-          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-green-700 mb-4">Riwayat Kondisi</h2>
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 text-center">
+          <p class="text-gray-500">Belum ada laporan kondisi untuk hewan ini.</p>
+          <a href="/adoption/reports/create/{{ adoption_id }}" class="inline-block mt-3 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg">
+            Buat Laporan Pertama
+          </a>
         </div>
       </div>
+      {% endif %}
+      
+      {% endif %}
       
       <!-- Navigation Buttons -->
       <div class="flex justify-between mt-8">
-        <a href="/adoption/1" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
+        <a href="{% url 'adoption_detail' adoption.id %}" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full btn-shine inline-flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
           </svg>
@@ -212,4 +209,34 @@
     </div>
   </div>
 </div>
+
+<style>
+.safari-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.safari-card:hover {
+  transform: translateY(-2px);
+}
+
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-shine:hover::before {
+  left: 100%;
+}
+</style>
 {% endblock %}
